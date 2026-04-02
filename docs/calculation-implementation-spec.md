@@ -183,8 +183,8 @@ Convert annual CO₂ amount into a daily time series using monthly weighted prof
 7. Return 365 daily values.
 
 ### 7.4 Open decisions
-- Are all-zero weights allowed?
-- Are negative weights allowed?
+- Are all-zero weights allowed --> validation error
+- Are negative weights allowed? --> validation error
 - How are rounding differences handled?
 - Is a fixed non-leap year assumed?
 

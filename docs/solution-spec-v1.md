@@ -219,6 +219,7 @@ Must include at minimum:
 - comparison result
 - short summary
 - optional assumptions appendix
+- html-to-pdf technology
 
 ---
 
@@ -411,7 +412,7 @@ Recommended logical data model:
     type CalculationResult = {
       input: ScenarioInput
       dailyResults: DailyResult[]
-      monthlySummary: unknown[]
+      monthlySummary: MonthlySummary
       annualSummary: ScenarioSummary
     }
 
@@ -558,6 +559,8 @@ PDF is built from a dedicated report model containing:
 - summary text blocks
 
 The first version should use a neutral visual style that is easy to brand later.
+
+HTML-to-PDF technology used.
 
 ---
 
