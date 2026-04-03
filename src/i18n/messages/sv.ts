@@ -214,6 +214,9 @@ export const sv = {
       downloadExcel: "Ladda ner Excel",
       exporting: "Exporterar…",
       error: "Excel-exporten misslyckades. Försök igen.",
+      downloadPdf: "Ladda ner PDF",
+      pdfExporting: "Förbereder PDF…",
+      pdfError: "PDF-exporten misslyckades. Försök igen.",
     },
   },
 } satisfies MessageTree;

@@ -214,6 +214,9 @@ export const en = {
       downloadExcel: "Download Excel",
       exporting: "Exporting…",
       error: "Excel export failed. Please try again.",
+      downloadPdf: "Download PDF",
+      pdfExporting: "Preparing PDF…",
+      pdfError: "PDF export failed. Please try again.",
     },
   },
 } as const satisfies MessageTree;

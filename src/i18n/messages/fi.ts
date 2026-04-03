@@ -214,6 +214,9 @@ export const fi = {
       downloadExcel: "Lataa Excel",
       exporting: "Viedään…",
       error: "Excel-vienti epäonnistui. Yritä uudelleen.",
+      downloadPdf: "Lataa PDF",
+      pdfExporting: "Valmistellaan PDF:ää…",
+      pdfError: "PDF-vienti epäonnistui. Yritä uudelleen.",
     },
   },
 } satisfies MessageTree;

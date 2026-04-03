@@ -15,3 +15,8 @@ export {
 export { assertExcelModelReady, type ExcelWorkbookSourceModel } from "./build-excel-model";
 export { buildScenarioExcelWorkbook, scenarioExcelWorkbookToBuffer } from "./build-excel-workbook";
 export { buildScenarioExcelArrayBuffer } from "./scenario-excel-buffer";
+export { buildScenarioPdfReportModel } from "./build-pdf-report-model";
+export type { PdfChartPoint, PdfCostRevenuePoint, PdfReportModel, PdfReportOverview } from "./build-pdf-report-model";
+export { pathDFromPoints, projectCostRevenueSeries, projectDayValueSeries } from "./pdf-chart-geometry";
+export { formatPdfEur, formatPdfMetricCell, formatPdfNumber, formatPdfPercentRatio } from "./pdf-format";
+export { buildScenarioPdfBlobFromResult, renderScenarioPdfToBlob } from "./scenario-pdf-render";
