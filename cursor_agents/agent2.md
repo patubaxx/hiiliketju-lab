@@ -1,18 +1,21 @@
-# Cursor Agent Prompt — Agent 2: CAPEX Annualization & Aggregation Skeleton
+# Cursor Agent Prompt — Agent 2: Temporal Harmonization, Core Formulas & Scenario Calculation Engine
 
-Your task is to implement the next layer of the Hiiliketju project after the domain/types/profile foundation is in place.
+Your task is to implement the next calculation layer for the Hiiliketju project on top of the domain/types/schema foundation.
 
 ## Goal
 
-Build the calculation-engine skeleton for:
-1. CAPEX annualization
-2. daily-to-monthly aggregation
-3. daily-to-annual aggregation
-4. placeholder-ready scenario calculation orchestration
+Build the daily-first calculation engine for the MVP.
 
-This work must remain **formula-ready**, not formula-complete.
+Your focus areas are:
+1. temporal harmonization into canonical daily series
+2. optional simple CAPEX allocation
+3. stoichiometric methane-path formulas
+4. hydrogen alternative revenue comparison
+5. monthly aggregation
+6. annual aggregation
+7. top-level scenario calculation orchestration
 
-You are not implementing final customer process formulas yet. Your task is to create the reusable calculation structure into which the real methane, hydrogen, electricity, and comparison formulas can later be inserted with minimal refactoring.
+This work must be production-usable and aligned with the updated project specification.
 
 ---
 
@@ -20,316 +23,342 @@ You are not implementing final customer process formulas yet. Your task is to cr
 
 The project is a browser-based techno-economic calculator.
 
-Agent 1 has already implemented:
-- TypeScript domain types
-- Zod schemas
-- scenario input structure
-- unit-model foundation
-- monthly weighted daily profile generator
-
-Your work now is to build the next calculation layer on top of that foundation.
+The application compares:
+- **Path A:** `CO2 + H2 -> CH4`
+- **Path B:** `CO2 released + H2 sold`
 
 The architecture direction is already decided:
 - Next.js + TypeScript
 - calculation logic must stay outside UI
-- one canonical calculation result structure must later support UI, Excel, and PDF
-- final customer formulas and parameter values are **still not available**
-- code must be easy to extend later without rewriting the architecture
+- one canonical calculation result structure must support UI, Excel, and PDF
+- internal engine is **daily**
+- input contracts are **daily/hourly capable**
+- process model is **stoichiometric + literature-based defaults + business/customer inputs**
+- assumptions must be explicitly traceable
 
-This implementation must be practical, minimal, deterministic, and maintainable.
+Your work now is to build the actual MVP calculation engine skeleton using the now-locked formulas and calculation policy.
 
 ---
 
 ## Locked assumptions for this task
 
-Use these assumptions as fixed for your implementation:
+Use these assumptions as fixed.
 
-- project working language: **English**
-- MVP default language: **English**
-- annual profile period is always **365 days**
-- CAPEX annualization is implemented as a **strategy/configurable calculation method**
-- default annualization strategy is **annuity**
-- fallback behavior for zero discount rate is:
-  - `annualizedCapex = capex / lifetimeYears`
-- lifetime years must be greater than zero for valid annualization
-- no final methane / hydrogen / electricity / revenue formulas yet
-- hydrogen alternative path will later rely on a **separate hydrogen availability assumption**
-- aggregation must work even while process formulas are still placeholders
-- no UI logic
-- no export logic
-- no database or persistence logic
+### Calculation resolution
+- internal engine = `daily`
+- requested input may be `daily` or `hourly`
+- hourly CO₂ must be harmonized to daily using `sum`
+- hourly electricity price must be harmonized to daily using `arithmetic_mean`
+- annual period = `365 days`
+
+### CO₂ availability modes
+- `flat_annual`
+- `seasonal_daily`
+- `time_series_daily`
+- `time_series_hourly`
+
+### Electricity price modes
+- `constant`
+- `daily_series`
+- `hourly_series`
+- `historical_market_data_imported`
+
+### CAPEX
+- CAPEX is optional
+- CAPEX method in MVP = `simple_lifetime_allocation`
+- formula:
+  `annualCapexCost = (electrolyzerCapexEur + methanationCapexEur) / capexLifetimeYears`
+- no annuity logic in MVP core
+- no discount-rate-based annualization in MVP core
+
+### Locked literature-based defaults
+- `stoichiometricHydrogenDemandFactor = 0.1832 kg_H2/kg_CO2`
+- `stoichiometricMethaneYieldFactor = 0.3645 kg_CH4/kg_CO2`
+- `electrolyzerSpecificEnergyConsumption = 54 kWh/kg_H2`
+- `electrolyzerSpecificEnergyConsumptionMWh = 0.054 MWh/kg_H2`
+- `plantAvailabilityPct = 100`
+- `processEfficiencyPct = 100`
+
+These defaults must be traceable through assumptions metadata, not hidden magic numbers.
+
+### Locked economic formulas
+- `breakEvenMethanePrice = annualTotalCost / annualMethaneProduced`
+- `priceAt10PctProfitability = annualTotalCost * 1.10 / annualMethaneProduced`
+- `priceAt30PctProfitability = annualTotalCost * 1.30 / annualMethaneProduced`
+- `hydrogenAlternativeRevenue = hydrogenNeeded * hydrogenPrice`
+
+### Locked units
+- internal CO₂ timestep = `kg/day`
+- internal H₂ timestep = `kg/day`
+- internal CH₄ timestep = `kg/day`
+- internal electricity timestep = `MWh/day`
+- methane annual business output = `t/year`
+- methane pricing unit = `EUR/t_CH4`
+- electricity price = `EUR/MWh`
 
 ---
 
 ## Main implementation objective
 
-Create a calculation-engine skeleton that supports this future flow:
+Create a calculation engine that supports this flow:
 
-1. validate scenario input
-2. build daily availability profile
-3. run placeholder-ready daily calculation pipeline
-4. allocate annualized CAPEX into daily values
-5. aggregate daily values into monthly summary
-6. aggregate daily values into annual summary
-7. return one canonical `CalculationResult`
+1. validate or safely consume validated scenario input
+2. resolve CO₂ availability into canonical daily series
+3. resolve electricity price into canonical daily series
+4. compute daily methane-path process outputs
+5. compute daily hydrogen alternative revenue
+6. apply optional CAPEX allocation
+7. aggregate daily results into monthly summary
+8. aggregate monthly/daily totals into annual summary
+9. return one canonical `CalculationResult`
 
-At this stage, the daily calculation pipeline may use placeholders for unresolved formula outputs, but the orchestration and aggregation structure must be real and production-usable.
+This is no longer a zero-placeholder skeleton for the core formulas above. Implement the locked MVP formulas now.
 
 ---
 
 ## Deliverables
 
-Implement the following:
+Implement the following.
 
-### 1. CAPEX annualization module
+### 1. Temporal harmonization layer
 
-Create a pure annualization module that supports at least:
+Create pure functions for harmonizing CO₂ and electricity inputs into canonical daily series.
 
-- `annuity` strategy
-- strategy-style extension point for future methods
+#### CO₂ harmonization
+Support:
+- `flat_annual`
+- `seasonal_daily`
+- `time_series_daily`
+- `time_series_hourly`
 
-Implement:
-- annualization input type
-- annualization strategy type
-- default annuity calculation
-- zero-discount fallback
-- validation handling for invalid lifetime
-- small, readable, testable functions
+Rules:
+- flat annual -> generate flat daily series
+- seasonal daily -> generate daily series
+- daily series -> validate and pass through
+- hourly series -> aggregate to daily using **sum**
 
-Use the standard annuity formula for the default method.
+#### Electricity harmonization
+Support:
+- `constant`
+- `daily_series`
+- `hourly_series`
+- `historical_market_data_imported`
+
+Rules:
+- constant -> generate flat daily price series
+- daily series -> validate and pass through
+- hourly series -> aggregate to daily using **arithmetic mean**
+- imported historical data -> normalize into daily or hourly structure first, then harmonize
+
+Keep harmonization separate from the actual process formulas.
+
+### 2. Simple CAPEX allocation module
+
+Create a pure CAPEX allocation module.
 
 Expected behavior:
-- if `discountRate > 0`, use annuity formula
-- if `discountRate === 0`, use straight-line annualization:
-  - `capex / lifetimeYears`
-- if `lifetimeYears <= 0`, fail clearly
-- if invalid numeric values are encountered, fail clearly
+- if `includeCapex = false` -> `annualCapexCost = 0`
+- if `includeCapex = true` ->
+  `annualCapexCost = (electrolyzerCapexEur + methanationCapexEur) / capexLifetimeYears`
+- invalid lifetime must fail clearly
+- daily allocated CAPEX =
+  `annualCapexCost / 365`
 
-Do not hardcode annualization logic inside the main scenario calculation function. Keep it modular.
+Do not implement annuity or discount-rate logic here.
 
-### 2. Aggregation model and functions
+### 3. Core daily formulas
+
+Implement the locked MVP formulas as pure functions.
+
+At minimum:
+
+#### Utilized CO₂
+`usableCO2Kg_day = availableCO2Kg_day * (utilizationRatePct / 100)`
+
+#### Hydrogen demand
+`hydrogenNeededKg_day = usableCO2Kg_day * stoichiometricHydrogenDemandFactor`
+
+#### Methane production
+`methaneProducedKg_day = usableCO2Kg_day * stoichiometricMethaneYieldFactor`
+
+#### Electricity consumption
+`electricityConsumedMWh_day = hydrogenNeededKg_day * electrolyzerSpecificEnergyConsumptionMWh`
+
+#### Electricity cost
+`electricityCostEur_day = electricityConsumedMWh_day * electricityPriceEurPerMWh_day`
+
+#### Other OPEX allocation
+`otherOpexAllocatedEur_day = otherOpexEurPerYear / 365`
+
+#### Variable cost
+`variableCostEur_day = electricityCostEur_day + otherOpexAllocatedEur_day`
+
+#### Total cost
+`totalCostEur_day = variableCostEur_day + allocatedCapexCostEur_day`
+
+#### Methane revenue
+`methaneRevenueEur_day = (methaneProducedKg_day / 1000) * methanePriceEurPerTon`
+
+#### Hydrogen alternative revenue
+`hydrogenAlternativeRevenueEur_day = hydrogenNeededKg_day * hydrogenPriceEurPerKg`
+
+### 4. Daily calculation pipeline
+
+Create a pure daily calculation layer that consumes:
+- canonical daily CO₂ series
+- canonical daily electricity price series
+- scenario input
+- annual CAPEX allocation result
+- assumptions/defaults metadata
+
+and returns `DailyResult[]`.
+
+### 5. Aggregation functions
 
 Implement reusable pure functions for:
-
 - monthly aggregation
 - annual aggregation
-
-These functions should operate on `DailyResult[]` and/or clearly related intermediate structures.
 
 Monthly aggregation must:
 - group by month
 - preserve month ordering
-- compute meaningful rollups for all available numeric fields
-- be easy to extend later if new result fields are added
+- aggregate all core numeric result fields
 
-Annual aggregation must:
-- sum annual totals for relevant numeric fields
-- produce the `ScenarioSummary` structure
-- handle placeholder fields in a consistent way
-- avoid embedding final customer formula assumptions
-
-### 3. Monthly summary structure
-
-Create a clean `MonthlySummary` type or equivalent if it does not yet exist.
-
-At minimum, monthly summary should be able to represent:
-- month index or month label
-- aggregated available CO₂
-- aggregated usable CO₂
-- aggregated hydrogen needed
-- aggregated methane produced
-- aggregated electricity consumed
-- aggregated variable cost
-- aggregated allocated CAPEX
-- aggregated total cost
-- aggregated methane revenue
-- aggregated hydrogen alternative revenue
-
-If some of these fields are currently placeholder-driven, still keep the structure in place.
-
-### 4. Placeholder-ready daily calculation step
-
-Create a minimal daily calculation layer that can consume:
-- the daily profile from Agent 1
-- scenario input
-- annualized CAPEX result
-
-and produce `DailyResult[]`.
-
-Important:
-- do **not** invent real customer formulas
-- do **not** hardcode fake scientific constants
-- do **not** pretend placeholder outputs are validated business outputs
-
-Instead:
-- build a clearly marked placeholder calculation pipeline
-- use neutral placeholder handling where unresolved fields can safely remain zero-based or explicitly TODO-driven
-- ensure the result shape is stable and ready for future formula insertion
-
-Recommended direction:
-- available CO₂ comes from daily profile
-- usable CO₂ can be calculated from utilization rate, since that logic is already agreed
-- unresolved fields such as hydrogen, methane, electricity, and revenues may use explicit placeholder functions returning zero or clearly labeled future values
-- daily allocated CAPEX should be `annualizedCapex / 365`
-- total cost should be structurally correct even if some variable-cost components are still placeholders
-
-### 5. Scenario calculation orchestrator skeleton
-
-Implement a top-level pure function such as:
-
-```ts
-calculateScenario(input: ScenarioInput): CalculationResult
-```
-
-This function should:
-1. assume validated input or perform defensive validation depending on the existing architecture
-2. build the daily profile
-3. compute annualized CAPEX through the annualization module
-4. generate daily results through the placeholder-ready daily calculation pipeline
-5. aggregate monthly summary
-6. aggregate annual summary
-7. return the canonical result object
-
-The orchestration must be easy to read and easy for later agents to extend.
-
-### 6. File/module structure
-
-Implement the code in a clean structure aligned with this direction:
-
-```txt
-src/
-  core/
-    calculation/
-      annualize-capex.ts
-      aggregate-results.ts
-      calculate-scenario.ts
-      calculate-daily-results.ts
-    domain/
-      result.ts
-```
-
-If Agent 1 already created some files that need extending, update them cleanly instead of duplicating concepts.
-
-You may adjust filenames slightly if needed, but keep the structure logically equivalent and clean.
-
----
-
-## Functional requirements
-
-### CAPEX annualization
-
-Implement support for a structure conceptually equivalent to:
-
-```ts
-type CapexAnnualizationMethod = "annuity"
-
-type CapexAnnualizationInput = {
-  capexEur: number
-  lifetimeYears: number
-  discountRatePct: number
-  method: CapexAnnualizationMethod
-}
-```
-
-You may extend this slightly if needed, but do not overengineer.
-
-### Daily allocated CAPEX
-
-Daily allocated CAPEX should be derived from annualized CAPEX using:
-
-```ts
-allocatedCapexCost_day = annualizedCapex / 365
-```
-
-### Monthly aggregation
-
-Monthly aggregation should be based on the fixed 365-day calendar profile and should produce stable, ordered summaries.
-
-### Annual aggregation
-
-Annual aggregation should produce a structurally complete summary even when some calculation branches are still placeholders.
-
-At minimum, the annual summary should include:
-- annual methane produced
+Annual aggregation must compute at least:
+- annual CO₂ available
+- annual CO₂ utilized
+- CO₂ recycling rate
+- annual methane produced in tons
 - annual hydrogen needed
 - annual electricity consumed
 - annual variable cost
 - annual CAPEX cost
 - annual total cost
-- methane revenue
-- hydrogen sales alternative revenue
-- unit cost methane
+- annual methane revenue
+- hydrogen alternative revenue
+- break-even methane price
+- methane price at 10% profitability
+- methane price at 30% profitability
 - delta vs hydrogen sale
 
-For fields that cannot yet be fully resolved because final formulas are missing:
-- keep them structurally present
-- use clearly documented placeholder behavior
-- avoid misleading fake business logic
+Handle zero-denominator cases explicitly and non-misleadingly.
+Recommended: return `null` for not-computable methane-price KPIs when annual methane produced is zero.
 
-### Placeholder KPI handling
+### 6. Scenario calculation orchestrator
 
-Because final formulas are not available, implement safe placeholder behavior for:
-- `unitCostMethane`
-- `deltaVsHydrogenSale`
+Implement a top-level pure function such as:
 
-Suggested approach:
-- if denominator is zero, return `null`, `undefined`, or another explicit non-misleading representation already compatible with the project style
-- do not silently invent ratios
-- document your chosen approach in comments
+```ts
+calculateScenario(input: ScenarioInput): CalculationResult
+````
 
-Pick one consistent approach and use it throughout.
+This function should:
+
+1. resolve daily CO₂ availability
+2. resolve daily electricity price
+3. resolve CAPEX allocation
+4. compute daily results
+5. aggregate monthly summary
+6. aggregate annual summary
+7. return canonical result object including assumptions metadata and warnings where appropriate
+
+### 7. Assumption flag propagation
+
+The calculation result must preserve or expose enough metadata so later UI and export layers can show:
+
+* literature-based defaults in use
+* customer confirmation pending where relevant
+* warnings for business-critical estimated assumptions
+
+At minimum, ensure assumption metadata is not lost between input/default resolution and final result.
+
+---
+
+## Functional requirements
+
+### Canonical engine inputs
+
+Before the daily loop, the engine should operate on:
+
+* resolved daily CO₂ series in `kg/day`
+* resolved daily electricity price series in `EUR/MWh`
+
+### Monthly summary
+
+`MonthlySummary` must support at least:
+
+* month index or month label
+* aggregated available CO₂
+* aggregated usable CO₂
+* aggregated hydrogen needed
+* aggregated methane produced
+* aggregated electricity consumed
+* aggregated electricity cost
+* aggregated variable cost
+* aggregated allocated CAPEX
+* aggregated total cost
+* aggregated methane revenue
+* aggregated hydrogen alternative revenue
+
+### Annual summary
+
+`ScenarioSummary` must support all locked MVP KPIs.
 
 ---
 
 ## Non-functional requirements
 
 ### Code quality
-- strict TypeScript style
-- small pure functions where useful
-- no duplicated aggregation logic
-- readable naming
-- avoid unnecessary abstraction layers
+
+* strict TypeScript style
+* small pure functions where useful
+* readable naming
+* no duplicated aggregation logic
+* avoid unnecessary abstraction layers
 
 ### Architecture
-- annualization logic must be independent from aggregation logic
-- aggregation logic must be independent from UI/export formatting
-- scenario orchestration must remain thin and readable
-- future formula insertion should require changing dedicated calculation functions, not the full orchestration
+
+* harmonization logic independent from core formulas
+* CAPEX logic independent from harmonization logic
+* aggregation independent from UI/export formatting
+* top-level scenario orchestration thin and readable
 
 ### Maintainability
-- keep extension points obvious
-- avoid coupling placeholder logic to permanent architecture decisions
-- write comments only where they add real clarity
+
+* later formula tuning should require updating formula functions, not rewriting orchestration
+* no speculative abstractions with no current need
 
 ---
 
 ## Important constraints
 
 Do **not** do these:
-- do not implement final methane production formulas
-- do not implement final hydrogen demand formulas
-- do not implement final electricity consumption formulas
-- do not implement final comparison formulas
-- do not create React components
-- do not add charts
-- do not add Excel/PDF code
-- do not add database, API, or persistence logic
-- do not hardcode customer-specific constants
-- do not bury placeholder assumptions in unrelated modules
+
+* do not create React components
+* do not add charts
+* do not add Excel/PDF code
+* do not add database, API, or persistence logic
+* do not reintroduce annuity CAPEX logic to MVP core
+* do not reintroduce constant-only electricity assumptions
+* do not reintroduce monthly-weighted-only product assumptions
 
 ---
 
-## Expected implementation choices
+## Recommended file/module structure
 
-Use sensible assumptions for unresolved details, but keep them lightweight and explicit.
+```txt
+src/
+  core/
+    calculation/
+      resolve-co2-series.ts
+      resolve-electricity-price-series.ts
+      allocate-capex.ts
+      calculate-daily-results.ts
+      aggregate-results.ts
+      calculate-scenario.ts
+```
 
-Recommended choices:
-- annuity formula is the default annualization strategy
-- zero discount rate uses straight-line fallback
-- invalid lifetime clearly fails
-- daily CAPEX allocation is evenly spread across 365 days in MVP
-- aggregation functions should sum numeric result fields explicitly or through a well-structured helper
-- unresolved KPI values should use a non-misleading explicit representation rather than a fake numeric value
+You may adjust filenames slightly if needed, but keep the structure logically equivalent and clean.
 
 ---
 
@@ -347,13 +376,14 @@ When you finish, provide:
 ## Definition of done
 
 This task is done when:
-- CAPEX annualization exists as a modular pure calculation utility
-- annuity strategy is implemented
-- zero-discount fallback is implemented
-- invalid lifetime handling is clear
-- daily CAPEX allocation is included in the daily result pipeline
-- monthly aggregation works
-- annual aggregation works
-- the top-level scenario calculation skeleton returns a canonical calculation result
-- placeholder behavior is explicit and non-misleading
-- the structure is ready for later formula-agent work without refactoring
+
+* temporal harmonization exists for CO₂ and electricity
+* simple optional CAPEX allocation exists
+* locked stoichiometric + SEC formulas are implemented
+* daily result pipeline works
+* monthly aggregation works
+* annual aggregation works
+* profitability KPIs work
+* the top-level scenario calculation returns a canonical result
+* assumption metadata is not lost
+* the structure is aligned with the updated documentation and requires no major refactor before testing/UI work

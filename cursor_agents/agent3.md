@@ -1,18 +1,18 @@
-# Cursor Agent Prompt — Agent 3: Testing Skeleton & Golden Scenario Harness
+# Cursor Agent Prompt — Agent 3: Testing Foundation, Formula Locking & Golden Scenario Harness
 
-Your task is to implement the testing foundation for the Hiiliketju project on top of the existing domain, schema, profile, annualization, aggregation, and calculation skeleton layers.
+Your task is to implement the testing foundation for the Hiiliketju project on top of the existing domain, schema, harmonization, calculation, aggregation, and scenario orchestration layers.
 
 ## Goal
 
 Build a clean, maintainable testing foundation that supports:
 1. unit tests for the current calculation building blocks
 2. validation tests for schema behavior
-3. regression-safe golden scenario harness for later formula locking
-4. explicit placeholder-aware testing rules while final customer formulas are still unavailable
+3. regression-safe tests for temporal harmonization
+4. regression-safe tests for locked stoichiometric formulas
+5. regression-safe tests for CAPEX allocation and aggregation
+6. a reusable golden scenario harness for later formula tightening
 
-This work must be **formula-ready**, not formula-complete.
-
-You are not validating final customer business outputs yet. Your task is to create the test structure that makes later formula insertion safe, predictable, and easy to extend.
+This work must reflect the actual MVP calculation logic now locked in the project.
 
 ---
 
@@ -22,21 +22,23 @@ The project is a browser-based techno-economic calculator.
 
 By the time you do this task, the codebase should already contain:
 - domain types
-- Zod input schemas
-- monthly weighted daily profile generator
-- CAPEX annualization module
+- assumption metadata / flags
+- zod input schemas
+- CO₂ temporal input structures
+- electricity temporal input structures
+- temporal harmonization to canonical daily series
+- simple CAPEX allocation logic
+- daily result calculation
 - aggregation functions
-- top-level scenario calculation skeleton
-- placeholder-ready daily calculation pipeline
-
-Final customer formulas and final parameter values are **still not available**.
+- top-level scenario calculation
+- canonical result model
 
 The architecture direction is already decided:
 - Next.js + TypeScript
 - calculation logic separated from UI
 - one canonical result structure later used by UI, Excel, and PDF
-- testing should protect architecture and future formula work from regressions
-- placeholder behavior must be tested honestly, not disguised as final business correctness
+- tests should protect both business logic and architectural invariants
+- literature-based defaults and their propagation must be testable
 
 The implementation should be practical, lightweight, and maintainable.
 
@@ -44,117 +46,161 @@ The implementation should be practical, lightweight, and maintainable.
 
 ## Locked assumptions for this task
 
-Use these assumptions as fixed for your implementation:
+Use these assumptions as fixed.
 
-- project working language: **English**
-- MVP default language: **English**
-- annual profile period is always **365 days**
-- monthly profile input uses exactly 12 weights
-- zero individual monthly weights are allowed
-- all-zero monthly weights are invalid
-- CAPEX annualization default strategy is **annuity**
-- zero discount rate fallback is:
-  - `capex / lifetimeYears`
-- final methane / hydrogen / electricity / comparison formulas are not yet available
-- current calculation pipeline may legitimately contain placeholder zero-values or explicit non-final KPI behavior
-- tests must reflect current implementation truthfully
-- no UI testing in this task unless there are already tiny existing non-UI helper tests tightly coupled to schema behavior
-- no browser/E2E framework setup in this task
-- no snapshot-heavy testing unless clearly justified
+### Calculation resolution
+- internal engine = `daily`
+- annual period = `365 days`
+- hourly CO₂ -> daily aggregation = `sum`
+- hourly electricity price -> daily aggregation = `arithmetic_mean`
+
+### Supported CO₂ modes
+- `flat_annual`
+- `seasonal_daily`
+- `time_series_daily`
+- `time_series_hourly`
+
+### Supported electricity modes
+- `constant`
+- `daily_series`
+- `hourly_series`
+- `historical_market_data_imported`
+
+### CAPEX
+- CAPEX is optional
+- simple lifetime allocation formula:
+  `annualCapexCost = (electrolyzerCapexEur + methanationCapexEur) / capexLifetimeYears`
+- daily CAPEX allocation =
+  `annualCapexCost / 365`
+
+### Locked literature-based defaults
+- `stoichiometricHydrogenDemandFactor = 0.1832 kg_H2/kg_CO2`
+- `stoichiometricMethaneYieldFactor = 0.3645 kg_CH4/kg_CO2`
+- `electrolyzerSpecificEnergyConsumption = 54 kWh/kg_H2`
+- `electrolyzerSpecificEnergyConsumptionMWh = 0.054 MWh/kg_H2`
+- `plantAvailabilityPct = 100`
+- `processEfficiencyPct = 100`
+
+### Locked KPI formulas
+- `breakEvenMethanePrice = annualTotalCost / annualMethaneProduced`
+- `priceAt10PctProfitability = annualTotalCost * 1.10 / annualMethaneProduced`
+- `priceAt30PctProfitability = annualTotalCost * 1.30 / annualMethaneProduced`
+- `hydrogenAlternativeRevenue = hydrogenNeeded * hydrogenPrice`
+
+### Important test policy
+- test what the implementation actually does
+- do not invent unsupported behaviors
+- use tolerances where floating-point distribution makes exact equality brittle
+- verify literature-based metadata propagation explicitly
 
 ---
 
 ## Main implementation objective
 
-Create a testing structure that protects the current architecture and makes later formula integration safer.
-
-At this stage, the tests should confirm:
-1. schemas reject/accept the correct structural inputs
-2. profile generation works correctly
-3. annualization works correctly
-4. aggregation works correctly
-5. scenario orchestration produces structurally valid outputs
-6. placeholder behavior is explicit and stable
-7. golden scenario infrastructure exists, even if current golden values are placeholder-stage and limited in scope
+Create a testing structure that protects:
+1. schema correctness
+2. temporal harmonization correctness
+3. stoichiometric formula correctness
+4. CAPEX allocation correctness
+5. aggregation correctness
+6. annual KPI correctness
+7. result shape and metadata integrity
+8. future regression safety through a reusable golden scenario harness
 
 ---
 
 ## Deliverables
 
-Implement the following:
+Implement the following.
 
 ### 1. Test setup and organization
 
-Create a clean test structure aligned with the existing codebase.
+Use the project’s current test tooling if it already exists.
+If not present, add a practical minimal TypeScript-friendly setup.
 
-Use the project’s current test tooling if it already exists. If test tooling is not yet present, add a practical minimal setup using the project’s most appropriate TypeScript-friendly choice.
-
-Preferred direction if not already decided:
-- Vitest for unit/integration-style logic tests
+Preferred direction:
+- **Vitest**
+- fast unit/integration-style logic tests
+- no browser-driven setup
 - no unnecessary complexity
-- no browser-driven testing setup
 
 Organize tests clearly by concern, for example:
 - schema tests
-- profile tests
-- annualization tests
+- harmonization tests
+- formula tests
+- CAPEX tests
 - aggregation tests
-- calculation orchestration tests
+- orchestration tests
 - golden scenario harness
 
 ### 2. Schema validation tests
 
 Create tests for the main scenario input schema behavior.
 
-Validation coverage must include at least:
+Coverage must include at least:
 - valid minimal scenario input passes
 - missing required scenario name fails
 - invalid annual CO₂ input fails where appropriate
-- exactly 12 monthly weights required
-- all-zero monthly weights fail
-- zero individual monthly weights pass
-- invalid negative values fail where appropriate
-- percentage range rules behave correctly where implemented
-- structurally valid discount rate and lifetime fields are accepted
-- invalid lifetime structure fails where schema currently rejects it
+- invalid methane price fails where appropriate
+- invalid hydrogen price fails where appropriate
+- valid CO₂ mode structures pass
+- invalid CO₂ mode structures fail
+- valid electricity mode structures pass
+- invalid electricity mode structures fail
+- valid optional CAPEX structure passes
+- invalid CAPEX lifetime structure fails when CAPEX included
+- utilization rate boundaries behave correctly
 
 Important:
-- align tests with the real schema implementation, not imagined rules
-- if a rule is intentionally not in the schema yet, do not fabricate a failing test for it
-- prefer clear test names over excessive abstraction
+- align with real schema implementation
+- do not fabricate schema rules that do not exist
 
-### 3. Daily profile generator tests
+### 3. Temporal harmonization tests
 
-Create focused tests for the monthly weighted profile generator.
+Create focused tests for CO₂ and electricity harmonization.
+
+#### CO₂ harmonization coverage
+- flat annual -> 365 daily rows
+- seasonal daily -> 365 daily rows
+- daily series passes correctly
+- hourly series aggregates to daily using **sum**
+- annual CO₂ total is preserved within documented tolerance
+- month indexing and date labeling are internally consistent
+
+#### Electricity harmonization coverage
+- constant price -> 365 daily rows
+- daily series passes correctly
+- hourly series aggregates to daily using **arithmetic mean**
+- imported historical series is normalized correctly if supported by current implementation
+- invalid hourly structure fails clearly
+
+### 4. Stoichiometric formula tests
+
+Create focused tests for the locked core formulas.
 
 Coverage must include at least:
-- returns exactly 365 daily rows
-- preserves annual total within the documented rounding strategy
-- flat profile distributes annual CO₂ across the full year correctly
-- strongly seasonal profile behaves as expected
-- single active month scenario behaves as expected
-- zero values inside weights are handled correctly
-- all-zero weights fail
-- date labeling / month indexing is internally consistent
-- month day counts match a fixed non-leap year calendar
+- usable CO₂ from utilization rate
+- hydrogen demand from stoichiometric factor
+- methane production from stoichiometric factor
+- electricity consumption from SEC
+- electricity cost from daily electricity price
+- methane revenue from methane produced and price
+- hydrogen alternative revenue from hydrogen needed and hydrogen price
 
-Do not overfit tests to fragile floating-point exactness if the implementation uses reconciliation logic. Use sensible tolerances where needed.
+Use readable deterministic fixture values.
 
-### 4. CAPEX annualization tests
+### 5. CAPEX allocation tests
 
-Create focused tests for the annualization module.
+Create focused tests for the CAPEX allocation module.
 
 Coverage must include at least:
-- standard annuity case
-- zero discount rate fallback case
-- invalid lifetime case
-- consistent handling of discount rate input
-- deterministic output for the same input
-- error throwing or failure handling matches actual implementation
+- includeCapex = false -> annual CAPEX = 0
+- includeCapex = true -> correct annual CAPEX allocation
+- correct daily CAPEX allocation over 365 days
+- invalid lifetime case fails clearly
+- deterministic output for identical input
 
-If the implementation supports only the default strategy now, test that honestly. Do not invent unsupported strategy cases.
-
-### 5. Aggregation tests
+### 6. Aggregation tests
 
 Create tests for:
 - monthly aggregation
@@ -164,82 +210,158 @@ Coverage must include at least:
 - monthly grouping works correctly
 - month ordering is preserved
 - annual totals sum correctly from daily results
-- allocated CAPEX totals aggregate correctly
-- placeholder numeric fields aggregate consistently
-- structurally complete annual summary is returned
-- KPI placeholder behavior is handled consistently with implementation
+- electricity cost totals aggregate correctly
+- CAPEX totals aggregate correctly
+- methane revenue totals aggregate correctly
+- hydrogen alternative revenue totals aggregate correctly
+- annual summary includes all locked KPI fields
+- zero-methane denominator handling is explicit and consistent
 
-If the current implementation returns explicit non-final KPI representations such as `null` for unresolved ratios, test that behavior directly.
+If the current implementation uses `null` for not-computable KPI values, test that directly.
 
-### 6. Scenario calculation orchestration tests
+### 7. Scenario orchestration tests
 
 Create tests for the top-level calculation flow.
 
 Coverage must include at least:
 - valid scenario input produces a structurally valid `CalculationResult`
 - daily results length is 365
-- monthly summary length matches 12 months
+- monthly summary length is 12
 - annual summary exists
-- annualized CAPEX is reflected in output structure
-- available CO₂ and usable CO₂ behave consistently with current agreed logic
-- placeholder fields remain explicit and non-misleading
-- calculation is deterministic for identical input
+- annualized CAPEX is reflected when CAPEX is included
+- annualized CAPEX is zero when CAPEX is excluded
+- annual CO₂ available and utilized behave consistently
+- profitability KPIs compute correctly when methane production > 0
+- result is deterministic for identical input
 
-Do not assert fake final methane/hydrogen/electricity correctness if those formulas are still placeholders.
+### 8. Assumption metadata propagation tests
 
-### 7. Golden scenario harness
+Create tests that verify:
+- literature-based defaults are represented with correct metadata
+- assumptions metadata is not lost in scenario calculation results
+- source/status/note fields remain available for later UI/export use
+- customer-confirmation-pending values can remain distinguishable if the implementation supports it
 
-Create the initial golden scenario test harness so later agents can lock real formulas against stable reference scenarios.
+This is an important part of the updated spec. Test it explicitly.
 
-Important:
-- this harness is required now even though final formulas are not yet available
-- current golden scenarios may only validate the currently agreed and implemented parts of the system
+### 9. Golden scenario harness
+
+Create the initial golden scenario harness so later agents can lock future formula changes against stable reference scenarios.
 
 Implement:
 - a small fixture structure for named scenarios
-- a way to store expected outputs or expected partial outputs
-- a test helper that compares actual result vs expected result
-- support for numeric tolerance where appropriate
-- support for partial assertions so current placeholder-stage scenarios remain useful
+- a way to store expected outputs or partial expected outputs
+- a helper that compares actual result vs expected result
+- support for numeric tolerance
+- support for partial assertions
+- readable failure output
 
-Recommended direction:
-- allow assertions on selected paths such as:
-  - annual total preserved
-  - annualized CAPEX expected value
-  - 365 daily rows exist
-  - 12 monthly summaries exist
-  - usable CO₂ matches utilization logic
-- avoid pretending unresolved placeholder fields are final business truths
+Do not overengineer a mini test framework.
 
-### 8. Golden scenario fixtures
+### 10. Golden scenario fixtures
 
-Create at least 2 initial golden scenarios that are useful already at this stage.
+Create at least 2 useful golden scenarios.
 
-These should be placeholder-safe scenarios such as:
-- a flat annual profile with simple utilization and zero-discount CAPEX
-- a seasonal profile with non-zero discount CAPEX annualization
+Recommended:
+1. **Flat annual scenario**
+   - flat CO₂
+   - constant electricity price
+   - CAPEX off
+   - easy-to-read prices and utilization
+2. **Seasonal + CAPEX scenario**
+   - seasonal daily CO₂
+   - daily or hourly electricity data
+   - CAPEX on
+   - enough variation to test harmonization + aggregation + KPIs
 
-The goal is not to prove final business correctness, but to lock:
-- profile behavior
-- annualization behavior
+These scenarios should lock:
+- harmonization behavior
+- formula behavior
+- CAPEX behavior
+- aggregation behavior
 - orchestration stability
-- aggregation stability
 
-Document clearly in fixture comments that these are **pre-formula golden scenarios** and will later be expanded or tightened when final customer formulas arrive.
+---
 
-### 9. File/module structure
+## Functional requirements
 
-Implement the test code in a clean structure aligned with this direction:
+### Test style
+Use:
+- clear test names
+- focused scopes
+- low ceremony
+- minimal mocking
+- real function calls for pure logic modules
+
+### Golden scenario comparison
+Your golden scenario helper should support:
+- exact structural assertions where safe
+- tolerance-based numeric assertions where appropriate
+- partial expected results
+- readable failure output
+
+### What should be locked now
+The tests should lock:
+- supported mode behavior
+- daily-first harmonization behavior
+- stoichiometric formula behavior
+- simple CAPEX allocation behavior
+- annual KPI formula behavior
+- assumptions metadata presence
+
+### What should not be overfit
+Do not make brittle tests around:
+- irrelevant internal helper implementation details
+- floating-point micro-differences beyond meaningful tolerance
+- hypothetical future fields that do not exist yet
+
+---
+
+## Non-functional requirements
+
+### Code quality
+- readable tests
+- maintainable helper structure
+- no duplicated large fixtures unless justified
+- no snapshot-heavy approach
+
+### Maintainability
+- later agents should be able to tighten golden scenarios without rewriting the harness
+- fixture structure should be easy to expand
+- tests should help debugging
+
+### Performance
+- tests should remain fast
+- no heavyweight setup
+- no browser/E2E framework in this task
+
+---
+
+## Important constraints
+
+Do **not** do these:
+- do not invent unsupported formulas
+- do not create browser/E2E test infrastructure
+- do not add React component tests in this task
+- do not rely heavily on snapshots
+- do not weaken assertions so much that regressions slip through
+- do not ignore literature-based metadata propagation
+
+---
+
+## Recommended file/module structure
 
 ```txt
 src/
   core/
     calculation/
       __tests__/
-        annualize-capex.test.ts
+        resolve-co2-series.test.ts
+        resolve-electricity-price-series.test.ts
+        allocate-capex.test.ts
         aggregate-results.test.ts
         calculate-scenario.test.ts
-        build-daily-profile.test.ts
+        core-formulas.test.ts
   features/
     scenario/
       schemas/
@@ -250,98 +372,9 @@ src/
       golden-scenarios.ts
     helpers/
       assert-golden-scenario.ts
-```
+````
 
 You may adjust the exact structure slightly if needed to match the existing project conventions, but keep it logically equivalent and clean.
-
----
-
-## Functional requirements
-
-### Test style
-
-Use:
-- clear test names
-- focused test scopes
-- low ceremony
-- minimal mocking unless truly necessary
-
-Prefer real function calls over artificial mocking for pure logic modules.
-
-### Golden scenario comparison
-
-Your golden scenario helper should support:
-- exact structural assertions where safe
-- tolerance-based numeric assertions where appropriate
-- partial expected results
-- readable failure output
-
-Do not build an overcomplicated custom test framework. Keep it practical.
-
-### Placeholder-aware testing policy
-
-The tests must distinguish between:
-- behavior that is already agreed and should be locked now
-- behavior that is still placeholder-stage and should only be checked structurally or partially
-
-Examples of behavior to lock now:
-- 12 weights required
-- all-zero weights rejected
-- 365-day profile returned
-- CAPEX annualization fallback for zero rate
-- monthly and annual aggregation shape and stability
-
-Examples of behavior not to fake-lock now:
-- final methane production values
-- final hydrogen demand values
-- final electricity consumption values
-- final comparison economics
-
----
-
-## Non-functional requirements
-
-### Code quality
-- readable tests
-- maintainable helper structure
-- no duplicated large fixtures unless justified
-- no brittle assertions tied to irrelevant implementation details
-
-### Maintainability
-- later formula agents should be able to add real expected outputs without rewriting the harness
-- fixture structure should be easy to expand
-- tests should help debugging rather than obscure failures
-
-### Performance
-- unit tests should remain fast
-- no heavyweight setup
-- no unnecessary integration complexity
-
----
-
-## Important constraints
-
-Do **not** do these:
-- do not invent final customer formulas
-- do not create misleading fake expected methane/hydrogen/electricity outputs
-- do not add browser/E2E testing frameworks unless already present and clearly necessary
-- do not add React component tests in this task
-- do not rely heavily on snapshots
-- do not hardcode customer-specific constants beyond neutral placeholder-safe fixtures
-- do not make tests pass by weakening meaningful assertions excessively
-
----
-
-## Expected implementation choices
-
-Use sensible assumptions for unresolved details, but keep them explicit.
-
-Recommended choices:
-- Vitest if test tooling is not yet established
-- small helper utilities for tolerance comparison
-- partial golden assertions rather than full fake-output locking
-- direct testing of current placeholder KPI behavior
-- deterministic fixtures with readable numbers
 
 ---
 
@@ -352,19 +385,23 @@ When you finish, provide:
 1. a short summary of what you implemented
 2. the created/modified file list
 3. any assumptions you made
-4. any open issues or recommendations for the next formula-oriented agent
+4. any open issues or recommendations for the next agent
 
 ---
 
 ## Definition of done
 
 This task is done when:
-- core schema tests exist
-- profile generator tests exist
-- CAPEX annualization tests exist
-- aggregation tests exist
-- scenario orchestration tests exist
-- a reusable golden scenario harness exists
-- at least 2 useful pre-formula golden scenarios exist
-- tests reflect current placeholder-stage truth honestly
-- the test structure is ready for later real-formula locking without major rewrites
+
+* core schema tests exist
+* temporal harmonization tests exist
+* stoichiometric formula tests exist
+* CAPEX allocation tests exist
+* aggregation tests exist
+* scenario orchestration tests exist
+* assumption metadata propagation tests exist
+* a reusable golden scenario harness exists
+* at least 2 useful golden scenarios exist
+* tests reflect the updated MVP logic honestly and help prevent regression
+
+```

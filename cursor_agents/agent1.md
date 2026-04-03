@@ -1,168 +1,245 @@
-# Cursor Agent Prompt — Agent 1: Domain & Schemas
+# Cursor Agent Prompt — Agent 1: Domain, Schemas & Temporal Input Foundation
 
 Your task is to build the domain foundation for the Hiiliketju project as the first technical implementation layer.
 
 ## Goal
 
-Create a strong, extensible, formula-ready domain layer for the calculator without hardcoding final customer formulas yet.
+Create a strong, extensible, implementation-ready domain layer for the calculator.
 
 Your focus areas are:
 1. TypeScript domain types
 2. Zod validation schemas
-3. a minimal but extensible unit-model foundation
-4. availability profile input structure
-5. monthly weighted profile generator
+3. assumption metadata / flags
+4. temporal input contracts for CO₂ and electricity
+5. temporal harmonization-ready profile structures
 6. clean module boundaries that support later formula implementation
 
-Do **not** implement the actual methane, hydrogen, electricity, revenue, or comparison formulas yet beyond clearly marked placeholders and extension points.
+Do **not** build React components or export logic.
+Do **not** implement full business UI behavior.
+Do **not** hardcode business logic into the UI layer.
 
 ---
 
 ## Context
 
-This is a browser-based techno-economic calculator where:
-- the user enters an annual CO₂ amount
-- the user defines 12 monthly weights
-- the system generates a 365-day daily availability profile
-- later agents will implement CAPEX annualization, aggregation, full calculation logic, tests, UI, and exports
+This is a browser-based techno-economic calculator where the application must compare:
+
+- **Path A:** `CO2 + H2 -> CH4`
+- **Path B:** `CO2 released + H2 sold`
 
 The architecture direction is already decided:
 - Next.js + TypeScript
 - calculation logic must be separated from UI
 - one canonical calculation result structure must later serve UI, Excel, and PDF
-- final customer formulas and parameter values are **not yet available**
-- placeholders must be easy to replace later without refactoring core architecture
+- the internal MVP engine is **daily-first**
+- the input contract must support **daily and hourly** source data
+- the process model is **stoichiometric + literature-based defaults + customer/business inputs**
+- assumptions must be explicitly traceable and inspectable
 
-The implementation should be production-oriented, minimal, and maintainable. Avoid overengineering, but design for extension.
+The implementation should be production-oriented, minimal, and maintainable.
 
 ---
 
 ## Locked assumptions for this task
 
-Use these assumptions as fixed for your implementation:
+Use these assumptions as fixed:
 
 - project working language: **English**
-- MVP default language: **English**
-- the solution must be **formula-ready**, not formula-complete
-- methane default business unit is currently assumed to be **kg**, but the architecture must support other units later
-- hydrogen alternative path will later use a **separate hydrogen availability assumption**, so do not bind hydrogen-alternative logic to methane-path hydrogen demand
-- monthly weights may contain zeros
-- all-zero monthly weights must be treated as a validation error
-- the annual profile period is always **365 days**
-- no persistence or database logic
+- MVP UI language: **English**
+- internal calculation resolution = **daily**
+- input contract may support **daily** and **hourly**
+- annual calculation period is always **365 days**
+- no persistence/database logic
+- no export logic
 - no UI business logic
-- no export logic in this task
+- no annuity CAPEX logic in MVP core
+- CO₂ availability must be mode-based
+- electricity price must be mode-based
+- all literature-estimated stoichiometric / SEC / process defaults must be explicitly flagged
+
+### Locked CO₂ modes
+- `flat_annual`
+- `seasonal_daily`
+- `time_series_daily`
+- `time_series_hourly`
+
+### Locked electricity price modes
+- `constant`
+- `daily_series`
+- `hourly_series`
+- `historical_market_data_imported`
+
+### Locked units
+- CO₂ user-facing default = `kt/year`
+- internal CO₂ = `kg/day`
+- H₂ = `kg`
+- CH₄ annual business unit = `t/year`
+- methane price = `EUR/t_CH4`
+- electricity = `MWh`
+- electricity price = `EUR/MWh`
+
+### Locked literature-based defaults that must be representable in the domain model
+- `stoichiometricHydrogenDemandFactor = 0.1832 kg_H2/kg_CO2`
+- `stoichiometricMethaneYieldFactor = 0.3645 kg_CH4/kg_CO2`
+- `electrolyzerSpecificEnergyConsumption = 54 kWh/kg_H2`
+- `electrolyzerSpecificEnergyConsumptionMWh = 0.054 MWh/kg_H2`
+- `plantAvailabilityPct = 100`
+- `processEfficiencyPct = 100`
+
+These values must not exist as anonymous magic numbers. They must be representable with explicit assumption metadata.
 
 ---
 
 ## Deliverables
 
-Implement the following:
+Implement the following.
 
 ### 1. Domain types
 
 Create clean TypeScript types for at least:
 
+- `AssumptionSource`
+- `AssumptionStatus`
+- `AssumptionMeta`
 - `AvailabilityProfileInput`
+- `ElectricityPriceInput`
 - `ScenarioInput`
 - `DailyProfilePoint`
+- `ResolvedDailyElectricityPricePoint` or equivalent
 - `DailyResult`
+- `MonthlySummary`
 - `ScenarioSummary`
 - `CalculationResult`
 - minimal unit-related types that make future unit expansion possible
 
-Design principle:
-- units should not be hidden only in field names
-- use a lightweight model that allows later extension
-- do not build a huge unit system
-
-Suggested direction:
-- use explicit unit enums or string literal unions where useful
+Design principles:
+- units should not exist only in field names
+- use a lightweight model
 - keep types readable and practical
+- avoid building a huge quantity framework
 
-### 2. Validation schemas
+### 2. Assumption metadata model
+
+Create an explicit assumption metadata structure.
+
+Minimum direction:
+
+```ts
+type AssumptionSource =
+  | "customer_provided"
+  | "product_locked"
+  | "literature_based"
+  | "placeholder"
+  | "derived"
+
+type AssumptionStatus =
+  | "confirmed"
+  | "estimated"
+  | "pending_customer_confirmation"
+  | "placeholder_only"
+
+type AssumptionMeta = {
+  assumptionSource: AssumptionSource
+  assumptionStatus: AssumptionStatus
+  assumptionNote?: string
+}
+````
+
+This must be reusable across process assumptions, economic assumptions, and future export/UI inspection.
+
+### 3. Validation schemas
 
 Create Zod schemas for the main input structures.
 
 Validation must cover at least:
-- required fields
-- numeric type checks
-- non-negative values where appropriate
-- percentage range validation where appropriate
-- exactly 12 monthly weights
-- all-zero monthly weights rejected
-- scenario name required
-- annual CO₂ amount must be valid
-- electricity price must be valid
-- CAPEX fields must be valid
-- discount rate and lifetime fields must be structurally valid even though formulas are not yet implemented
+
+* required fields
+* numeric type checks
+* non-negative values where appropriate
+* utilization rate range 0–100
+* scenario name required
+* valid CO₂ amount
+* valid methane price
+* valid hydrogen price
+* valid optional CAPEX inputs
+* valid lifetime input when CAPEX is included
+* mode-specific structural validation for CO₂ and electricity inputs
+* daily vs hourly structure validation where appropriate
 
 Important:
-- validation messages should be developer-friendly and reasonably clear
-- do not overcomplicate error abstraction at this stage
 
-### 3. Monthly weighted profile generator
+* validation messages should be clear and developer-friendly
+* do not overcomplicate error abstraction
+* schema logic must stay separate from calculation logic
 
-Implement a pure function that converts:
-- annual CO₂ amount
-- 12 monthly weights
+### 4. Temporal input structures
 
-into:
-- a 365-row daily profile
+Implement input structures for CO₂ and electricity.
 
-The logic must:
-1. validate input assumptions
-2. normalize the 12 weights
-3. allocate annual CO₂ across months using normalized weights
-4. allocate each month’s CO₂ across the days in that month
-5. return a daily series for a fixed non-leap year calendar
-6. preserve the annual total within a clearly documented rounding strategy
+#### CO₂ input
 
-Requirements:
-- pure deterministic function
-- no UI concerns
-- no side effects
-- clearly documented handling of rounding
-- code must be easy to test
+Support:
 
-You may choose whether internal precision handling is done via:
-- full floating-point distribution with final sum reconciliation, or
-- another clean approach
+* `flat_annual`
+* `seasonal_daily`
+* `time_series_daily`
+* `time_series_hourly`
 
-But document the choice in comments.
+#### Electricity input
 
-### 4. Placeholder-ready calculation model scaffolding
+Support:
 
-Create minimal structures that make later work easy:
-- a placeholder shape for process assumptions
-- a placeholder shape for economics assumptions
-- result types that later agents can extend without breaking existing contracts
+* `constant`
+* `daily_series`
+* `hourly_series`
+* `historical_market_data_imported`
 
-Do **not** fake real formulas.
-Do **not** invent customer-specific constants unless needed as neutral placeholders.
-If a value is unknown, represent it clearly as a future input/parameter concern.
+Do not collapse these into one weakly typed bag.
 
-### 5. File/module structure
+### 5. Daily profile / harmonization-ready structures
 
-Implement the code in a clean structure aligned with this direction:
+Create the structures needed so later agents can harmonize inputs into canonical daily series.
 
-```txt
-src/
-  core/
-    domain/
-      scenario.ts
-      result.ts
-      units.ts
-      profile.ts
-    calculation/
-      build-daily-profile.ts
-  features/
-    scenario/
-      schemas/
-        scenario-schema.ts
-```
+At minimum, daily profile point should include:
 
-You may adjust filenames slightly if needed, but keep the structure logically equivalent and clean.
+* `dayIndex`
+* `dateLabel`
+* `monthIndex`
+* `dayOfMonth`
+* `availableCO2Kg`
+
+For electricity, create an equivalent daily resolved structure that later agents can consume.
+
+### 6. Seasonal daily CO₂ generator
+
+Implement a pure function that can generate a 365-row daily CO₂ availability profile from:
+
+* annual CO₂ amount
+* a seasonal daily profile definition
+
+Recommended direction:
+
+* use a 12-month seasonal weighting model as the MVP implementation behind `seasonal_daily`
+* return a 365-row daily series for a fixed non-leap year
+* preserve annual total with a documented rounding/reconciliation strategy
+
+Important:
+
+* this function is part of temporal input handling, not legacy product logic
+* do not name the public domain contract `monthly_weighted`
+* `seasonal_daily` is the externally intended mode name
+
+### 7. Placeholder-ready process/economics assumptions structures
+
+Create minimal but extensible structures for:
+
+* process assumptions
+* economics assumptions
+* optional CAPEX assumptions
+* assumptions metadata
+
+Do **not** invent customer-specific constants.
+Do **not** implement final methane, hydrogen, electricity, or comparison formulas yet.
 
 ---
 
@@ -170,90 +247,116 @@ You may adjust filenames slightly if needed, but keep the structure logically eq
 
 ### Availability profile
 
-Implement support for:
+The domain model must support:
 
-```ts
-type AvailabilityProfileInput = {
-  mode: "monthly_weighted"
-  monthlyWeights: [
-    number, number, number, number, number, number,
-    number, number, number, number, number, number
-  ]
-}
-```
+* flat annual profile
+* seasonal daily profile
+* daily time series
+* hourly time series
 
-Use a fixed non-leap-year month/day distribution.
+### Electricity price input
 
-### Scenario input
+The domain model must support:
+
+* constant electricity price
+* daily series
+* hourly series
+* imported historical market series
+
+### Scenario input groups
 
 The scenario input should support at least these logical groups:
 
-- scenario metadata
-- CO₂ input
-- energy input
-- economics input
-- process placeholder parameters
-- assumptions metadata
+* scenario metadata
+* CO₂ input
+* electricity input
+* economics input
+* optional CAPEX input
+* process assumptions
+* assumptions metadata / version
 
-Keep the types clean and future-proof, but do not add speculative complexity.
+### Daily result structure
 
-### Daily profile output
+At minimum, `DailyResult` should support:
 
-At minimum, each daily profile point should include:
-- `dayIndex`
-- `dateLabel`
-- `monthIndex`
-- `dayOfMonth`
-- `availableCO2`
-- explicit or inferable unit metadata where appropriate
+* `dayIndex`
+* `dateLabel`
+* `availableCO2Kg`
+* `usableCO2Kg`
+* `hydrogenNeededKg`
+* `methaneProducedKg`
+* `electricityConsumedMWh`
+* `electricityCostEur`
+* `variableCostEur`
+* `allocatedCapexCostEur`
+* `totalCostEur`
+* `methaneRevenueEur`
+* `hydrogenAlternativeRevenueEur`
+
+It is acceptable if some fields are initially placeholder-oriented, but the structure must exist now.
 
 ---
 
 ## Non-functional requirements
 
 ### Code quality
-- strict TypeScript style
-- readable naming
-- small pure functions where useful
-- no duplicated logic
-- avoid premature abstraction
+
+* strict TypeScript style
+* readable naming
+* small pure functions where useful
+* no duplicated logic
+* avoid premature abstraction
 
 ### Architecture
-- no calculation logic inside schemas
-- no UI dependencies in core calculation logic
-- domain types should remain reusable across UI, tests, and exports
+
+* no calculation logic inside schemas
+* no UI dependencies in core logic
+* domain types must remain reusable across UI, tests, and exports
 
 ### Maintainability
-- leave clear extension points for later formula implementation
-- avoid tight coupling between profile logic and future process logic
+
+* leave clear extension points for later formula implementation
+* avoid tight coupling between temporal harmonization and later process logic
 
 ---
 
 ## Important constraints
 
 Do **not** do these:
-- do not implement methane production formulas
-- do not implement hydrogen demand formulas
-- do not implement electricity consumption formulas
-- do not implement comparison formulas
-- do not implement CAPEX annualization yet
-- do not create React components
-- do not add charts
-- do not add Excel/PDF code
-- do not add database or API logic
+
+* do not implement final methane production formulas
+* do not implement final hydrogen demand formulas
+* do not implement final electricity consumption formulas
+* do not implement comparison formulas
+* do not implement CAPEX allocation formulas yet beyond structures
+* do not create React components
+* do not add charts
+* do not add Excel/PDF code
+* do not add database or API logic
+* do not reintroduce legacy `monthly_weighted only` product assumptions
 
 ---
 
-## Expected implementation choices
+## Recommended file/module structure
 
-Use sensible assumptions for unresolved details, but keep them lightweight and explicit.
+```txt
+src/
+  core/
+    domain/
+      assumptions.ts
+      scenario.ts
+      result.ts
+      units.ts
+      temporal.ts
+    calculation/
+      build-seasonal-daily-co2-profile.ts
+  features/
+    scenario/
+      schemas/
+        scenario-schema.ts
+```
 
-Recommended choices:
-- fixed calendar for a non-leap year
-- all-zero monthly weights => validation error
-- zero values inside the 12 monthly weights => allowed
-- daily allocation should preserve annual total as closely as possible
-- internal profile values can remain numeric without introducing a heavy quantity class
+You may adjust filenames slightly if needed, but keep the structure logically equivalent and clean.
 
 ---
 
@@ -271,10 +374,12 @@ When you finish, provide:
 ## Definition of done
 
 This task is done when:
-- domain types exist and are coherent
-- zod schemas validate the scenario input structure
-- the monthly weighted profile generator works for a 365-day year
-- all-zero weights are rejected
-- zero individual monthly weights are accepted
-- the annual total is preserved with a documented strategy
-- the structure clearly supports later calculation-engine work without refactoring
+
+* domain types exist and are coherent
+* assumption metadata / flags are modeled explicitly
+* zod schemas validate the scenario input structure
+* temporal input modes for CO₂ and electricity are modeled cleanly
+* seasonal daily CO₂ generation works for a 365-day year
+* the structure supports later harmonization and formula implementation without refactoring
+* the model is aligned with daily-first internal resolution and hourly-capable input contracts
+
