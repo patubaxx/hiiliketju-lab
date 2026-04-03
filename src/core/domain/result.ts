@@ -15,6 +15,7 @@ export type DailyResult = {
   readonly hydrogenNeededKg: number;
   readonly methaneProducedKg: number;
   readonly electricityConsumedMwh: number;
+  readonly electricityCostEur: number;
   readonly variableCostEur: number;
   readonly allocatedCapexCostEur: number;
   readonly totalCostEur: number;
@@ -35,6 +36,7 @@ export type MonthlySummary = {
     readonly hydrogenNeededKg: number;
     readonly methaneProducedKg: number;
     readonly electricityConsumedMwh: number;
+    readonly electricityCostEur: number;
     readonly variableCostEur: number;
     readonly allocatedCapexCostEur: number;
     readonly totalCostEur: number;
@@ -45,15 +47,22 @@ export type MonthlySummary = {
 
 /** Annual KPI block (solution / calc specs). */
 export type ScenarioSummary = {
+  readonly annualCO2AvailableKg: number;
+  readonly annualCO2UtilizedKg: number;
+  /** `null` when annual CO₂ available is zero (ratio undefined). */
+  readonly co2RecyclingRatePct: number | null;
   readonly annualMethaneProducedTons: number;
   readonly annualHydrogenNeededKg: number;
   readonly annualElectricityConsumedMwh: number;
   readonly annualVariableCostEur: number;
   readonly annualCapexCostEur: number;
   readonly annualTotalCostEur: number;
-  readonly methaneRevenueEur: number;
+  readonly annualMethaneRevenueEur: number;
   readonly hydrogenSalesAlternativeRevenueEur: number;
-  readonly unitCostMethaneEurPerTch4: number;
+  /** `null` when no methane is produced (avoid misleading infinite prices). */
+  readonly breakEvenMethanePriceEurPerTon: number | null;
+  readonly methanePriceAt10PctProfitabilityEurPerTon: number | null;
+  readonly methanePriceAt30PctProfitabilityEurPerTon: number | null;
   readonly deltaVsHydrogenSaleEur: number;
 };
 
@@ -68,4 +77,6 @@ export type CalculationResult = {
   readonly dailyResults: readonly DailyResult[];
   readonly monthlySummary: readonly MonthlySummary[];
   readonly annualSummary: ScenarioSummary;
+  /** Non-fatal issues (e.g. SEC kWh/MWh mismatch); input assumptions remain on `input.process`. */
+  readonly warnings: readonly string[];
 };
