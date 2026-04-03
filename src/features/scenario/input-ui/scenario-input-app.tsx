@@ -34,6 +34,7 @@ import {
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { useLocale } from "@/i18n/locale-context";
+import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
 
 const ASSUMPTION_SOURCES: AssumptionSource[] = [
   "customer_provided",
@@ -193,7 +194,7 @@ export function ScenarioInputApp() {
   const hasErrors = errors.size > 0;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 px-4 py-10 pb-20">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 pb-20">
       <header className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -841,63 +842,7 @@ export function ScenarioInputApp() {
         {!result ? (
           <p className="text-sm text-muted-foreground">{t("results.empty")}</p>
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">{t("results.success")}</p>
-            <dl className="grid gap-3 sm:grid-cols-2 text-sm">
-              <div>
-                <dt className="text-muted-foreground">{t("results.annualMethaneT")}</dt>
-                <dd className="font-mono font-medium">
-                  {result.annualSummary.annualMethaneProducedTons.toLocaleString(undefined, {
-                    maximumFractionDigits: 4,
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-muted-foreground">{t("results.annualTotalCost")}</dt>
-                <dd className="font-mono font-medium">
-                  {result.annualSummary.annualTotalCostEur.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-muted-foreground">{t("results.annualCo2Utilized")}</dt>
-                <dd className="font-mono font-medium">
-                  {result.annualSummary.annualCO2UtilizedKg.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-muted-foreground">{t("results.annualElectricityMwh")}</dt>
-                <dd className="font-mono font-medium">
-                  {result.annualSummary.annualElectricityConsumedMwh.toLocaleString(undefined, {
-                    maximumFractionDigits: 4,
-                  })}
-                </dd>
-              </div>
-              <div className="sm:col-span-2">
-                <dt className="text-muted-foreground">{t("results.deltaHydrogenPath")}</dt>
-                <dd className="font-mono font-medium">
-                  {result.annualSummary.deltaVsHydrogenSaleEur.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </dd>
-              </div>
-            </dl>
-            {result.warnings.length > 0 ? (
-              <div>
-                <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-                  {t("results.warningsTitle")}
-                </p>
-                <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground space-y-1">
-                  {result.warnings.map((w, i) => (
-                    <li key={i}>{w}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
+          <ResultsPanel result={result} locale={locale} t={t} />
         )}
       </Section>
     </div>
