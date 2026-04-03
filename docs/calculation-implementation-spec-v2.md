@@ -356,6 +356,8 @@ The result model must contain:
 - warnings array
 - export-ready formatted sections
 
+HTTP Excel/PDF export in the shipped app builds file bytes only after server-side validation of `scenario` and a fresh `calculateScenario` run; reporting code maps that result and must not substitute a client-posted result snapshot for engine output.
+
 ---
 
 ## 14. Testing Readiness

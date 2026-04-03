@@ -142,7 +142,8 @@ These defaults must be implemented as clearly flagged assumptions, not hard-code
 
 ### Reporting layer
 
-* Export layers consume canonical result only.
+* Export layers consume canonical result only (map and format; no independent KPI or harmonization math).
+* Shipped Excel/PDF downloads use server routes that validate a wire `scenario`, run `calculateScenario`, then build bytes from that result. Do not accept a client-sent result object as authoritative input on the export API.
 * Excel and PDF must include assumptions metadata.
 * Literature-based defaults must be visible in exports.
 

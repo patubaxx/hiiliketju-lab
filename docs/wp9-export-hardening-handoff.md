@@ -82,4 +82,5 @@
 
 - Layering: **`AGENTS.md`**, **`.cursor/rules.md`**
 - Prior polish: **`docs/wp8-post-validation-handoff.md`**
-- WP6 export constraints: **`docs/wp6-post-validation-handoff.md`**
+- Post-check (read-only): **`docs/wp9-post-check-validation.md`**
+- Release snapshot: **`docs/wp10-release-readiness-handoff.md`**

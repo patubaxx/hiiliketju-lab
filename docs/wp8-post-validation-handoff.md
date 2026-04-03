@@ -2,7 +2,7 @@
 
 **Status date:** After WP8 polish/QA pass.  
 **Audience:** Maintainers and the next feature phase.  
-**Source of truth:** Validated WP6/WP7 behavior in repo, plus `AGENTS.md` and `.cursor/rules.md`.
+**Source of truth:** Canonical calculation and export architecture validated through WP9 (see `docs/wp9-post-check-validation.md`), plus `AGENTS.md` and `.cursor/rules.md`. For a release snapshot after doc alignment, see `docs/wp10-release-readiness-handoff.md`.
 
 ---
 
@@ -42,6 +42,6 @@
 
 ## Cross-reference
 
-- WP6 handoff: `docs/wp6-post-validation-handoff.md` --> no longer relevant, deleted
+- Export hardening: `docs/wp9-export-hardening-handoff.md`, `docs/wp9-post-check-validation.md`
 - Solution intent: `docs/solution-spec-v2.md`
 - Calculation contract: `docs/calculation-implementation-spec-v2.md`

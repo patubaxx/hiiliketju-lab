@@ -2,7 +2,7 @@
 **Project:** Hiiliketju – browser-based techno-economic calculation application  
 **Implementation model:** Next.js + TypeScript + Cursor-agent guided implementation  
 **Status:** Updated after revised tender requirements  
-**Language of UI:** UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally witn i18n.
+**Language of UI:** UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally with i18n.
 **Core principle:** daily-first engine, hourly-capable input contract
 
 ---
@@ -83,6 +83,8 @@ React components must not contain calculation formulas or domain logic.
 
 ### 3.3 One canonical result model
 UI, Excel, and PDF must all consume the same canonical calculation result.
+
+For shipped file downloads, the server recomputes that result from a validated `scenario` payload (`calculateScenario`); export mappers must not re-derive business numbers and must not accept a client-sent result object as authoritative input on the export API.
 
 ### 3.4 Daily-first, hourly-capable
 The MVP internal engine operates on daily timesteps, but input contracts must support both daily and hourly temporal data.
@@ -666,6 +668,16 @@ Before that, protect:
 * error states
 * documentation
 * final polish
+
+### WP9 — Server-side export hardening
+
+* `/api/export/excel` and `/api/export/pdf` validate `scenario`, run `calculateScenario`, return bytes
+* structural guards; no client-sent authoritative results
+
+### WP10 — Release readiness
+
+* documentation alignment with accepted implementation
+* handoff and explicit MVP limitations (no product expansion)
 
 ---
 

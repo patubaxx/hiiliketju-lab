@@ -145,6 +145,8 @@ Excel/PDF exports must:
 - include flags/metadata for literature-based assumptions
 - not create their own independent calculation logic
 
+Shipped HTTP exports (`/api/export/excel`, `/api/export/pdf`) must validate `scenario` on the server, run `calculateScenario`, then map that result. The request body must not treat a client-provided `CalculationResult` (or partial KPIs) as authoritative.
+
 ---
 
 ## 9. Placeholder policy
