@@ -1,4 +1,4 @@
-#Git process
+### Git process
 
 This document is a reminder for human user. Agents can ignore.
 

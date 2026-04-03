@@ -1,0 +1,136 @@
+import type { MessageTree } from "./tree";
+
+export const sv = {
+  app: {
+    title: "Hiiliketju",
+    tagline: "Teknik-ekonomisk scenariosinmatning (MVP)",
+  },
+  locale: {
+    label: "Språk",
+    en: "Engelska",
+    fi: "Finska",
+    sv: "Svenska",
+  },
+  scenarioForm: {
+    title: "Scenario",
+    description:
+      "Definiera indata för en fast 365-dagars analysperiod (inget skottår). Validering och beräkning använder samma kontrakt som motorn.",
+    periodNote: "Analysperioden är i MVP:n låst till 365 dagar.",
+    scenarioName: "Scenarionamn",
+    assumptionsVersion: "Version av antaganden",
+    assumptionsNotes: "Scenarianteckningar (valfritt)",
+    runCalculation: "Kör beräkning",
+    reset: "Återställ standardvärden",
+    generalValidation: "Åtgärda punkterna nedan.",
+  },
+  sections: {
+    co2: "Koldioxidtillgång",
+    co2Intro:
+      "Årlig tillgång, utnyttjande och hur CO₂ fördelas över året. I tidsserielägen kommer daglig tillgång från den serie du anger; fältet kt/år krävs fortfarande i formuläret men skalar inte serien i nuvarande motor.",
+    electricity: "Elpris",
+    electricityIntro:
+      "Hur elpriset anges över MVP-horisonten. Timdata harmoniseras till dagliga medelvärden internt.",
+    economics: "Ekonomi",
+    economicsIntro: "Råvarupriser, driftkostnad och valfri investering (CAPEX).",
+    advanced: "Avancerade processantaganden",
+    advancedIntro:
+      "Åsidosätt litteraturstandardvärden endast när du har projektspecifika data. Metadata sparas med varje värde för spårbarhet.",
+    results: "Beräkningsresultat",
+  },
+  co2: {
+    annualKt: "Årlig CO₂ (kt/år)",
+    utilization: "Utnyttjandegrad (%)",
+    mode: "Tidsprofil",
+    mode_flat_annual: "Jämn (uniform över året)",
+    mode_seasonal_daily: "Säsong (månadsrelativa vikter)",
+    mode_time_series_daily: "Tidsserie (daglig kg/dygn, 365 värden)",
+    mode_time_series_hourly: "Tidsserie (timvis kg/h, 8760 värden)",
+    seasonalHelp:
+      "Tolv relativa vikter (en per kalendermånad). Nollor tillåtna; minst en månad måste vara större än noll. Motorn skalar vikterna till den årliga totalen.",
+    month: "Månad",
+    seriesDailyLabel: "Daglig tillgänglig CO₂ (kg/dygn × 365)",
+    seriesDailyHelp:
+      "Ange exakt 365 icke-negativa tal separerade med komma, semikolon eller radbrytning.",
+    seriesHourlyLabel: "Timvis tillgänglig CO₂ (kg/h × 8760)",
+    seriesHourlyHelp:
+      "Ange exakt 8760 icke-negativa tal. Timmar summeras till kalenderdagar i motorn.",
+    timeSeriesAnnualHint:
+      "I tidsserielägen använder motorn endast serien för tillgång; håll kt/år i linje med egna rapporter om du använder det.",
+    fillOnes365: "Fyll med 365 × 1",
+    fillOnes8760: "Fyll med 8760 × 1",
+  },
+  electricity: {
+    mode: "Prisläge",
+    mode_constant: "Konstant (EUR/MWh)",
+    mode_daily_series: "Daglig serie (365 EUR/MWh-värden)",
+    mode_hourly_series: "Timserie (8760 EUR/MWh-värden)",
+    mode_historical_imported: "Importerade marknadsdata (daglig eller timserie)",
+    constantPrice: "Elpris (EUR/MWh)",
+    seriesDailyLabel: "Dagpriser (EUR/MWh × 365)",
+    seriesHourlyLabel: "Timpriser (EUR/MWh × 8760)",
+    seriesHelp:
+      "Ange det krävda antalet icke-negativa tal separerade med komma, semikolon eller radbrytning.",
+    historicalResolution: "Upplösning för importerad serie",
+    resolution_daily: "Daglig (365 värden)",
+    resolution_hourly: "Timvis (8760 värden)",
+    historicalHelp:
+      "Klistra in normaliserade EUR/MWh-värden i MVP-ordning. Filimport och datarensning ingår ännu inte i denna vy.",
+    fillOnes365: "Fyll med 365 × 50",
+    fillOnes8760: "Fyll med 8760 × 50",
+  },
+  economics: {
+    methanePrice: "Metanpris (EUR/t CH₄)",
+    hydrogenPrice: "Vätepris (EUR/kg H₂)",
+    otherOpex: "Övrig OPEX (EUR/år)",
+    includeCapex: "Inkludera CAPEX i kostnadsstacken",
+    electrolyzerCapex: "Elektrolysör CAPEX (EUR)",
+    methanationCapex: "Metaniserings-CAPEX (EUR)",
+    capexLifetime: "CAPEX-livslängd (år)",
+  },
+  advanced: {
+    inactiveFactorsTitle: "Används ännu inte i dagliga formler",
+    inactiveFactorsBody:
+      "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
+    override: "Åsidosätt standard",
+    value: "Värde",
+    assumptionSource: "Antagandekälla",
+    assumptionStatus: "Antagandestatus",
+    assumptionNote: "Anteckning (valfritt)",
+    field_stoichH2: "Stökiometriskt H₂-behov (kg H₂ / kg CO₂)",
+    field_stoichCh4: "Stökiometriskt CH₄-utbyte (kg CH₄ / kg CO₂)",
+    field_secKwh: "Elektrolysör SEC (kWh / kg H₂)",
+    field_secMwh: "Elektrolysör SEC (MWh / kg H₂)",
+    field_plantAvail: "Anläggningstillgänglighet (%)",
+    field_processEff: "Processeffektivitet (%)",
+  },
+  assumptionSource: {
+    customer_provided: "Kundlevererad",
+    product_locked: "Låst i produkt",
+    literature_based: "Litteraturbaserad",
+    placeholder: "Platshållare",
+    derived: "Härledd",
+  },
+  assumptionStatus: {
+    confirmed: "Bekräftad",
+    estimated: "Uppskattad",
+    pending_customer_confirmation: "Väntar på kundbekräftelse",
+    placeholder_only: "Endast platshållare",
+  },
+  validation: {
+    seriesWrongCount: "Förväntade {{expected}} tal, parsade {{actual}}.",
+    seriesNonNumeric: "Kunde inte tolka alla poster som ändliga tal.",
+    invalidNumber: "Ange ett giltigt ändligt tal.",
+    fieldRequired: "Detta fält är obligatoriskt.",
+  },
+  results: {
+    title: "Senaste resultat",
+    empty: "Kör beräkningen för att se kanoniska utdata från motorn.",
+    success: "Beräkningen slutfördes utan fel.",
+    warningsTitle: "Varningar",
+    annualMethaneT: "Årlig metan (t CH₄)",
+    annualTotalCost: "Årlig total kostnad (EUR)",
+    annualCo2Utilized: "Årlig utnyttjad CO₂ (kg)",
+    annualElectricityMwh: "Årlig elförbrukning (MWh)",
+    deltaHydrogenPath: "Metanintäkt minus H₂-försäljningsalternativ (EUR)",
+  },
+} satisfies MessageTree;
