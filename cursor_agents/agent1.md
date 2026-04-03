@@ -45,7 +45,7 @@ The implementation should be production-oriented, minimal, and maintainable.
 Use these assumptions as fixed:
 
 - project working language: **English**
-- MVP UI language: **English**
+- MVP UI language: **UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally.**
 - internal calculation resolution = **daily**
 - input contract may support **daily** and **hourly**
 - annual calculation period is always **365 days**

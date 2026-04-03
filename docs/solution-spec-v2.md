@@ -2,7 +2,7 @@
 **Project:** Hiiliketju – browser-based techno-economic calculation application  
 **Implementation model:** Next.js + TypeScript + Cursor-agent guided implementation  
 **Status:** Updated after revised tender requirements  
-**Language of UI:** English  
+**Language of UI:** UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally witn i18n.
 **Core principle:** daily-first engine, hourly-capable input contract
 
 ---
