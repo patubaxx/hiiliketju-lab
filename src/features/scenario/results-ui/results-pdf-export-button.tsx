@@ -5,8 +5,9 @@ import { useCallback, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import type { CalculationResult } from "@/core/domain/result";
+import { safeExportBasename } from "@/core/reporting/export-filename";
 
-import { safeExportBasename } from "./safe-export-basename";
+import { attachmentFilenameFromHeader } from "./attachment-filename";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
@@ -24,12 +25,21 @@ export function ResultsPdfExportButton({
     setBusy(true);
     setError(null);
     try {
-      const { buildScenarioPdfBlobFromResult } = await import("@/core/reporting/scenario-pdf-render");
-      const blob = await buildScenarioPdfBlobFromResult(result);
+      const fallbackName = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.pdf`;
+      const res = await fetch("/api/export/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario: result.input }),
+      });
+      if (!res.ok) {
+        setError(t("results.export.pdfError"));
+        return;
+      }
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.pdf`;
+      a.download = attachmentFilenameFromHeader(res.headers.get("Content-Disposition"), fallbackName);
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();

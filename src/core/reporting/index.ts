@@ -1,3 +1,5 @@
+export { assertCalculationResultExportable, CalculationResultNotExportableError } from "./assert-calculation-result-exportable";
+export { safeExportBasename } from "./export-filename";
 export { buildScenarioExcelExportModel } from "./build-export-model";
 export type {
   AnnualMetricExportRow,
@@ -12,7 +14,7 @@ export {
   PROCESS_ASSUMPTION_EXPORT_ORDER,
   PROCESS_ASSUMPTION_EXPORT_UNITS,
 } from "./build-export-model";
-export { assertExcelModelReady, type ExcelWorkbookSourceModel } from "./build-excel-model";
+export { assertExcelModelReady, ExcelExportModelInvariantError, type ExcelWorkbookSourceModel } from "./build-excel-model";
 export { buildScenarioExcelWorkbook, scenarioExcelWorkbookToBuffer } from "./build-excel-workbook";
 export { buildScenarioExcelArrayBuffer } from "./scenario-excel-buffer";
 export { buildScenarioPdfReportModel } from "./build-pdf-report-model";

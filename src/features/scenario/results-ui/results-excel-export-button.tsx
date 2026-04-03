@@ -5,9 +5,9 @@ import { useCallback, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import type { CalculationResult } from "@/core/domain/result";
-import { buildScenarioExcelArrayBuffer } from "@/core/reporting/scenario-excel-buffer";
+import { safeExportBasename } from "@/core/reporting/export-filename";
 
-import { safeExportBasename } from "./safe-export-basename";
+import { attachmentFilenameFromHeader } from "./attachment-filename";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
@@ -25,14 +25,21 @@ export function ResultsExcelExportButton({
     setBusy(true);
     setError(null);
     try {
-      const buffer = await buildScenarioExcelArrayBuffer(result);
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      const fallbackName = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.xlsx`;
+      const res = await fetch("/api/export/excel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario: result.input }),
       });
+      if (!res.ok) {
+        setError(t("results.export.error"));
+        return;
+      }
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.xlsx`;
+      a.download = attachmentFilenameFromHeader(res.headers.get("Content-Disposition"), fallbackName);
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();

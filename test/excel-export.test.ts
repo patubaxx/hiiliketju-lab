@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
 import { buildScenarioExcelExportModel } from "@/core/reporting/build-export-model";
+import { assertExcelModelReady, ExcelExportModelInvariantError } from "@/core/reporting/build-excel-model";
 import { buildScenarioExcelWorkbook } from "@/core/reporting/build-excel-workbook";
 import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 
@@ -65,6 +66,13 @@ describe("Excel export model (WP7)", () => {
       "Comparison",
       "Warnings",
     ]);
+  });
+
+  it("rejects excel models with corrupted warnings shape", () => {
+    const result = calculateScenario(parseScenarioInput(minimalScenarioRaw()));
+    const model = buildScenarioExcelExportModel(result);
+    const bad = { ...model, warnings: [1] as unknown as string[] };
+    expect(() => assertExcelModelReady(bad)).toThrow(ExcelExportModelInvariantError);
   });
 
   it("copies process assumption metadata from canonical input without inventing fields", () => {

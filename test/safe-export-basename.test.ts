@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { safeExportBasename } from "@/features/scenario/results-ui/safe-export-basename";
+import { safeExportBasename } from "@/core/reporting/export-filename";
 
 describe("safeExportBasename", () => {
   it("sanitizes unsafe characters and truncates", () => {
