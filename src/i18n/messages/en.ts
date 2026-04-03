@@ -1,0 +1,136 @@
+import type { MessageTree } from "./tree";
+
+export const en = {
+  app: {
+    title: "Hiiliketju",
+    tagline: "Techno-economic scenario input (MVP)",
+  },
+  locale: {
+    label: "Language",
+    en: "English",
+    fi: "Finnish",
+    sv: "Swedish",
+  },
+  scenarioForm: {
+    title: "Scenario",
+    description:
+      "Define inputs for a single 365-day non-leap analysis period. Validation and calculation use the same contracts as the engine.",
+    periodNote: "Analysis period is fixed at 365 days in the MVP.",
+    scenarioName: "Scenario name",
+    assumptionsVersion: "Assumptions version",
+    assumptionsNotes: "Scenario notes (optional)",
+    runCalculation: "Run calculation",
+    reset: "Reset to defaults",
+    generalValidation: "Please fix the issues below.",
+  },
+  sections: {
+    co2: "Carbon dioxide availability",
+    co2Intro:
+      "Annual availability, utilization, and how CO₂ is distributed over the year. For time-series modes, daily availability comes from the series you provide; the annual kt/year field is still required by the form but does not rescale that series in the current engine.",
+    electricity: "Electricity price",
+    electricityIntro:
+      "How electricity price is supplied over the MVP horizon. Hourly inputs are harmonized to daily averages internally.",
+    economics: "Economics",
+    economicsIntro: "Commodity prices, operating cost, and optional capital expenditure.",
+    advanced: "Advanced process assumptions",
+    advancedIntro:
+      "Override literature-based defaults only when you have project-specific data. Metadata is stored with each value for traceability.",
+    results: "Calculation output",
+  },
+  co2: {
+    annualKt: "Annual CO₂ (kt/year)",
+    utilization: "Utilization rate (%)",
+    mode: "Temporal profile",
+    mode_flat_annual: "Flat (uniform over the year)",
+    mode_seasonal_daily: "Seasonal (monthly relative weights)",
+    mode_time_series_daily: "Time series (daily kg/day, 365 values)",
+    mode_time_series_hourly: "Time series (hourly kg/h, 8760 values)",
+    seasonalHelp:
+      "Twelve relative weights (one per calendar month). Zeros allowed; at least one month must be greater than zero. The engine scales them to match the annual total.",
+    month: "Month",
+    seriesDailyLabel: "Daily available CO₂ (kg/day × 365)",
+    seriesDailyHelp:
+      "Enter exactly 365 non-negative numbers, separated by commas, semicolons, or line breaks.",
+    seriesHourlyLabel: "Hourly available CO₂ (kg/h × 8760)",
+    seriesHourlyHelp:
+      "Enter exactly 8760 non-negative numbers. Hours are summed to each calendar day in the engine.",
+    timeSeriesAnnualHint:
+      "In time-series modes, the engine uses only the series for availability; keep annual kt/year aligned with your own records if you use it for reporting.",
+    fillOnes365: "Fill with 365 × 1",
+    fillOnes8760: "Fill with 8760 × 1",
+  },
+  electricity: {
+    mode: "Price mode",
+    mode_constant: "Constant (EUR/MWh)",
+    mode_daily_series: "Daily series (365 EUR/MWh values)",
+    mode_hourly_series: "Hourly series (8760 EUR/MWh values)",
+    mode_historical_imported: "Imported market data (daily or hourly series)",
+    constantPrice: "Electricity price (EUR/MWh)",
+    seriesDailyLabel: "Daily prices (EUR/MWh × 365)",
+    seriesHourlyLabel: "Hourly prices (EUR/MWh × 8760)",
+    seriesHelp:
+      "Enter the required count of non-negative numbers, separated by commas, semicolons, or line breaks.",
+    historicalResolution: "Imported series resolution",
+    resolution_daily: "Daily (365 values)",
+    resolution_hourly: "Hourly (8760 values)",
+    historicalHelp:
+      "Paste normalized EUR/MWh values in MVP order. File import and data cleaning are not part of this screen yet.",
+    fillOnes365: "Fill with 365 × 50",
+    fillOnes8760: "Fill with 8760 × 50",
+  },
+  economics: {
+    methanePrice: "Methane price (EUR/t CH₄)",
+    hydrogenPrice: "Hydrogen price (EUR/kg H₂)",
+    otherOpex: "Other OPEX (EUR/year)",
+    includeCapex: "Include CAPEX in cost stack",
+    electrolyzerCapex: "Electrolyzer CAPEX (EUR)",
+    methanationCapex: "Methanation CAPEX (EUR)",
+    capexLifetime: "CAPEX lifetime (years)",
+  },
+  advanced: {
+    inactiveFactorsTitle: "Not yet applied in daily formulas",
+    inactiveFactorsBody:
+      "Plant availability and process efficiency are carried with assumption metadata for transparency, but the current MVP daily engine does not multiply outputs by these values (defaults are neutral 100%).",
+    override: "Override default",
+    value: "Value",
+    assumptionSource: "Assumption source",
+    assumptionStatus: "Assumption status",
+    assumptionNote: "Note (optional)",
+    field_stoichH2: "Stoichiometric H₂ demand (kg H₂ / kg CO₂)",
+    field_stoichCh4: "Stoichiometric CH₄ yield (kg CH₄ / kg CO₂)",
+    field_secKwh: "Electrolyzer SEC (kWh / kg H₂)",
+    field_secMwh: "Electrolyzer SEC (MWh / kg H₂)",
+    field_plantAvail: "Plant availability (%)",
+    field_processEff: "Process efficiency (%)",
+  },
+  assumptionSource: {
+    customer_provided: "Customer provided",
+    product_locked: "Product locked",
+    literature_based: "Literature based",
+    placeholder: "Placeholder",
+    derived: "Derived",
+  },
+  assumptionStatus: {
+    confirmed: "Confirmed",
+    estimated: "Estimated",
+    pending_customer_confirmation: "Pending customer confirmation",
+    placeholder_only: "Placeholder only",
+  },
+  validation: {
+    seriesWrongCount: "Expected {{expected}} numbers, parsed {{actual}}.",
+    seriesNonNumeric: "Could not parse all entries as finite numbers.",
+    invalidNumber: "Enter a valid finite number.",
+    fieldRequired: "This field is required.",
+  },
+  results: {
+    title: "Latest result",
+    empty: "Run the calculation to see canonical outputs from the engine.",
+    success: "Calculation finished successfully.",
+    warningsTitle: "Warnings",
+    annualMethaneT: "Annual methane (t CH₄)",
+    annualTotalCost: "Annual total cost (EUR)",
+    annualCo2Utilized: "Annual CO₂ utilized (kg)",
+    annualElectricityMwh: "Annual electricity (MWh)",
+    deltaHydrogenPath: "Methane revenue minus H₂ sale alternative (EUR)",
+  },
+} as const satisfies MessageTree;

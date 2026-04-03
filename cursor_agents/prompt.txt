@@ -1,5 +1,4 @@
-First read AGENTS.md, .cursor/rules.md, solution-spec-v2.md, 
-calculation-implementation-spec-v2.md, and other relevant documentation.
+First read AGENTS.md, .cursor/rules.md, solution-spec-v2.md, and other relevant documentation.
 
 Provide as outcome:
 1. a short handoff summary with:
