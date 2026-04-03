@@ -93,6 +93,24 @@ describe("co2AvailabilityInputSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects time_series_daily with a negative entry", () => {
+    const series = [...ones365];
+    series[5] = -0.01;
+    const result = co2AvailabilityInputSchema.safeParse({
+      mode: "time_series_daily",
+      dailyAvailableCo2Kg: series,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects time_series_hourly with wrong length", () => {
+    const result = co2AvailabilityInputSchema.safeParse({
+      mode: "time_series_hourly",
+      hourlyAvailableCo2Kg: zeros8760.slice(0, 100),
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("electricityPriceInputSchema", () => {
@@ -206,6 +224,31 @@ describe("scenarioInputSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts utilization rate at boundaries 0 and 100", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          co2: {
+            annualAmountKtPerYear: 1,
+            utilizationRatePct: 0,
+            availability: { mode: "flat_annual" },
+          },
+        }),
+      ).success,
+    ).toBe(true);
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          co2: {
+            annualAmountKtPerYear: 1,
+            utilizationRatePct: 100,
+            availability: { mode: "flat_annual" },
+          },
+        }),
+      ).success,
+    ).toBe(true);
+  });
+
   it("rejects NaN in electricity price", () => {
     const result = safeParseScenarioInput(
       baseScenario({
@@ -227,6 +270,131 @@ describe("scenarioInputSchema", () => {
       }),
     );
     expect(result.success).toBe(false);
+  });
+
+  it("rejects empty scenario name", () => {
+    expect(safeParseScenarioInput(baseScenario({ scenarioName: "" })).success).toBe(false);
+  });
+
+  it("rejects whitespace-only scenario name", () => {
+    expect(safeParseScenarioInput(baseScenario({ scenarioName: "   " })).success).toBe(false);
+  });
+
+  it("rejects non-365 periodDays", () => {
+    expect(safeParseScenarioInput(baseScenario({ periodDays: 364 })).success).toBe(false);
+  });
+
+  it("rejects negative annual CO₂ (kt/year)", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          co2: {
+            annualAmountKtPerYear: -0.001,
+            utilizationRatePct: 50,
+            availability: { mode: "flat_annual" },
+          },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects non-finite annual CO₂ (kt/year)", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          co2: {
+            annualAmountKtPerYear: Number.POSITIVE_INFINITY,
+            utilizationRatePct: 50,
+            availability: { mode: "flat_annual" },
+          },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects negative hydrogen price", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          economics: {
+            methanePriceEurPerTch4: 1,
+            hydrogenPriceEurPerKg: -1,
+            otherOpexEurPerYear: 0,
+            includeCapex: false,
+          },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects empty assumptionsVersion", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          assumptionsMeta: { assumptionsVersion: "" },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects CAPEX enabled with zero lifetime", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          economics: {
+            methanePriceEurPerTch4: 1,
+            hydrogenPriceEurPerKg: 1,
+            otherOpexEurPerYear: 0,
+            includeCapex: true,
+            electrolyzerCapexEur: 1,
+            methanationCapexEur: 0,
+            capexLifetimeYears: 0,
+          },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects seasonal_daily CO₂ without monthly weights", () => {
+    expect(
+      co2AvailabilityInputSchema.safeParse({
+        mode: "seasonal_daily",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects unknown CO₂ mode string", () => {
+    expect(
+      co2AvailabilityInputSchema.safeParse({
+        mode: "unknown_mode",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects constant electricity without price field", () => {
+    expect(
+      electricityPriceInputSchema.safeParse({
+        mode: "constant",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects unknown electricity payload shape", () => {
+    expect(
+      electricityPriceInputSchema.safeParse({
+        mode: "unknown",
+        priceEurPerMwh: 1,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects strict scenario object with extra top-level keys", () => {
+    expect(
+      safeParseScenarioInput({
+        ...baseScenario(),
+        extraField: true,
+      }).success,
+    ).toBe(false);
   });
 });
 

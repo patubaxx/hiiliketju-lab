@@ -9,7 +9,7 @@ import {
 import { resolveCo2Series } from "@/core/calculation/resolve-co2-series";
 import { resolveElectricityPriceSeries } from "@/core/calculation/resolve-electricity-price-series";
 import { resolveElectrolyzerSecMwhPerKgH2 } from "@/core/calculation/validate-sec-consistency";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { mergeProcessAssumptionsInput, type Co2Input, type ScenarioInput } from "@/core/domain/scenario";
 import { annualCo2KtPerYearToKgPerYear } from "@/core/domain/units";
 import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 
@@ -116,6 +116,48 @@ describe("resolveCo2Series", () => {
       expect(p.availableCO2Kg).toBe(1);
     }
   });
+
+  it("seasonal_daily yields 365 rows with stable calendar labels", () => {
+    const series = resolveCo2Series(
+      baseScenario({
+        co2: {
+          annualAmountKtPerYear: 1,
+          utilizationRatePct: 100,
+          availability: {
+            mode: "seasonal_daily",
+            monthlyRelativeWeights: [...equalSeasonalWeights],
+          },
+        },
+      }).co2,
+    );
+    expect(series).toHaveLength(365);
+    expect(series[0]!.dateLabel).toBe("2023-01-01");
+    expect(series[0]!.dayIndex).toBe(0);
+    expect(series[364]!.dateLabel).toBe("2023-12-31");
+  });
+
+  it("throws RangeError when time_series_daily contains a negative value (resolver path)", () => {
+    const dailyAvailableCo2Kg = Array.from({ length: 365 }, () => 0);
+    dailyAvailableCo2Kg[10] = -1;
+    const co2: Co2Input = {
+      annualAmountKtPerYear: 1,
+      utilizationRatePct: 100,
+      availability: { mode: "time_series_daily", dailyAvailableCo2Kg },
+    };
+    expect(() => resolveCo2Series(co2)).toThrow(RangeError);
+  });
+
+  it("throws RangeError when time_series_hourly length is not 8760 (resolver path)", () => {
+    const co2: Co2Input = {
+      annualAmountKtPerYear: 1,
+      utilizationRatePct: 100,
+      availability: {
+        mode: "time_series_hourly",
+        hourlyAvailableCo2Kg: Array.from({ length: 100 }, () => 0),
+      },
+    };
+    expect(() => resolveCo2Series(co2)).toThrow(RangeError);
+  });
 });
 
 describe("resolveElectricityPriceSeries", () => {
@@ -165,6 +207,15 @@ describe("resolveElectricityPriceSeries", () => {
       b.map((p) => p.electricityPriceEurPerMWh),
     );
   });
+
+  it("throws when hourly_series has wrong hourly length", () => {
+    expect(() =>
+      resolveElectricityPriceSeries({
+        mode: "hourly_series",
+        hourlyPricesEurPerMwh: Array.from({ length: 100 }, () => 1),
+      }),
+    ).toThrow(RangeError);
+  });
 });
 
 describe("allocateCapex", () => {
@@ -197,6 +248,20 @@ describe("allocateCapex", () => {
     };
     expect(() => allocateCapex({ ...econ, capexLifetimeYears: 0 })).toThrow(RangeError);
     expect(() => allocateCapex({ ...econ, capexLifetimeYears: undefined })).toThrow(RangeError);
+  });
+
+  it("is deterministic for identical economics input", () => {
+    const econ = {
+      ...baseScenario().economics,
+      includeCapex: true,
+      electrolyzerCapexEur: 200_000,
+      methanationCapexEur: 100_000,
+      capexLifetimeYears: 5,
+    };
+    const a = allocateCapex(econ);
+    const b = allocateCapex(econ);
+    expect(a.annualCapexCostEur).toBe(b.annualCapexCostEur);
+    expect(a.dailyAllocatedCapexEur).toBe(b.dailyAllocatedCapexEur);
   });
 });
 
@@ -272,6 +337,42 @@ describe("calculateDailyResults formulas", () => {
     expect(row.variableCostEur).toBeCloseTo(row.electricityCostEur, 8);
     expect(row.methaneRevenueEur).toBeCloseTo((row.methaneProducedKg / 1000) * 1000, 8);
     expect(row.hydrogenAlternativeRevenueEur).toBeCloseTo(row.hydrogenNeededKg * 2, 8);
+  });
+
+  it("composes totalCostEur as variable cost plus daily CAPEX allocation", () => {
+    const scenario = baseScenario({
+      co2: {
+        annualAmountKtPerYear: 0.365,
+        utilizationRatePct: 100,
+        availability: { mode: "flat_annual" },
+      },
+      electricity: { mode: "constant", priceEurPerMwh: 20 },
+      economics: {
+        methanePriceEurPerTch4: 0,
+        hydrogenPriceEurPerKg: 0,
+        otherOpexEurPerYear: 0,
+        includeCapex: true,
+        electrolyzerCapexEur: 365_000,
+        methanationCapexEur: 0,
+        capexLifetimeYears: 1,
+      },
+    });
+    const co2 = resolveCo2Series(scenario.co2);
+    const el = resolveElectricityPriceSeries(scenario.electricity);
+    const sec = resolveElectrolyzerSecMwhPerKgH2(scenario.process);
+    const capex = allocateCapex(scenario.economics);
+    const daily = calculateDailyResults({
+      resolvedCo2: co2,
+      resolvedElectricityPrice: el,
+      economics: scenario.economics,
+      process: scenario.process,
+      electrolyzerSecMwhPerKgH2: sec.electrolyzerSecMwhPerKgH2,
+      dailyAllocatedCapexEur: capex.dailyAllocatedCapexEur,
+      utilizationRatePct: scenario.co2.utilizationRatePct,
+    });
+    const row = daily[0]!;
+    expect(row.totalCostEur).toBeCloseTo(row.variableCostEur + capex.dailyAllocatedCapexEur, 8);
+    expect(row.allocatedCapexCostEur).toBeCloseTo(capex.dailyAllocatedCapexEur, 10);
   });
 });
 
@@ -356,6 +457,38 @@ describe("aggregateMonthlyFromDaily", () => {
     const fromMonthly = r.monthlySummary.reduce((a, m) => a + m.sums.electricityCostEur, 0);
     expect(fromMonthly).toBeCloseTo(fromDaily, 6);
   });
+
+  it("reconciles methane and hydrogen alternative revenue sums monthly vs daily", () => {
+    const r = calculateScenario(baseScenario());
+    const dMeth = r.dailyResults.reduce((a, d) => a + d.methaneRevenueEur, 0);
+    const mMeth = r.monthlySummary.reduce((a, m) => a + m.sums.methaneRevenueEur, 0);
+    const dH2 = r.dailyResults.reduce((a, d) => a + d.hydrogenAlternativeRevenueEur, 0);
+    const mH2 = r.monthlySummary.reduce((a, m) => a + m.sums.hydrogenAlternativeRevenueEur, 0);
+    expect(mMeth).toBeCloseTo(dMeth, 5);
+    expect(mH2).toBeCloseTo(dH2, 5);
+    expect(r.annualSummary.annualMethaneRevenueEur).toBeCloseTo(dMeth, 5);
+    expect(r.annualSummary.hydrogenSalesAlternativeRevenueEur).toBeCloseTo(dH2, 5);
+  });
+
+  it("reconciles annual totals with summed daily rows for CAPEX and total cost", () => {
+    const r = calculateScenario(
+      baseScenario({
+        economics: {
+          methanePriceEurPerTch4: 100,
+          hydrogenPriceEurPerKg: 3,
+          otherOpexEurPerYear: 7300,
+          includeCapex: true,
+          electrolyzerCapexEur: 730_000,
+          methanationCapexEur: 0,
+          capexLifetimeYears: 1,
+        },
+      }),
+    );
+    const sumCapexDaily = r.dailyResults.reduce((a, d) => a + d.allocatedCapexCostEur, 0);
+    const sumTotalDaily = r.dailyResults.reduce((a, d) => a + d.totalCostEur, 0);
+    expect(r.annualSummary.annualCapexCostEur).toBeCloseTo(sumCapexDaily, 4);
+    expect(r.annualSummary.annualTotalCostEur).toBeCloseTo(sumTotalDaily, 4);
+  });
 });
 
 describe("calculateScenario integration", () => {
@@ -408,6 +541,45 @@ describe("calculateScenario integration", () => {
   it("adds a single literature-based estimated defaults warning for default process assumptions", () => {
     const r = calculateScenario(baseScenario());
     expect(r.warnings).toContain(WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
+  });
+
+  it("lists SEC mismatch at most once and preserves MWh authority", () => {
+    const scenario = parseScenarioInput({
+      scenarioName: "sec-once",
+      periodDays: 365,
+      co2: {
+        annualAmountKtPerYear: 0.365,
+        utilizationRatePct: 100,
+        availability: { mode: "flat_annual" },
+      },
+      electricity: { mode: "constant", priceEurPerMwh: 0 },
+      economics: {
+        methanePriceEurPerTch4: 0,
+        hydrogenPriceEurPerKg: 0,
+        otherOpexEurPerYear: 0,
+        includeCapex: false,
+      },
+      process: {
+        electrolyzerSpecificEnergyConsumptionKwhPerKgH2: {
+          value: 48,
+          assumptionMeta: { assumptionSource: "customer_provided", assumptionStatus: "confirmed" },
+        },
+        electrolyzerSpecificEnergyConsumptionMwhPerKgH2: {
+          value: 0.054,
+          assumptionMeta: { assumptionSource: "customer_provided", assumptionStatus: "confirmed" },
+        },
+      },
+      assumptionsMeta: { assumptionsVersion: "v" },
+    });
+    const r = calculateScenario(scenario);
+    const secMsgs = r.warnings.filter((w) => w.includes("Electrolyzer SEC inconsistency"));
+    expect(secMsgs).toHaveLength(1);
+    expect(r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS)).toHaveLength(1);
+  });
+
+  it("does not duplicate the literature umbrella warning when defaults are used", () => {
+    const r = calculateScenario(baseScenario());
+    expect(r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS)).toHaveLength(1);
   });
 });
 

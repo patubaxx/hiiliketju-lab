@@ -1,0 +1,943 @@
+diff --git a/test/calculation-contract.test.ts b/test/calculation-contract.test.ts
+new file mode 100644
+index 0000000..f7d6afd
+--- /dev/null
++++ b/test/calculation-contract.test.ts
+@@ -0,0 +1,148 @@
++import { describe, expect, it } from "vitest";
++
++import {
++  WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS,
++  calculateScenario,
++} from "@/core/calculation/calculate-scenario";
++import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
++
++import { assertCalculationResultShape } from "./helpers/assert-golden-scenario";
++
++const confirmed = {
++  assumptionSource: "customer_provided" as const,
++  assumptionStatus: "confirmed" as const,
++};
++
++function minimalScenarioRaw(overrides?: Record<string, unknown>) {
++  return {
++    scenarioName: "Contract test",
++    periodDays: 365,
++    co2: {
++      annualAmountKtPerYear: 0.365,
++      utilizationRatePct: 100,
++      availability: { mode: "flat_annual" as const },
++    },
++    electricity: { mode: "constant" as const, priceEurPerMwh: 10 },
++    economics: {
++      methanePriceEurPerTch4: 100,
++      hydrogenPriceEurPerKg: 2,
++      otherOpexEurPerYear: 0,
++      includeCapex: false,
++    },
++    assumptionsMeta: { assumptionsVersion: "contract_test" },
++    process: {},
++    ...overrides,
++  };
++}
++
++/** Every `AssumptionValue` inspected by `literatureEstimatedProcessWarning`, customer-confirmed. */
++function allProcessAssumptionsCustomerConfirmed() {
++  return {
++    stoichiometricHydrogenDemandFactorKgH2PerKgCo2: { value: 0.1832, assumptionMeta: confirmed },
++    stoichiometricMethaneYieldFactorKgCh4PerKgCo2: { value: 0.3645, assumptionMeta: confirmed },
++    electrolyzerSpecificEnergyConsumptionKwhPerKgH2: { value: 54, assumptionMeta: confirmed },
++    electrolyzerSpecificEnergyConsumptionMwhPerKgH2: { value: 0.054, assumptionMeta: confirmed },
++    plantAvailabilityPct: { value: 100, assumptionMeta: confirmed },
++    processEfficiencyPct: { value: 100, assumptionMeta: confirmed },
++  };
++}
++
++describe("CalculationResult contract (result.ts)", () => {
++  it("exposes canonical top-level keys including annualSummary and warnings", () => {
++    const r = calculateScenario(parseScenarioInput(minimalScenarioRaw()));
++    assertCalculationResultShape(r);
++    expect(r.input).toBeDefined();
++    expect(typeof r.annualSummary.annualTotalCostEur).toBe("number");
++  });
++
++  it("keeps CAPEX at zero on annualSummary when includeCapex is false", () => {
++    const r = calculateScenario(parseScenarioInput(minimalScenarioRaw()));
++    expect(r.annualSummary.annualCapexCostEur).toBe(0);
++    expect(r.dailyResults.every((d) => d.allocatedCapexCostEur === 0)).toBe(true);
++  });
++
++  it("reflects non-zero annualCapexCostEur when CAPEX is enabled", () => {
++    const r = calculateScenario(
++      parseScenarioInput(
++        minimalScenarioRaw({
++          economics: {
++            methanePriceEurPerTch4: 100,
++            hydrogenPriceEurPerKg: 2,
++            otherOpexEurPerYear: 0,
++            includeCapex: true,
++            electrolyzerCapexEur: 365_000,
++            methanationCapexEur: 0,
++            capexLifetimeYears: 1,
++          },
++        }),
++      ),
++    );
++    expect(r.annualSummary.annualCapexCostEur).toBeGreaterThan(0);
++    expect(r.annualSummary.annualCO2UtilizedKg).toBeLessThanOrEqual(r.annualSummary.annualCO2AvailableKg);
++  });
++
++  it("returns a deterministic result for identical parsed input", () => {
++    const input = parseScenarioInput(minimalScenarioRaw());
++    const a = calculateScenario(input);
++    const b = calculateScenario(input);
++    expect(a.dailyResults.map((d) => d.totalCostEur)).toEqual(b.dailyResults.map((d) => d.totalCostEur));
++    expect(a.warnings).toEqual(b.warnings);
++  });
++
++  it("preserves the full input snapshot on the result (including scenario-level assumptionsMeta)", () => {
++    const input = parseScenarioInput(
++      minimalScenarioRaw({
++        assumptionsMeta: { assumptionsVersion: "v_snapshot", notes: "scenario-level only" },
++      }),
++    );
++    const r = calculateScenario(input);
++    expect(r.input).toBe(input);
++    expect(r.input.assumptionsMeta.assumptionsVersion).toBe("v_snapshot");
++    expect(r.input.assumptionsMeta.notes).toBe("scenario-level only");
++    expect(r.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.assumptionMeta).toHaveProperty(
++      "assumptionSource",
++    );
++  });
++
++  it("does not emit the literature umbrella warning when every tracked process assumption is customer-confirmed", () => {
++    const r = calculateScenario(
++      parseScenarioInput(
++        minimalScenarioRaw({
++          process: allProcessAssumptionsCustomerConfirmed(),
++        }),
++      ),
++    );
++    expect(r.warnings).not.toContain(WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
++  });
++
++  it("keeps plantAvailabilityPct and processEfficiencyPct metadata-bearing on the snapshot", () => {
++    const input = parseScenarioInput(minimalScenarioRaw());
++    expect(input.process.plantAvailabilityPct.assumptionMeta.assumptionSource).toBe("literature_based");
++    expect(input.process.processEfficiencyPct.assumptionMeta.assumptionSource).toBe("literature_based");
++  });
++
++  it("does not change chemical or cost outputs when only plantAvailabilityPct value changes (inactive modifier)", () => {
++    const base = minimalScenarioRaw({
++      process: {
++        ...allProcessAssumptionsCustomerConfirmed(),
++        plantAvailabilityPct: { value: 100, assumptionMeta: confirmed },
++      },
++    });
++    const variant = {
++      ...base,
++      process: {
++        ...allProcessAssumptionsCustomerConfirmed(),
++        plantAvailabilityPct: { value: 42, assumptionMeta: confirmed },
++      },
++    };
++    const a = calculateScenario(parseScenarioInput(base));
++    const b = calculateScenario(parseScenarioInput(variant));
++    expect(a.annualSummary.annualMethaneProducedTons).toBeCloseTo(b.annualSummary.annualMethaneProducedTons, 10);
++    expect(a.annualSummary.annualHydrogenNeededKg).toBeCloseTo(b.annualSummary.annualHydrogenNeededKg, 10);
++    expect(a.annualSummary.annualElectricityConsumedMwh).toBeCloseTo(
++      b.annualSummary.annualElectricityConsumedMwh,
++      10,
++    );
++    expect(a.annualSummary.annualTotalCostEur).toBeCloseTo(b.annualSummary.annualTotalCostEur, 6);
++  });
++});
+diff --git a/test/calculation-engine.test.ts b/test/calculation-engine.test.ts
+index 46743ad..9181bd0 100644
+--- a/test/calculation-engine.test.ts
++++ b/test/calculation-engine.test.ts
+@@ -9,7 +9,7 @@ import {
+ import { resolveCo2Series } from "@/core/calculation/resolve-co2-series";
+ import { resolveElectricityPriceSeries } from "@/core/calculation/resolve-electricity-price-series";
+ import { resolveElectrolyzerSecMwhPerKgH2 } from "@/core/calculation/validate-sec-consistency";
+-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
++import { mergeProcessAssumptionsInput, type Co2Input, type ScenarioInput } from "@/core/domain/scenario";
+ import { annualCo2KtPerYearToKgPerYear } from "@/core/domain/units";
+ import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+ 
+@@ -116,6 +116,48 @@ describe("resolveCo2Series", () => {
+       expect(p.availableCO2Kg).toBe(1);
+     }
+   });
++
++  it("seasonal_daily yields 365 rows with stable calendar labels", () => {
++    const series = resolveCo2Series(
++      baseScenario({
++        co2: {
++          annualAmountKtPerYear: 1,
++          utilizationRatePct: 100,
++          availability: {
++            mode: "seasonal_daily",
++            monthlyRelativeWeights: [...equalSeasonalWeights],
++          },
++        },
++      }).co2,
++    );
++    expect(series).toHaveLength(365);
++    expect(series[0]!.dateLabel).toBe("2023-01-01");
++    expect(series[0]!.dayIndex).toBe(0);
++    expect(series[364]!.dateLabel).toBe("2023-12-31");
++  });
++
++  it("throws RangeError when time_series_daily contains a negative value (resolver path)", () => {
++    const dailyAvailableCo2Kg = Array.from({ length: 365 }, () => 0);
++    dailyAvailableCo2Kg[10] = -1;
++    const co2: Co2Input = {
++      annualAmountKtPerYear: 1,
++      utilizationRatePct: 100,
++      availability: { mode: "time_series_daily", dailyAvailableCo2Kg },
++    };
++    expect(() => resolveCo2Series(co2)).toThrow(RangeError);
++  });
++
++  it("throws RangeError when time_series_hourly length is not 8760 (resolver path)", () => {
++    const co2: Co2Input = {
++      annualAmountKtPerYear: 1,
++      utilizationRatePct: 100,
++      availability: {
++        mode: "time_series_hourly",
++        hourlyAvailableCo2Kg: Array.from({ length: 100 }, () => 0),
++      },
++    };
++    expect(() => resolveCo2Series(co2)).toThrow(RangeError);
++  });
+ });
+ 
+ describe("resolveElectricityPriceSeries", () => {
+@@ -165,6 +207,15 @@ describe("resolveElectricityPriceSeries", () => {
+       b.map((p) => p.electricityPriceEurPerMWh),
+     );
+   });
++
++  it("throws when hourly_series has wrong hourly length", () => {
++    expect(() =>
++      resolveElectricityPriceSeries({
++        mode: "hourly_series",
++        hourlyPricesEurPerMwh: Array.from({ length: 100 }, () => 1),
++      }),
++    ).toThrow(RangeError);
++  });
+ });
+ 
+ describe("allocateCapex", () => {
+@@ -198,6 +249,20 @@ describe("allocateCapex", () => {
+     expect(() => allocateCapex({ ...econ, capexLifetimeYears: 0 })).toThrow(RangeError);
+     expect(() => allocateCapex({ ...econ, capexLifetimeYears: undefined })).toThrow(RangeError);
+   });
++
++  it("is deterministic for identical economics input", () => {
++    const econ = {
++      ...baseScenario().economics,
++      includeCapex: true,
++      electrolyzerCapexEur: 200_000,
++      methanationCapexEur: 100_000,
++      capexLifetimeYears: 5,
++    };
++    const a = allocateCapex(econ);
++    const b = allocateCapex(econ);
++    expect(a.annualCapexCostEur).toBe(b.annualCapexCostEur);
++    expect(a.dailyAllocatedCapexEur).toBe(b.dailyAllocatedCapexEur);
++  });
+ });
+ 
+ describe("resolveElectrolyzerSecMwhPerKgH2 (SEC policy)", () => {
+@@ -273,6 +338,42 @@ describe("calculateDailyResults formulas", () => {
+     expect(row.methaneRevenueEur).toBeCloseTo((row.methaneProducedKg / 1000) * 1000, 8);
+     expect(row.hydrogenAlternativeRevenueEur).toBeCloseTo(row.hydrogenNeededKg * 2, 8);
+   });
++
++  it("composes totalCostEur as variable cost plus daily CAPEX allocation", () => {
++    const scenario = baseScenario({
++      co2: {
++        annualAmountKtPerYear: 0.365,
++        utilizationRatePct: 100,
++        availability: { mode: "flat_annual" },
++      },
++      electricity: { mode: "constant", priceEurPerMwh: 20 },
++      economics: {
++        methanePriceEurPerTch4: 0,
++        hydrogenPriceEurPerKg: 0,
++        otherOpexEurPerYear: 0,
++        includeCapex: true,
++        electrolyzerCapexEur: 365_000,
++        methanationCapexEur: 0,
++        capexLifetimeYears: 1,
++      },
++    });
++    const co2 = resolveCo2Series(scenario.co2);
++    const el = resolveElectricityPriceSeries(scenario.electricity);
++    const sec = resolveElectrolyzerSecMwhPerKgH2(scenario.process);
++    const capex = allocateCapex(scenario.economics);
++    const daily = calculateDailyResults({
++      resolvedCo2: co2,
++      resolvedElectricityPrice: el,
++      economics: scenario.economics,
++      process: scenario.process,
++      electrolyzerSecMwhPerKgH2: sec.electrolyzerSecMwhPerKgH2,
++      dailyAllocatedCapexEur: capex.dailyAllocatedCapexEur,
++      utilizationRatePct: scenario.co2.utilizationRatePct,
++    });
++    const row = daily[0]!;
++    expect(row.totalCostEur).toBeCloseTo(row.variableCostEur + capex.dailyAllocatedCapexEur, 8);
++    expect(row.allocatedCapexCostEur).toBeCloseTo(capex.dailyAllocatedCapexEur, 10);
++  });
+ });
+ 
+ describe("aggregateAnnualFromDaily", () => {
+@@ -356,6 +457,38 @@ describe("aggregateMonthlyFromDaily", () => {
+     const fromMonthly = r.monthlySummary.reduce((a, m) => a + m.sums.electricityCostEur, 0);
+     expect(fromMonthly).toBeCloseTo(fromDaily, 6);
+   });
++
++  it("reconciles methane and hydrogen alternative revenue sums monthly vs daily", () => {
++    const r = calculateScenario(baseScenario());
++    const dMeth = r.dailyResults.reduce((a, d) => a + d.methaneRevenueEur, 0);
++    const mMeth = r.monthlySummary.reduce((a, m) => a + m.sums.methaneRevenueEur, 0);
++    const dH2 = r.dailyResults.reduce((a, d) => a + d.hydrogenAlternativeRevenueEur, 0);
++    const mH2 = r.monthlySummary.reduce((a, m) => a + m.sums.hydrogenAlternativeRevenueEur, 0);
++    expect(mMeth).toBeCloseTo(dMeth, 5);
++    expect(mH2).toBeCloseTo(dH2, 5);
++    expect(r.annualSummary.annualMethaneRevenueEur).toBeCloseTo(dMeth, 5);
++    expect(r.annualSummary.hydrogenSalesAlternativeRevenueEur).toBeCloseTo(dH2, 5);
++  });
++
++  it("reconciles annual totals with summed daily rows for CAPEX and total cost", () => {
++    const r = calculateScenario(
++      baseScenario({
++        economics: {
++          methanePriceEurPerTch4: 100,
++          hydrogenPriceEurPerKg: 3,
++          otherOpexEurPerYear: 7300,
++          includeCapex: true,
++          electrolyzerCapexEur: 730_000,
++          methanationCapexEur: 0,
++          capexLifetimeYears: 1,
++        },
++      }),
++    );
++    const sumCapexDaily = r.dailyResults.reduce((a, d) => a + d.allocatedCapexCostEur, 0);
++    const sumTotalDaily = r.dailyResults.reduce((a, d) => a + d.totalCostEur, 0);
++    expect(r.annualSummary.annualCapexCostEur).toBeCloseTo(sumCapexDaily, 4);
++    expect(r.annualSummary.annualTotalCostEur).toBeCloseTo(sumTotalDaily, 4);
++  });
+ });
+ 
+ describe("calculateScenario integration", () => {
+@@ -409,6 +542,45 @@ describe("calculateScenario integration", () => {
+     const r = calculateScenario(baseScenario());
+     expect(r.warnings).toContain(WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
+   });
++
++  it("lists SEC mismatch at most once and preserves MWh authority", () => {
++    const scenario = parseScenarioInput({
++      scenarioName: "sec-once",
++      periodDays: 365,
++      co2: {
++        annualAmountKtPerYear: 0.365,
++        utilizationRatePct: 100,
++        availability: { mode: "flat_annual" },
++      },
++      electricity: { mode: "constant", priceEurPerMwh: 0 },
++      economics: {
++        methanePriceEurPerTch4: 0,
++        hydrogenPriceEurPerKg: 0,
++        otherOpexEurPerYear: 0,
++        includeCapex: false,
++      },
++      process: {
++        electrolyzerSpecificEnergyConsumptionKwhPerKgH2: {
++          value: 48,
++          assumptionMeta: { assumptionSource: "customer_provided", assumptionStatus: "confirmed" },
++        },
++        electrolyzerSpecificEnergyConsumptionMwhPerKgH2: {
++          value: 0.054,
++          assumptionMeta: { assumptionSource: "customer_provided", assumptionStatus: "confirmed" },
++        },
++      },
++      assumptionsMeta: { assumptionsVersion: "v" },
++    });
++    const r = calculateScenario(scenario);
++    const secMsgs = r.warnings.filter((w) => w.includes("Electrolyzer SEC inconsistency"));
++    expect(secMsgs).toHaveLength(1);
++    expect(r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS)).toHaveLength(1);
++  });
++
++  it("does not duplicate the literature umbrella warning when defaults are used", () => {
++    const r = calculateScenario(baseScenario());
++    expect(r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS)).toHaveLength(1);
++  });
+ });
+ 
+ describe("usableCo2KgPerDay", () => {
+diff --git a/test/fixtures/golden-scenarios.ts b/test/fixtures/golden-scenarios.ts
+new file mode 100644
+index 0000000..2c5a207
+--- /dev/null
++++ b/test/fixtures/golden-scenarios.ts
+@@ -0,0 +1,111 @@
++/**
++ * Golden scenario **inputs** (MVP regression fixtures).
++ * Expected metrics are asserted in tests using helpers + documented arithmetic.
++ */
++
++/** GS-001 — flat annual CO₂, constant electricity, CAPEX off, round numbers. */
++export const GS001_FLAT_ANNUAL_BASELINE_RAW = {
++  scenarioName: "GS-001 flat annual baseline",
++  periodDays: 365 as const,
++  co2: {
++    annualAmountKtPerYear: 1,
++    utilizationRatePct: 100,
++    availability: { mode: "flat_annual" as const },
++  },
++  electricity: {
++    mode: "constant" as const,
++    priceEurPerMwh: 50,
++  },
++  economics: {
++    methanePriceEurPerTch4: 120,
++    hydrogenPriceEurPerKg: 6,
++    otherOpexEurPerYear: 0,
++    includeCapex: false,
++  },
++  assumptionsMeta: {
++    assumptionsVersion: "golden_gs001",
++    notes: "Golden baseline — not customer-confirmed",
++  },
++  process: {},
++} as const;
++
++/** GS-002 — seasonal CO₂, daily electricity series, CAPEX on. */
++const dailyPricesGs002 = Array.from({ length: 365 }, (_, d) => 40 + (d % 7));
++
++export const GS002_SEASONAL_CAPEX_RAW = {
++  scenarioName: "GS-002 seasonal + CAPEX",
++  periodDays: 365 as const,
++  co2: {
++    annualAmountKtPerYear: 1,
++    utilizationRatePct: 100,
++    availability: {
++      mode: "seasonal_daily" as const,
++      monthlyRelativeWeights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
++    },
++  },
++  electricity: {
++    mode: "daily_series" as const,
++    dailyPricesEurPerMwh: dailyPricesGs002,
++  },
++  economics: {
++    methanePriceEurPerTch4: 200,
++    hydrogenPriceEurPerKg: 5,
++    otherOpexEurPerYear: 36_500,
++    includeCapex: true,
++    electrolyzerCapexEur: 1_000_000,
++    methanationCapexEur: 500_000,
++    capexLifetimeYears: 10,
++  },
++  assumptionsMeta: {
++    assumptionsVersion: "golden_gs002",
++  },
++  process: {},
++} as const;
++
++/** GS-003 — SEC kWh/MWh mismatch (warning) while other defaults stay literature-estimated. */
++export const GS003_SEC_WARNING_RAW = {
++  scenarioName: "GS-003 SEC mismatch warnings",
++  periodDays: 365 as const,
++  co2: {
++    annualAmountKtPerYear: 0.365,
++    utilizationRatePct: 100,
++    availability: { mode: "flat_annual" as const },
++  },
++  electricity: { mode: "constant" as const, priceEurPerMwh: 10 },
++  economics: {
++    methanePriceEurPerTch4: 0,
++    hydrogenPriceEurPerKg: 0,
++    otherOpexEurPerYear: 0,
++    includeCapex: false,
++  },
++  assumptionsMeta: { assumptionsVersion: "golden_gs003" },
++  process: {
++    electrolyzerSpecificEnergyConsumptionKwhPerKgH2: {
++      value: 40,
++      assumptionMeta: {
++        assumptionSource: "customer_provided" as const,
++        assumptionStatus: "confirmed" as const,
++      },
++    },
++    electrolyzerSpecificEnergyConsumptionMwhPerKgH2: {
++      value: 0.054,
++      assumptionMeta: {
++        assumptionSource: "customer_provided" as const,
++        assumptionStatus: "confirmed" as const,
++      },
++    },
++  },
++} as const;
++
++/**
++ * Independent totals for GS-001 (1 kt/y flat, 100% util, default stoichiometry & SEC).
++ * annualCo2 kg = 1e6; daily available = 1e6/365.
++ */
++export const GS001_EXPECTED_ANNUAL = {
++  annualCO2AvailableKg: 1_000_000,
++  annualCO2UtilizedKg: 1_000_000,
++  co2RecyclingRatePct: 100,
++  annualHydrogenNeededKg: 183_200,
++  annualMethaneProducedTons: 364.5,
++  annualElectricityConsumedMwh: 9892.8,
++} as const;
+diff --git a/test/golden-scenarios.test.ts b/test/golden-scenarios.test.ts
+new file mode 100644
+index 0000000..d2d18e3
+--- /dev/null
++++ b/test/golden-scenarios.test.ts
+@@ -0,0 +1,134 @@
++import { describe, expect, it } from "vitest";
++
++import {
++  WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS,
++  calculateScenario,
++} from "@/core/calculation/calculate-scenario";
++import { annualCo2KtPerYearToKgPerYear } from "@/core/domain/units";
++import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
++
++import {
++  GS001_EXPECTED_ANNUAL,
++  GS001_FLAT_ANNUAL_BASELINE_RAW,
++  GS002_SEASONAL_CAPEX_RAW,
++  GS003_SEC_WARNING_RAW,
++} from "./fixtures/golden-scenarios";
++import {
++  assertCalculationResultShape,
++  assertFirstDailyRowClose,
++  assertPartialScenarioSummary,
++  expectClose,
++} from "./helpers/assert-golden-scenario";
++
++describe("golden scenarios (MVP regression)", () => {
++  it("GS-001 flat annual baseline matches locked stoichiometry, cost stack, and literature warning", () => {
++    const input = parseScenarioInput(GS001_FLAT_ANNUAL_BASELINE_RAW);
++    const r = calculateScenario(input);
++
++    assertCalculationResultShape(r);
++    expect(r.input.assumptionsMeta.assumptionsVersion).toBe("golden_gs001");
++    expect(r.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.assumptionMeta.assumptionSource).toBe(
++      "literature_based",
++    );
++
++    const lit = r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
++    expect(lit).toHaveLength(1);
++
++    assertPartialScenarioSummary(
++      r.annualSummary,
++      {
++        annualCO2AvailableKg: GS001_EXPECTED_ANNUAL.annualCO2AvailableKg,
++        annualCO2UtilizedKg: GS001_EXPECTED_ANNUAL.annualCO2UtilizedKg,
++        co2RecyclingRatePct: GS001_EXPECTED_ANNUAL.co2RecyclingRatePct,
++        annualHydrogenNeededKg: GS001_EXPECTED_ANNUAL.annualHydrogenNeededKg,
++        annualMethaneProducedTons: GS001_EXPECTED_ANNUAL.annualMethaneProducedTons,
++        annualElectricityConsumedMwh: GS001_EXPECTED_ANNUAL.annualElectricityConsumedMwh,
++        annualCapexCostEur: 0,
++      },
++      4,
++    );
++
++    const annualKg = annualCo2KtPerYearToKgPerYear(1);
++    const perDayAvail = annualKg / 365;
++    const annualElecCost = GS001_EXPECTED_ANNUAL.annualElectricityConsumedMwh * 50;
++    assertPartialScenarioSummary(
++      r.annualSummary,
++      {
++        annualVariableCostEur: annualElecCost,
++        annualTotalCostEur: annualElecCost,
++        annualMethaneRevenueEur: GS001_EXPECTED_ANNUAL.annualMethaneProducedTons * 120,
++        hydrogenSalesAlternativeRevenueEur: GS001_EXPECTED_ANNUAL.annualHydrogenNeededKg * 6,
++      },
++      3,
++    );
++
++    const tons = r.annualSummary.annualMethaneProducedTons;
++    expectClose(r.annualSummary.breakEvenMethanePriceEurPerTon!, r.annualSummary.annualTotalCostEur / tons, 5);
++    expectClose(
++      r.annualSummary.methanePriceAt10PctProfitabilityEurPerTon!,
++      (r.annualSummary.annualTotalCostEur * 1.1) / tons,
++      5,
++    );
++    expectClose(
++      r.annualSummary.methanePriceAt30PctProfitabilityEurPerTon!,
++      (r.annualSummary.annualTotalCostEur * 1.3) / tons,
++      5,
++    );
++
++    const usable0 = perDayAvail;
++    assertFirstDailyRowClose(
++      r,
++      {
++        availableCO2Kg: perDayAvail,
++        usableCO2Kg: usable0,
++        hydrogenNeededKg: usable0 * 0.1832,
++        methaneProducedKg: usable0 * 0.3645,
++        electricityConsumedMwh: usable0 * 0.1832 * 0.054,
++        electricityCostEur: usable0 * 0.1832 * 0.054 * 50,
++        variableCostEur: usable0 * 0.1832 * 0.054 * 50,
++        allocatedCapexCostEur: 0,
++        totalCostEur: usable0 * 0.1832 * 0.054 * 50,
++      },
++      5,
++    );
++  });
++
++  it("GS-002 seasonal + daily electricity + CAPEX preserves annual CO₂ mass and allocates CAPEX", () => {
++    const input = parseScenarioInput(GS002_SEASONAL_CAPEX_RAW);
++    const a = calculateScenario(input);
++    const b = calculateScenario(input);
++
++    assertCalculationResultShape(a);
++    expect(a.annualSummary).toEqual(b.annualSummary);
++
++    const sumCo2 = a.resolvedDailyCo2.reduce((s, p) => s + p.availableCO2Kg, 0);
++    expect(sumCo2).toBeCloseTo(annualCo2KtPerYearToKgPerYear(1), 4);
++
++    expectClose(a.annualSummary.annualCapexCostEur, 150_000, 4);
++    expect(a.dailyResults.every((d) => d.allocatedCapexCostEur === a.dailyResults[0]!.allocatedCapexCostEur)).toBe(
++      true,
++    );
++    expectClose(a.dailyResults[0]!.allocatedCapexCostEur, 150_000 / 365, 6);
++
++    const fromDaily =
++      a.dailyResults.reduce((s, d) => s + d.methaneRevenueEur, 0) -
++      a.dailyResults.reduce((s, d) => s + d.hydrogenAlternativeRevenueEur, 0);
++    expectClose(a.annualSummary.deltaVsHydrogenSaleEur, fromDaily, 4);
++
++    const sumMonthlyCapex = a.monthlySummary.reduce((s, m) => s + m.sums.allocatedCapexCostEur, 0);
++    expectClose(sumMonthlyCapex, a.annualSummary.annualCapexCostEur, 4);
++
++    expect(a.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS)).toHaveLength(1);
++  });
++
++  it("GS-003 SEC mismatch stacks with literature warning without duplicating either", () => {
++    const r = calculateScenario(parseScenarioInput(GS003_SEC_WARNING_RAW));
++    assertCalculationResultShape(r);
++
++    const sec = r.warnings.filter((w) => w.includes("Electrolyzer SEC inconsistency"));
++    const lit = r.warnings.filter((w) => w === WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
++    expect(sec).toHaveLength(1);
++    expect(lit).toHaveLength(1);
++    expect(r.warnings).toHaveLength(2);
++  });
++});
+diff --git a/test/helpers/assert-golden-scenario.ts b/test/helpers/assert-golden-scenario.ts
+new file mode 100644
+index 0000000..5721829
+--- /dev/null
++++ b/test/helpers/assert-golden-scenario.ts
+@@ -0,0 +1,106 @@
++import { expect } from "vitest";
++
++import type { CalculationResult } from "@/core/domain/result";
++import type { ScenarioSummary } from "@/core/domain/result";
++import { SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
++
++/** Canonical `CalculationResult` keys from `result.ts` (regression guard). */
++export const CALCULATION_RESULT_TOP_LEVEL_KEYS = [
++  "input",
++  "resolvedDailyCo2",
++  "resolvedDailyElectricityPrice",
++  "dailyResults",
++  "monthlySummary",
++  "annualSummary",
++  "warnings",
++] as const satisfies readonly (keyof CalculationResult)[];
++
++/** Required `ScenarioSummary` keys for structural smoke checks. */
++export const SCENARIO_SUMMARY_KEYS: (keyof ScenarioSummary)[] = [
++  "annualCO2AvailableKg",
++  "annualCO2UtilizedKg",
++  "co2RecyclingRatePct",
++  "annualMethaneProducedTons",
++  "annualHydrogenNeededKg",
++  "annualElectricityConsumedMwh",
++  "annualVariableCostEur",
++  "annualCapexCostEur",
++  "annualTotalCostEur",
++  "annualMethaneRevenueEur",
++  "hydrogenSalesAlternativeRevenueEur",
++  "breakEvenMethanePriceEurPerTon",
++  "methanePriceAt10PctProfitabilityEurPerTon",
++  "methanePriceAt30PctProfitabilityEurPerTon",
++  "deltaVsHydrogenSaleEur",
++];
++
++export function assertCalculationResultShape(result: CalculationResult): void {
++  for (const key of CALCULATION_RESULT_TOP_LEVEL_KEYS) {
++    expect(result).toHaveProperty(key);
++  }
++  expect(result.dailyResults).toHaveLength(SCENARIO_PERIOD_DAYS);
++  expect(result.resolvedDailyCo2).toHaveLength(SCENARIO_PERIOD_DAYS);
++  expect(result.resolvedDailyElectricityPrice).toHaveLength(SCENARIO_PERIOD_DAYS);
++  expect(result.monthlySummary).toHaveLength(12);
++  expect(Array.isArray(result.warnings)).toBe(true);
++  for (const key of SCENARIO_SUMMARY_KEYS) {
++    expect(result.annualSummary).toHaveProperty(key);
++  }
++}
++
++export function expectClose(
++  actual: number,
++  expected: number,
++  precision: number,
++  message?: string,
++): void {
++  expect(actual, message).toBeCloseTo(expected, precision);
++}
++
++/**
++ * Compare a subset of `ScenarioSummary` fields with numeric tolerance or exact null.
++ */
++export function assertPartialScenarioSummary(
++  actual: ScenarioSummary,
++  partial: Partial<Record<keyof ScenarioSummary, number | null>>,
++  precision: number,
++): void {
++  for (const [rawKey, expected] of Object.entries(partial)) {
++    const key = rawKey as keyof ScenarioSummary;
++    const got = actual[key];
++    if (expected === null) {
++      expect(got, `ScenarioSummary.${key}`).toBeNull();
++      continue;
++    }
++    if (typeof expected === "number" && typeof got === "number") {
++      expect(got, `ScenarioSummary.${key}`).toBeCloseTo(expected, precision);
++      continue;
++    }
++    expect(got, `ScenarioSummary.${key}`).toBe(expected);
++  }
++}
++
++/**
++ * First day slice of `dailyResults` for lightweight golden checks.
++ */
++export function assertFirstDailyRowClose(
++  result: CalculationResult,
++  partial: Partial<{
++    availableCO2Kg: number;
++    usableCO2Kg: number;
++    hydrogenNeededKg: number;
++    methaneProducedKg: number;
++    electricityConsumedMwh: number;
++    electricityCostEur: number;
++    variableCostEur: number;
++    allocatedCapexCostEur: number;
++    totalCostEur: number;
++  }>,
++  precision: number,
++): void {
++  const row = result.dailyResults[0]!;
++  for (const [k, expected] of Object.entries(partial)) {
++    const key = k as keyof typeof partial;
++    expect(row[key], `dailyResults[0].${key}`).toBeCloseTo(expected as number, precision);
++  }
++}
+diff --git a/test/scenario-schemas.test.ts b/test/scenario-schemas.test.ts
+index d3d0002..76ea070 100644
+--- a/test/scenario-schemas.test.ts
++++ b/test/scenario-schemas.test.ts
+@@ -93,6 +93,24 @@ describe("co2AvailabilityInputSchema", () => {
+     });
+     expect(result.success).toBe(false);
+   });
++
++  it("rejects time_series_daily with a negative entry", () => {
++    const series = [...ones365];
++    series[5] = -0.01;
++    const result = co2AvailabilityInputSchema.safeParse({
++      mode: "time_series_daily",
++      dailyAvailableCo2Kg: series,
++    });
++    expect(result.success).toBe(false);
++  });
++
++  it("rejects time_series_hourly with wrong length", () => {
++    const result = co2AvailabilityInputSchema.safeParse({
++      mode: "time_series_hourly",
++      hourlyAvailableCo2Kg: zeros8760.slice(0, 100),
++    });
++    expect(result.success).toBe(false);
++  });
+ });
+ 
+ describe("electricityPriceInputSchema", () => {
+@@ -206,6 +224,31 @@ describe("scenarioInputSchema", () => {
+     expect(result.success).toBe(false);
+   });
+ 
++  it("accepts utilization rate at boundaries 0 and 100", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          co2: {
++            annualAmountKtPerYear: 1,
++            utilizationRatePct: 0,
++            availability: { mode: "flat_annual" },
++          },
++        }),
++      ).success,
++    ).toBe(true);
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          co2: {
++            annualAmountKtPerYear: 1,
++            utilizationRatePct: 100,
++            availability: { mode: "flat_annual" },
++          },
++        }),
++      ).success,
++    ).toBe(true);
++  });
++
+   it("rejects NaN in electricity price", () => {
+     const result = safeParseScenarioInput(
+       baseScenario({
+@@ -228,6 +271,131 @@ describe("scenarioInputSchema", () => {
+     );
+     expect(result.success).toBe(false);
+   });
++
++  it("rejects empty scenario name", () => {
++    expect(safeParseScenarioInput(baseScenario({ scenarioName: "" })).success).toBe(false);
++  });
++
++  it("rejects whitespace-only scenario name", () => {
++    expect(safeParseScenarioInput(baseScenario({ scenarioName: "   " })).success).toBe(false);
++  });
++
++  it("rejects non-365 periodDays", () => {
++    expect(safeParseScenarioInput(baseScenario({ periodDays: 364 })).success).toBe(false);
++  });
++
++  it("rejects negative annual CO₂ (kt/year)", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          co2: {
++            annualAmountKtPerYear: -0.001,
++            utilizationRatePct: 50,
++            availability: { mode: "flat_annual" },
++          },
++        }),
++      ).success,
++    ).toBe(false);
++  });
++
++  it("rejects non-finite annual CO₂ (kt/year)", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          co2: {
++            annualAmountKtPerYear: Number.POSITIVE_INFINITY,
++            utilizationRatePct: 50,
++            availability: { mode: "flat_annual" },
++          },
++        }),
++      ).success,
++    ).toBe(false);
++  });
++
++  it("rejects negative hydrogen price", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          economics: {
++            methanePriceEurPerTch4: 1,
++            hydrogenPriceEurPerKg: -1,
++            otherOpexEurPerYear: 0,
++            includeCapex: false,
++          },
++        }),
++      ).success,
++    ).toBe(false);
++  });
++
++  it("rejects empty assumptionsVersion", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          assumptionsMeta: { assumptionsVersion: "" },
++        }),
++      ).success,
++    ).toBe(false);
++  });
++
++  it("rejects CAPEX enabled with zero lifetime", () => {
++    expect(
++      safeParseScenarioInput(
++        baseScenario({
++          economics: {
++            methanePriceEurPerTch4: 1,
++            hydrogenPriceEurPerKg: 1,
++            otherOpexEurPerYear: 0,
++            includeCapex: true,
++            electrolyzerCapexEur: 1,
++            methanationCapexEur: 0,
++            capexLifetimeYears: 0,
++          },
++        }),
++      ).success,
++    ).toBe(false);
++  });
++
++  it("rejects seasonal_daily CO₂ without monthly weights", () => {
++    expect(
++      co2AvailabilityInputSchema.safeParse({
++        mode: "seasonal_daily",
++      }).success,
++    ).toBe(false);
++  });
++
++  it("rejects unknown CO₂ mode string", () => {
++    expect(
++      co2AvailabilityInputSchema.safeParse({
++        mode: "unknown_mode",
++      }).success,
++    ).toBe(false);
++  });
++
++  it("rejects constant electricity without price field", () => {
++    expect(
++      electricityPriceInputSchema.safeParse({
++        mode: "constant",
++      }).success,
++    ).toBe(false);
++  });
++
++  it("rejects unknown electricity payload shape", () => {
++    expect(
++      electricityPriceInputSchema.safeParse({
++        mode: "unknown",
++        priceEurPerMwh: 1,
++      }).success,
++    ).toBe(false);
++  });
++
++  it("rejects strict scenario object with extra top-level keys", () => {
++    expect(
++      safeParseScenarioInput({
++        ...baseScenario(),
++        extraField: true,
++      }).success,
++    ).toBe(false);
++  });
+ });
+ 
+ describe("buildSeasonalDailyCo2ProfileKg", () => {
