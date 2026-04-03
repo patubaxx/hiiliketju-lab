@@ -35,7 +35,7 @@ The MVP must produce, at minimum:
 
 ## 2. MVP Scope
 
-### Included in MVP
+### 2.1 Included in MVP
 - temporally resolved calculation using **daily internal resolution**
 - support for CO₂ availability input modes:
   - `flat_annual`
@@ -57,7 +57,7 @@ The MVP must produce, at minimum:
 - PDF export
 - assumptions metadata and assumptions flags
 
-### Explicitly out of scope in MVP
+### 2.2 Explicitly out of scope in MVP
 - native hourly internal calculation engine
 - dispatch/load optimization
 - storage dynamics
@@ -114,12 +114,12 @@ Minimum expected example:
 
 ## 4. Users and Primary Use Cases
 
-### User groups
+### 4.1 User groups
 - researcher / analyst
 - industrial stakeholder
 - internal project expert
 
-### Primary use cases
+### 4.2 Primary use cases
 
 #### UC1: Build scenario
 User defines CO₂ input, temporal availability, electricity pricing assumptions, economic assumptions, and optional CAPEX inputs.
@@ -182,6 +182,7 @@ The following defaults are locked for MVP and must be flagged as `literature_bas
 
 ### 6.4 Modifier policy
 Availability and efficiency modifiers may exist in advanced assumptions, but the stoichiometric core must remain visible and separable from modifier effects.
+Plant availability and process efficiency are schema- and assumption-ready MVP fields. They may be displayed and versioned before they are applied as active multipliers in the first engine iteration.
 
 ---
 
@@ -240,6 +241,12 @@ At minimum:
 - cost vs revenue
 - methane path vs hydrogen sales comparison
 
+#### Tables
+At minimum:
+- annual summary
+- monthly or aggregated summary
+- optional daily preview
+
 ### 7.4 Export functions
 
 #### Excel
@@ -294,7 +301,7 @@ Must include:
 - capexLifetimeYears
 
 #### F. Calculation settings
-- timeResolution input contract
+- requestedTimeResolution input contract
 - internalCalculationResolution
 - assumptionsVersion
 
@@ -310,9 +317,11 @@ Must include:
 
 ### 8.4 CAPEX logic
 If `includeCapex = true`, then:
+
 `annualCapexCost = (electrolyzerCapexEur + methanationCapexEur) / capexLifetimeYears`
 
 If `includeCapex = false`, then:
+
 `annualCapexCost = 0`
 
 ### 8.5 Profitability logic
@@ -322,8 +331,36 @@ If `includeCapex = false`, then:
 
 ---
 
-## 9. Domain Model Direction
+## 9. Units and Measurement Conventions
 
+### 9.1 User-facing default units
+- CO₂: `kt/year`
+- H₂: `kg`
+- CH₄: `t/year`
+- methane price: `EUR/t_CH4`
+- electricity: `MWh`
+- electricity price: `EUR/MWh`
+- other OPEX: `EUR/year`
+- CAPEX: `EUR`
+
+### 9.2 Internal canonical units
+- CO₂ timestep value: `kg/day`
+- H₂ timestep value: `kg/day`
+- CH₄ timestep value: `kg/day`
+- electricity timestep value: `MWh/day`
+- money timestep value: `EUR/day`
+
+### 9.3 Unit principles
+- every input and output field must display units explicitly
+- internal units and user-facing units must be kept distinct where needed
+- exports must use the same business-facing units as the UI unless explicitly justified otherwise
+- unit transformations must live in calculation/domain helpers, not in UI components
+
+---
+
+## 10. Domain Model Direction and Calculation I/O Contract
+
+### 10.1 Domain model direction
 The domain model must support:
 - multiple temporal input modes
 - explicit assumption flags
@@ -332,30 +369,403 @@ The domain model must support:
 - daily internal calculation outputs
 - annual business outputs
 
+### 10.2 Input contract
+The calculation engine accepts one validated scenario input object containing:
+- scenario metadata
+- CO₂ input data
+- electricity price input data
+- economic inputs
+- optional CAPEX inputs
+- assumptions metadata
+
+### 10.3 Output contract
+The calculation engine returns one canonical calculation result containing:
+- raw input snapshot
+- resolved daily time series
+- assumptions metadata including source flags
+- annual summary
+- warnings array
+- export-ready formatted sections or export-ready mapping inputs
+
+### 10.4 Contract principles
+- input is validated before calculation
+- calculation does not fetch external data
+- calculation is deterministic
+- the same input always produces the same output
+- output contains everything needed by UI and exports
+- calculation consumes canonical resolved temporal series rather than raw UI-specific source formats
+
 ---
 
-## 10. Definition of Done for MVP
+## 11. Validation and Error Handling
+
+### 11.1 Input validation
+- required fields are checked
+- invalid negative values are blocked where appropriate
+- percentage fields are range-limited
+- profile mode and profile data must match
+- electricity price mode and price data must match
+- temporal series length must be valid for the selected mode
+- optional CAPEX inputs must be complete if CAPEX is enabled
+- CAPEX lifetime must be greater than zero if CAPEX is enabled
+
+### 11.2 Error cases
+- missing inputs
+- invalid numeric values
+- unsupported mode/data combination
+- inconsistent temporal series
+- calculation does not produce valid output
+- zero methane output causes invalid profitability price division
+
+### 11.3 Soft warnings
+Warnings may be emitted for:
+- literature-based defaults in use
+- customer confirmation still pending for business-critical values
+- imported historical data gaps that required filling
+- plant availability or process efficiency still using neutral defaults
+
+### 11.4 Error handling principle
+The UI must show user-friendly errors, not technical exceptions.
+
+---
+
+## 12. Non-Functional Requirements
+
+### 12.1 Usability
+- clear and expert-oriented
+- no heavy multi-step navigation
+- quick to use with defaults
+- advanced assumptions should be available without overwhelming the main workflow
+
+### 12.2 Performance
+- a single scenario calculation should complete effectively instantly in a normal browser
+- daily temporal calculation must not create visible lag
+- hourly input harmonization must remain lightweight enough for normal interactive use
+
+### 12.3 Maintainability
+- calculation is separated from UI
+- units are explicit in code
+- formulas are centralized in the domain/calculation layer
+- temporal source harmonization is separated from core scenario calculation
+- assumptions metadata is explicit and traceable
+
+### 12.4 Testability
+- calculation logic is covered by unit tests
+- UI validation is tested separately
+- harmonization logic is tested separately from business formulas
+- golden scenario infrastructure exists even before final customer-confirmed business values
+
+---
+
+## 13. Technical Architecture
+
+### 13.1 Recommended stack
+- Next.js App Router
+- TypeScript
+- Tailwind
+- shadcn/ui
+- react-hook-form
+- zod
+- Recharts
+- ExcelJS
+
+PDF generation should be template-based and server-side or server-compatible.
+
+### 13.2 Recommended code structure
+- Note that this structure is the intended architectural direction; exact filenames/modules may vary as long as the same layering and responsibility boundaries are preserved.
+
+```txt
+src/
+  app/
+    page.tsx
+    results/
+    api/
+      export/
+  core/
+    domain/
+      scenario.ts
+      result.ts
+      units.ts
+      assumptions.ts
+    calculation/
+      resolve-co2-profile.ts
+      resolve-electricity-price.ts
+      harmonize-time-series.ts
+      allocate-capex.ts
+      calculate-scenario.ts
+      calculate-methane-path.ts
+      calculate-hydrogen-alternative.ts
+      aggregate-results.ts
+    reporting/
+      build-export-model.ts
+      build-pdf-model.ts
+      build-excel-model.ts
+  features/
+    scenario/
+      components/
+      forms/
+      hooks/
+      schemas/
+  components/
+    charts/
+    layout/
+    ui/
+  lib/
+    formatters/
+    constants/
+test/
+```
+
+### 13.3 Interface principles
+
+* UI calls one clear `calculateScenario()` function
+* exports call `buildExportModel()`-style helpers
+* formulas do not leak into component code
+* presentation formatting is separated from calculation
+* temporal source resolution is separated from core scenario calculation
+
+---
+
+## 14. Export Architecture
+
+### 14.1 Excel
+
+Excel is built from a structured export view model.
+
+Suggested sheets:
+
+* `Inputs`
+* `Assumptions`
+* `CO2 Profile`
+* `Electricity Price`
+* `Daily Results`
+* `Annual Summary`
+* `Comparison`
+
+### 14.2 PDF
+
+PDF is built from a dedicated report model containing:
+
+* report header
+* formatted KPIs
+* chart-ready data
+* assumptions summary
+* visible flags for literature-based assumptions
+* summary text blocks
+
+The first version should use a neutral visual style that is easy to brand later.
+
+HTML-to-PDF technology is used.
+
+---
+
+## 15. Testing Strategy
+
+### 15.1 Calculation tests
+
+* temporal CO₂ profile resolution
+* temporal electricity price resolution
+* daily harmonization logic
+* CAPEX allocation logic
+* stoichiometric hydrogen demand calculation
+* stoichiometric methane production calculation
+* electricity consumption calculation
+* break-even price calculation
+* target-profitability price calculation
+* hydrogen-sales comparison path
+* monthly and annual aggregation
+
+### 15.2 Validation tests
+
+* required fields
+* range limits
+* invalid source-mode combinations
+* invalid temporal series lengths
+* CAPEX completeness rules
+* user-facing error messages
+
+### 15.3 UI tests
+
+* form behavior
+* dynamic input sections by mode
+* results rendering
+* export action triggers
+* literature-based assumption flags rendering
+
+### 15.4 Golden scenario tests
+
+Once final customer-confirmed business values are available, lock 2–5 reference scenarios to prevent regressions.
+
+Before that, protect:
+
+* harmonization behavior
+* CAPEX behavior
+* structural result integrity
+* assumption flag propagation
+* placeholder-safe and literature-safe outputs
+
+---
+
+## 16. Delivery Order
+
+### WP1 — Solution refinement
+
+* this solution specification
+* input/output field lock
+* process-model basis lock
+* assumptions structure lock
+
+### WP2 — Calculation implementation specification
+
+* formulas
+* units
+* parameters
+* assumptions versions
+* reference tests
+
+### WP3 — Domain foundation
+
+* TypeScript types
+* zod schemas
+* formatters
+* assumption metadata structures
+* temporal input structures
+* temporal resolution helpers
+
+### WP4 — Calculation engine
+
+* temporal series resolution
+* methane path
+* hydrogen-sales alternative
+* optional CAPEX allocation
+* aggregations
+
+### WP5 — Input UI
+
+* form view
+* advanced assumptions
+* temporal profile editor / input controls
+* electricity price mode input
+* validation
+
+### WP6 — Results UI
+
+* KPI cards
+* charts
+* comparisons
+* tables
+* assumption flags and warnings presentation
+
+### WP7 — Exports
+
+* Excel
+* PDF
+
+### WP8 — Polish + QA
+
+* error states
+* documentation
+* final polish
+
+---
+
+## 17. Cursor Agent Work Split
+
+### Agent 1 — Domain & schemas
+
+Responsible for:
+
+* types
+* zod validation
+* unit models
+* temporal input structures
+* assumption metadata structures
+
+### Agent 2 — Calculation engine
+
+Responsible for:
+
+* pure calculation logic
+* temporal series resolution and harmonization
+* stoichiometric methane path
+* hydrogen alternative comparison
+* optional CAPEX allocation
+* aggregation
+
+### Agent 3 — Testing
+
+Responsible for:
+
+* unit tests
+* harmonization tests
+* golden scenario tests
+* edge cases
+
+### Agent 4 — Inputs UI
+
+Responsible for:
+
+* forms
+* validation
+* temporal profile input UI
+* electricity price mode UI
+* advanced assumptions UI
+* UX
+
+### Agent 5 — Results UI
+
+Responsible for:
+
+* KPI cards
+* charts
+* comparison layout
+* tables
+* responsive behavior
+* warnings and flags display
+
+### Agent 6 — Excel export
+
+Responsible for:
+
+* workbook structure
+* sheets
+* assumptions metadata visibility
+* numeric formatting
+
+### Agent 7 — PDF export
+
+Responsible for:
+
+* report template
+* layout
+* brand-ready styling
+* visible assumption flags
+
+---
+
+## 18. Definition of Done for MVP
 
 The MVP is done when:
-- user can define all required scenario inputs
-- mode-based CO₂ input works
-- mode-based electricity input works
-- daily-first calculation engine works
-- methane path works using stoichiometric + literature-based defaults
-- hydrogen alternative comparison works
-- optional simple CAPEX works
-- KPI summary renders correctly
-- literature-based assumptions are explicitly flagged in UI and exports
-- Excel export works
-- PDF export works
-- validation and shape tests pass
+
+* user can define all required scenario inputs
+* mode-based CO₂ input works
+* mode-based electricity input works
+* daily-first calculation engine works
+* methane path works using stoichiometric + literature-based defaults
+* hydrogen alternative comparison works
+* optional simple CAPEX works
+* KPI summary renders correctly
+* literature-based assumptions are explicitly flagged in UI and exports
+* Excel export works
+* PDF export works
+* validation and shape tests pass
 
 ---
 
-## 11. Assumptions Used in This Specification
+## 19. Assumptions Used in This Specification
 
-- The tender requirement is the stronger source of truth versus older internal MVP assumptions.
-- Daily internal resolution is sufficient for MVP if hourly input remains supported at the contract level.
-- Literature-based defaults are acceptable for MVP when clearly marked and separated from customer-confirmed values.
-- Profitability prices are interpreted as markup on cost in MVP.
-- Methane is priced in `EUR/t_CH4` in MVP.
+* The tender requirement is the stronger source of truth versus older internal MVP assumptions.
+* Daily internal resolution is sufficient for MVP if hourly input remains supported at the contract level.
+* Literature-based defaults are acceptable for MVP when clearly marked and separated from customer-confirmed values.
+* Profitability prices are interpreted as markup on cost in MVP.
+* Methane is priced in `EUR/t_CH4` in MVP.

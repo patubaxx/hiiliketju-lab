@@ -180,4 +180,3 @@ Avoid:
 - mixed UI/domain responsibilities
 - speculative abstractions with no current use
 - silent fallbacks that change business meaning
-````

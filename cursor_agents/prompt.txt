@@ -1,0 +1,1 @@
+First read AGENTS.md, .cursor/rules.md, solution-spec-v2.md, calculation-implementation-spec-vs.md, and other relevant documentation.

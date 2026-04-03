@@ -57,7 +57,7 @@ type AssumptionMeta = {
     | "placeholder_only"
   assumptionNote?: string
 }
-````
+```
 
 ### Mandatory usage
 
@@ -109,7 +109,7 @@ Locked MVP defaults:
 * stoichiometricHydrogenDemandFactor = `0.1832 kg_H2/kg_CO2`
 * stoichiometricMethaneYieldFactor = `0.3645 kg_CH4/kg_CO2`
 * electrolyzerSpecificEnergyConsumption = `54 kWh/kg_H2`
-* electrolyzerSpecificEnergyConsumptionMWh = `0.054 MWh/kg_H2`
+* electrolyzerSpecificEnergyConsumptionMWh = `0.054 MWh/kg_H2` (derived from electrolyzerSpecificEnergyConsumption)
 * plantAvailabilityPct = `100`
 * processEfficiencyPct = `100`
 
@@ -176,5 +176,3 @@ Prefer:
 * visible assumptions over hidden defaults
 * deterministic domain logic over UI-derived calculations
 * simple MVP-compatible solutions over speculative future complexity
-
-````
