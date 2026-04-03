@@ -42,29 +42,38 @@ export function ResultsTables({
     { label: t("results.kpi.hydrogenAltRevenue"), value: formatResultEur(s.hydrogenSalesAlternativeRevenueEur, locale) },
     {
       label: t("results.kpi.breakEvenMethanePrice"),
-      value: s.breakEvenMethanePriceEurPerTon === null ? na : formatResultEur(s.breakEvenMethanePriceEurPerTon, locale),
+      value:
+        s.breakEvenMethanePriceEurPerTon === null
+          ? na
+          : `${formatResultEur(s.breakEvenMethanePriceEurPerTon, locale)} / t`,
     },
     {
       label: t("results.kpi.methanePrice10"),
-      value: s.methanePriceAt10PctProfitabilityEurPerTon === null ? na : formatResultEur(s.methanePriceAt10PctProfitabilityEurPerTon, locale),
+      value:
+        s.methanePriceAt10PctProfitabilityEurPerTon === null
+          ? na
+          : `${formatResultEur(s.methanePriceAt10PctProfitabilityEurPerTon, locale)} / t`,
     },
     {
       label: t("results.kpi.methanePrice30"),
-      value: s.methanePriceAt30PctProfitabilityEurPerTon === null ? na : formatResultEur(s.methanePriceAt30PctProfitabilityEurPerTon, locale),
+      value:
+        s.methanePriceAt30PctProfitabilityEurPerTon === null
+          ? na
+          : `${formatResultEur(s.methanePriceAt30PctProfitabilityEurPerTon, locale)} / t`,
     },
     { label: t("results.kpi.deltaVsHydrogen"), value: formatResultEur(s.deltaVsHydrogenSaleEur, locale) },
   ];
 
   return (
     <section className="space-y-6" aria-labelledby="results-tables-heading">
-      <h2 id="results-tables-heading" className="text-sm font-semibold tracking-tight text-foreground">
+      <h3 id="results-tables-heading" className="text-sm font-semibold tracking-tight text-foreground">
         {t("results.section.tables")}
-      </h2>
+      </h3>
 
       <div className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("results.table.annualTitle")}
-        </h3>
+        </h4>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className={tableClass}>
             <thead>
@@ -86,9 +95,9 @@ export function ResultsTables({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("results.table.monthlyTitle")}
-        </h3>
+        </h4>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className={`${tableClass} min-w-[720px]`}>
             <thead>
@@ -122,38 +131,44 @@ export function ResultsTables({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {t("results.table.dailyPreviewTitle")}
-        </h3>
-        <p className="text-xs text-muted-foreground">
-          {t("results.table.dailyPreviewNote", { shown: String(previewRows.length), total: String(totalDays) })}
-        </p>
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <table className={`${tableClass} min-w-[640px]`}>
-            <thead>
-              <tr>
-                <th className={thClass}>{t("results.table.column.date")}</th>
-                <th className={thClass}>{t("results.table.column.availableCo2Kg")}</th>
-                <th className={thClass}>{t("results.table.column.methaneKg")}</th>
-                <th className={thClass}>{t("results.table.column.electricityMwh")}</th>
-                <th className={thClass}>{t("results.table.column.totalCostEur")}</th>
-                <th className={thClass}>{t("results.table.column.methaneRevenueEur")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {previewRows.map((row) => (
-                <tr key={row.dayIndex}>
-                  <td className={tdClass}>{row.dateLabel}</td>
-                  <td className={tdClass}>{formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}</td>
-                  <td className={tdClass}>{formatResultNumber(row.methaneProducedKg, locale, { maximumFractionDigits: 4 })}</td>
-                  <td className={tdClass}>{formatResultNumber(row.electricityConsumedMwh, locale, { maximumFractionDigits: 6 })}</td>
-                  <td className={tdClass}>{formatResultEur(row.totalCostEur, locale)}</td>
-                  <td className={tdClass}>{formatResultEur(row.methaneRevenueEur, locale)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        </h4>
+        {totalDays === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("results.table.dailyPreviewEmpty")}</p>
+        ) : (
+          <>
+            <p className="text-xs text-muted-foreground">
+              {t("results.table.dailyPreviewNote", { shown: String(previewRows.length), total: String(totalDays) })}
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className={`${tableClass} min-w-[640px]`}>
+                <thead>
+                  <tr>
+                    <th className={thClass}>{t("results.table.column.date")}</th>
+                    <th className={thClass}>{t("results.table.column.availableCo2Kg")}</th>
+                    <th className={thClass}>{t("results.table.column.methaneKg")}</th>
+                    <th className={thClass}>{t("results.table.column.electricityMwh")}</th>
+                    <th className={thClass}>{t("results.table.column.totalCostEur")}</th>
+                    <th className={thClass}>{t("results.table.column.methaneRevenueEur")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewRows.map((row) => (
+                    <tr key={row.dayIndex}>
+                      <td className={tdClass}>{row.dateLabel}</td>
+                      <td className={tdClass}>{formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}</td>
+                      <td className={tdClass}>{formatResultNumber(row.methaneProducedKg, locale, { maximumFractionDigits: 4 })}</td>
+                      <td className={tdClass}>{formatResultNumber(row.electricityConsumedMwh, locale, { maximumFractionDigits: 6 })}</td>
+                      <td className={tdClass}>{formatResultEur(row.totalCostEur, locale)}</td>
+                      <td className={tdClass}>{formatResultEur(row.methaneRevenueEur, locale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

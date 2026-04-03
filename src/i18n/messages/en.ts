@@ -124,7 +124,7 @@ export const en = {
   },
   results: {
     title: "Results",
-    empty: "Run the calculation to see canonical outputs from the engine.",
+    empty: 'Use "Run calculation" above to see engine outputs: KPIs, charts, tables, and exports.',
     success: "Calculation finished successfully.",
     summary: {
       lead: "All figures below are read directly from the canonical engine output; nothing is recomputed in the UI.",
@@ -187,6 +187,7 @@ export const en = {
       monthlyTitle: "Monthly aggregates",
       dailyPreviewTitle: "Daily preview",
       dailyPreviewNote: "Showing the first {{shown}} of {{total}} days.",
+      dailyPreviewEmpty: "No daily rows are present in the engine output.",
       column: {
         metric: "Metric",
         value: "Value",

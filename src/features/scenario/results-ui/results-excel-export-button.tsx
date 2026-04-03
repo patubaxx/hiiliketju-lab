@@ -7,12 +7,9 @@ import { Button } from "@/components/ui/button";
 import type { CalculationResult } from "@/core/domain/result";
 import { buildScenarioExcelArrayBuffer } from "@/core/reporting/scenario-excel-buffer";
 
-type TFn = (id: string, vars?: Record<string, string>) => string;
+import { safeExportBasename } from "./safe-export-basename";
 
-function safeExcelBasename(name: string): string {
-  const s = name.replace(/[^a-zA-Z0-9._-]+/g, "_").replace(/^_+|_+$/g, "");
-  return s.slice(0, 80) || "scenario";
-}
+type TFn = (id: string, vars?: Record<string, string>) => string;
 
 export function ResultsExcelExportButton({
   result,
@@ -35,7 +32,7 @@ export function ResultsExcelExportButton({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `hiiliketju_${safeExcelBasename(result.input.scenarioName)}.xlsx`;
+      a.download = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.xlsx`;
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -55,13 +52,17 @@ export function ResultsExcelExportButton({
         variant="outline"
         size="sm"
         disabled={busy}
+        aria-busy={busy}
+        aria-label={busy ? t("results.export.exporting") : t("results.export.downloadExcel")}
         onClick={() => void onClick()}
         className="gap-1.5"
       >
-        <Download className="size-3.5" aria-hidden />
+        <Download className="size-3.5 shrink-0" aria-hidden />
         {busy ? t("results.export.exporting") : t("results.export.downloadExcel")}
       </Button>
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      <div role="status" aria-live="polite" className="min-h-[1rem]">
+        {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      </div>
     </div>
   );
 }

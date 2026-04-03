@@ -36,9 +36,9 @@ export function ResultsKpiGrid({
 
   return (
     <section className="space-y-3" aria-labelledby="results-kpi-heading">
-      <h2 id="results-kpi-heading" className="text-sm font-semibold tracking-tight text-foreground">
+      <h3 id="results-kpi-heading" className="text-sm font-semibold tracking-tight text-foreground">
         {t("results.section.kpis")}
-      </h2>
+      </h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <KpiCard
           label={t("results.kpi.annualCo2Available")}

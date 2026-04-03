@@ -124,7 +124,7 @@ export const fi = {
   },
   results: {
     title: "Tulokset",
-    empty: "Suorita laskenta nähdäksesi moottorin kanoniset tulosteet.",
+    empty: 'Paina yllä olevaa "Suorita laskenta" -painiketta nähdäksesi tunnusluvut, kuvaajat, taulukot ja viennit.',
     success: "Laskenta valmistui onnistuneesti.",
     summary: {
       lead: "Kaikki luvut alla luetaan suoraan kanonisesta moottoritulosteesta; käyttöliittymä ei laske niitä uudelleen.",
@@ -187,6 +187,7 @@ export const fi = {
       monthlyTitle: "Kuukausikohtaiset summat",
       dailyPreviewTitle: "Päiväesikatselu",
       dailyPreviewNote: "Näytetään {{total}} päivästä ensimmäiset {{shown}}.",
+      dailyPreviewEmpty: "Päivittäisiä rivejä ei ole moottorin tulosteessa.",
       column: {
         metric: "Tunnusluku",
         value: "Arvo",

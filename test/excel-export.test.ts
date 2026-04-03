@@ -66,4 +66,18 @@ describe("Excel export model (WP7)", () => {
       "Warnings",
     ]);
   });
+
+  it("copies process assumption metadata from canonical input without inventing fields", () => {
+    const result = calculateScenario(parseScenarioInput(minimalScenarioRaw()));
+    const model = buildScenarioExcelExportModel(result);
+    const h2 = model.processAssumptions.find((r) => r.fieldKey === "stoichiometricHydrogenDemandFactorKgH2PerKgCo2");
+    expect(h2).toBeDefined();
+    expect(h2!.value).toBe(result.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.value);
+    expect(h2!.assumptionSource).toBe(
+      result.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.assumptionMeta.assumptionSource,
+    );
+    expect(h2!.assumptionStatus).toBe(
+      result.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.assumptionMeta.assumptionStatus,
+    );
+  });
 });

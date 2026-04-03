@@ -7,9 +7,9 @@ export function ResultsWarnings({ result, t }: { result: CalculationResult; t: T
 
   return (
     <section className="rounded-xl border border-border bg-card p-4 shadow-sm" aria-labelledby="results-warnings-heading">
-      <h2 id="results-warnings-heading" className="text-sm font-semibold tracking-tight text-foreground">
+      <h3 id="results-warnings-heading" className="text-sm font-semibold tracking-tight text-foreground">
         {t("results.section.warnings")}
-      </h2>
+      </h3>
       {items.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">{t("results.warnings.empty")}</p>
       ) : (

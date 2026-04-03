@@ -124,7 +124,7 @@ export const sv = {
   },
   results: {
     title: "Resultat",
-    empty: "Kör beräkningen för att se kanoniska utdata från motorn.",
+    empty: 'Använd knappen "Kör beräkning" ovan för att se nyckeltal, diagram, tabeller och exporter.',
     success: "Beräkningen slutfördes utan fel.",
     summary: {
       lead: "Alla siffror nedan hämtas direkt från motorns kanoniska resultat; inget räknas om i gränssnittet.",
@@ -187,6 +187,7 @@ export const sv = {
       monthlyTitle: "Månadsaggregationer",
       dailyPreviewTitle: "Dagsförhandsvisning",
       dailyPreviewNote: "Visar de första {{shown}} av {{total}} dagar.",
+      dailyPreviewEmpty: "Inga dagliga rader finns i motorns utdata.",
       column: {
         metric: "Nyckeltal",
         value: "Värde",

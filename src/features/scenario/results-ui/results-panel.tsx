@@ -27,7 +27,7 @@ export function ResultsPanel({
     <div className="space-y-10">
       <header className="space-y-1 border-b border-border pb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">{t("results.title")}</h2>
+          <h3 className="text-lg font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
           <div className="flex flex-wrap gap-2 sm:justify-end">
             <ResultsExcelExportButton result={result} t={t} />
             <ResultsPdfExportButton result={result} t={t} />
@@ -66,9 +66,9 @@ export function ResultsPanel({
         className="rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
         aria-labelledby="results-path-heading"
       >
-        <h2 id="results-path-heading" className="text-sm font-semibold tracking-tight text-foreground">
+        <h3 id="results-path-heading" className="text-sm font-semibold tracking-tight text-foreground">
           {t("results.section.pathComparison")}
-        </h2>
+        </h3>
         <p className="mt-1 text-xs text-muted-foreground">{t("results.pathComparison.help")}</p>
         <dl className="mt-4 grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-border bg-card p-3">

@@ -6,12 +6,9 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CalculationResult } from "@/core/domain/result";
 
-type TFn = (id: string, vars?: Record<string, string>) => string;
+import { safeExportBasename } from "./safe-export-basename";
 
-function safePdfBasename(name: string): string {
-  const s = name.replace(/[^a-zA-Z0-9._-]+/g, "_").replace(/^_+|_+$/g, "");
-  return s.slice(0, 80) || "scenario";
-}
+type TFn = (id: string, vars?: Record<string, string>) => string;
 
 export function ResultsPdfExportButton({
   result,
@@ -32,7 +29,7 @@ export function ResultsPdfExportButton({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `hiiliketju_${safePdfBasename(result.input.scenarioName)}.pdf`;
+      a.download = `hiiliketju_${safeExportBasename(result.input.scenarioName)}.pdf`;
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -52,13 +49,17 @@ export function ResultsPdfExportButton({
         variant="outline"
         size="sm"
         disabled={busy}
+        aria-busy={busy}
+        aria-label={busy ? t("results.export.pdfExporting") : t("results.export.downloadPdf")}
         onClick={() => void onClick()}
         className="gap-1.5"
       >
-        <FileText className="size-3.5" aria-hidden />
+        <FileText className="size-3.5 shrink-0" aria-hidden />
         {busy ? t("results.export.pdfExporting") : t("results.export.downloadPdf")}
       </Button>
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      <div role="status" aria-live="polite" className="min-h-[1rem]">
+        {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      </div>
     </div>
   );
 }
