@@ -132,6 +132,10 @@ export const sv = {
     title: "Resultat",
     empty: 'Använd knappen "Kör beräkning" ovan för att se nyckeltal, diagram, tabeller och exporter.',
     success: "Beräkningen slutfördes utan fel.",
+    narrative: {
+      outcomeIntro:
+        "Läsningsordning: viktigaste resultat först, vägsjämförelse, stödjande kvantiteter, därefter tidsserier och tabeller för revision.",
+    },
     summary: {
       lead: "Alla siffror nedan hämtas direkt från motorns kanoniska resultat; inget räknas om i gränssnittet.",
       scenarioName: "Scenario",
@@ -147,7 +151,10 @@ export const sv = {
       kpisSecondary: "Kompletterande nyckeltal",
       pathComparison: "Jämförelse mellan vägar (metan vs vätgasförsäljning)",
       charts: "Tidsserier",
-      tables: "Tabeller",
+      chartsLead: "Dagligt upplösta serier från motorn (samma horisont som tabellerna nedan).",
+      tables: "Tabellinformation",
+      tablesDetailLead:
+        "Exakta siffror för export och revision. Årsraderna speglar hela nyckeltalsuppsättningen; månads- och dagsvyer ger finare upplösning.",
       assumptions: "Processantaganden (från indata)",
       warnings: "Motorvarningar",
     },
@@ -168,9 +175,13 @@ export const sv = {
       methanePrice30: "Metanpris vid 30 % lönsamhet",
       deltaVsHydrogen: "Skillnad mot vätgasförsäljning",
     },
+    kpiSecondary: {
+      lead: "Massa–energibalans, kostnadsstack och lönsamhetströsklar. Vägintäkterna jämförs i nästa avsnitt.",
+    },
     pathComparison: {
-      help: "Årliga intäkter och metanvägens marginal jämfört med att sälja väte, enligt motorns beräkning.",
-      methaneRevenue: "Intäkt metanväg",
+      title: "Vägintäkter (år)",
+      help: "Årlig intäkt sida vid sida: CO₂ → CH₄ mot att sälja väte. Motorns delta mot vätealternativet finns i sammanfattande nyckeltal ovan.",
+      methaneRevenue: "Metanväg (CH₄-försäljning)",
       hydrogenAltRevenue: "Alternativ: vätgasförsäljning",
       delta: "Delta (metan minus H₂-alternativ)",
     },
@@ -192,8 +203,11 @@ export const sv = {
     },
     table: {
       annualTitle: "Årssammanfattning",
+      annualIntro: "En rad per nyckeltal — referens som motsvar motorns årssammanfattning.",
       monthlyTitle: "Månadsaggregationer",
+      monthlyIntro: "Månadssummor från samma dagliga motorresultat.",
       dailyPreviewTitle: "Dagsförhandsvisning",
+      dailyPreviewDetails: "Expandera för att granska de första dagraderna (detaljnivå).",
       dailyPreviewNote: "Visar de första {{shown}} av {{total}} dagar.",
       dailyPreviewEmpty: "Inga dagliga rader finns i motorns utdata.",
       column: {

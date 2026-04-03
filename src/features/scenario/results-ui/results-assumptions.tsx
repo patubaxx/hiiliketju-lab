@@ -23,7 +23,7 @@ export function ResultsAssumptions({
   readonly t: TFn;
 }) {
   return (
-    <section className="space-y-5" aria-labelledby="results-assumptions-heading">
+    <section className="space-y-5 border-t border-border/70 pt-10" aria-labelledby="results-assumptions-heading">
       <h3 id="results-assumptions-heading" className="text-base font-semibold tracking-tight text-foreground">
         {t("results.section.assumptions")}
       </h3>

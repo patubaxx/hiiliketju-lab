@@ -132,6 +132,10 @@ export const en = {
     title: "Results",
     empty: 'Use "Run calculation" above to see engine outputs: KPIs, charts, tables, and exports.',
     success: "Calculation finished successfully.",
+    narrative: {
+      outcomeIntro:
+        "Readout order: key outcomes first, pathway comparison, supporting quantities, then time series and tabular detail for audit.",
+    },
     summary: {
       lead: "All figures below are read directly from the canonical engine output; nothing is recomputed in the UI.",
       scenarioName: "Scenario",
@@ -147,7 +151,10 @@ export const en = {
       kpisSecondary: "Supporting metrics",
       pathComparison: "Path comparison (methane vs hydrogen sales)",
       charts: "Time series",
-      tables: "Tables",
+      chartsLead: "Resolved daily series from the engine (same horizon as the tables below).",
+      tables: "Tabular detail",
+      tablesDetailLead:
+        "Exact figures for export and audit. Annual rows mirror the full KPI set; month and day views add resolution.",
       assumptions: "Process assumptions (from inputs)",
       warnings: "Engine warnings",
     },
@@ -168,10 +175,14 @@ export const en = {
       methanePrice30: "Methane price at 30% profitability",
       deltaVsHydrogen: "Delta vs hydrogen sales alternative",
     },
+    kpiSecondary: {
+      lead: "Mass–energy balance, cost stack, and profitability thresholds. Pathway revenues are compared in the next section.",
+    },
     pathComparison: {
-      help: "Annual revenues and the methane-path margin versus selling hydrogen instead, as computed by the engine.",
-      methaneRevenue: "Methane path revenue",
-      hydrogenAltRevenue: "Hydrogen sales alternative",
+      title: "Pathway revenues (annual)",
+      help: "Side-by-side annual revenue for CO₂ → CH₄ versus selling hydrogen instead. The engine’s delta vs hydrogen alternative is in the summary KPIs above.",
+      methaneRevenue: "Methane path (CH₄ sales)",
+      hydrogenAltRevenue: "Hydrogen sale alternative",
       delta: "Delta (methane minus H₂ alternative)",
     },
     chart: {
@@ -192,8 +203,11 @@ export const en = {
     },
     table: {
       annualTitle: "Annual summary",
+      annualIntro: "One row per KPI — authoritative reference matching the engine annual summary object.",
       monthlyTitle: "Monthly aggregates",
+      monthlyIntro: "Monthly sums over the same daily engine output.",
       dailyPreviewTitle: "Daily preview",
+      dailyPreviewDetails: "Open to inspect the first daily rows (high-resolution drill-down).",
       dailyPreviewNote: "Showing the first {{shown}} of {{total}} days.",
       dailyPreviewEmpty: "No daily rows are present in the engine output.",
       column: {

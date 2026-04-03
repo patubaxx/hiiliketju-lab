@@ -11,7 +11,11 @@ const tableClass = "w-full border-collapse text-sm";
 const thClass =
   "border-b border-border bg-muted/50 px-3 py-2.5 text-left text-xs font-medium text-muted-foreground first:pl-4 last:pr-4";
 const tdClass =
-  "border-b border-border/70 px-3 py-2.5 font-mono text-xs tabular-nums text-foreground first:pl-4 last:pr-4 align-top";
+  "border-b border-border/60 px-3 py-2.5 font-mono text-xs tabular-nums text-foreground first:pl-4 last:pr-4 align-top";
+
+function zebraRowClass(i: number): string {
+  return i % 2 === 1 ? "bg-muted/[0.12]" : "";
+}
 
 export function ResultsTables({
   result,
@@ -67,24 +71,30 @@ export function ResultsTables({
   ];
 
   return (
-    <section className="space-y-8" aria-labelledby="results-tables-heading">
-      <h3 id="results-tables-heading" className="text-base font-semibold tracking-tight text-foreground">
-        {t("results.section.tables")}
-      </h3>
+    <section className="space-y-10 border-t border-border/70 pt-10" aria-labelledby="results-tables-heading">
+      <div className="space-y-2">
+        <h3 id="results-tables-heading" className="text-base font-semibold tracking-tight text-foreground">
+          {t("results.section.tables")}
+        </h3>
+        <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">{t("results.section.tablesDetailLead")}</p>
+      </div>
 
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-foreground">{t("results.table.annualTitle")}</h4>
-        <div className="overflow-x-auto rounded-xl border border-border">
+        <div>
+          <h4 className="text-sm font-semibold text-foreground">{t("results.table.annualTitle")}</h4>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t("results.table.annualIntro")}</p>
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-border/80 bg-card/30">
           <table className={tableClass}>
             <thead>
               <tr>
                 <th className={thClass}>{t("results.table.column.metric")}</th>
-                <th className={`${thClass} text-right`}>{t("results.table.column.value")}</th>
+                <th className={`${thClass} w-[min(12rem,28vw)] text-right`}>{t("results.table.column.value")}</th>
               </tr>
             </thead>
             <tbody>
-              {annualRows.map((row) => (
-                <tr key={row.label} className="hover:bg-muted/30">
+              {annualRows.map((row, i) => (
+                <tr key={row.label} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                   <td
                     className={`${tdClass} max-w-[min(280px,55vw)] whitespace-normal font-sans text-foreground/90`}
                   >
@@ -99,12 +109,15 @@ export function ResultsTables({
       </div>
 
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-foreground">{t("results.table.monthlyTitle")}</h4>
-        <div className="overflow-x-auto rounded-xl border border-border">
+        <div>
+          <h4 className="text-sm font-semibold text-foreground">{t("results.table.monthlyTitle")}</h4>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t("results.table.monthlyIntro")}</p>
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-border/80 bg-card/30">
           <table className={`${tableClass} min-w-[720px]`}>
             <thead>
               <tr>
-                <th className={thClass}>{t("results.table.column.month")}</th>
+                <th className={`${thClass} min-w-[5.5rem]`}>{t("results.table.column.month")}</th>
                 <th className={`${thClass} text-right`}>{t("results.table.column.methaneT")}</th>
                 <th className={`${thClass} text-right`}>{t("results.table.column.electricityMwh")}</th>
                 <th className={`${thClass} text-right`}>{t("results.table.column.totalCostEur")}</th>
@@ -113,8 +126,8 @@ export function ResultsTables({
               </tr>
             </thead>
             <tbody>
-              {result.monthlySummary.map((m) => (
-                <tr key={m.monthIndex} className="hover:bg-muted/30">
+              {result.monthlySummary.map((m, i) => (
+                <tr key={m.monthIndex} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                   <td className={`${tdClass} font-sans`}>
                     {t("co2.month")} {m.monthIndex + 1}
                   </td>
@@ -132,20 +145,23 @@ export function ResultsTables({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <h4 className="text-sm font-semibold text-foreground">{t("results.table.dailyPreviewTitle")}</h4>
         {totalDays === 0 ? (
           <p className="text-sm text-muted-foreground">{t("results.table.dailyPreviewEmpty")}</p>
         ) : (
-          <>
-            <p className="text-xs text-muted-foreground">
+          <details className="group rounded-xl border border-dashed border-border/80 bg-muted/10 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-medium text-foreground marker:text-muted-foreground">
+              {t("results.table.dailyPreviewDetails")}
+            </summary>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
               {t("results.table.dailyPreviewNote", { shown: String(previewRows.length), total: String(totalDays) })}
             </p>
-            <div className="overflow-x-auto rounded-xl border border-border">
+            <div className="mt-4 overflow-x-auto rounded-lg border border-border/80 bg-card/40">
               <table className={`${tableClass} min-w-[640px]`}>
                 <thead>
                   <tr>
-                    <th className={thClass}>{t("results.table.column.date")}</th>
+                    <th className={`${thClass} min-w-[6.5rem]`}>{t("results.table.column.date")}</th>
                     <th className={`${thClass} text-right`}>{t("results.table.column.availableCo2Kg")}</th>
                     <th className={`${thClass} text-right`}>{t("results.table.column.methaneKg")}</th>
                     <th className={`${thClass} text-right`}>{t("results.table.column.electricityMwh")}</th>
@@ -154,8 +170,8 @@ export function ResultsTables({
                   </tr>
                 </thead>
                 <tbody>
-                  {previewRows.map((row) => (
-                    <tr key={row.dayIndex} className="hover:bg-muted/30">
+                  {previewRows.map((row, i) => (
+                    <tr key={row.dayIndex} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                       <td className={`${tdClass} font-sans`}>{row.dateLabel}</td>
                       <td className={`${tdClass} text-right`}>
                         {formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}
@@ -173,7 +189,7 @@ export function ResultsTables({
                 </tbody>
               </table>
             </div>
-          </>
+          </details>
         )}
       </div>
     </section>

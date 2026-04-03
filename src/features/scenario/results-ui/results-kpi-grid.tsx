@@ -22,15 +22,14 @@ type KpiKey =
   | "methanePrice30"
   | "deltaVsHydrogen";
 
-/** Decision-focused subset; order is intentional for scanability. */
-const HEADLINE_KEYS: readonly KpiKey[] = [
-  "deltaVsHydrogen",
-  "annualTotalCost",
-  "annualMethaneRevenue",
-  "hydrogenAltRevenue",
-  "breakEvenMethanePrice",
-];
+/**
+ * Executive summary — avoids duplicating path revenues shown in path comparison.
+ */
+const HEADLINE_KEYS: readonly KpiKey[] = ["deltaVsHydrogen", "annualTotalCost", "breakEvenMethanePrice"];
 
+/**
+ * Physical / cost / price context; path revenues appear in path comparison + annual table.
+ */
 const SECONDARY_KEYS: readonly KpiKey[] = [
   "annualCo2Available",
   "annualCo2Utilized",
@@ -182,7 +181,7 @@ function kpiContent(
   }
 }
 
-export function ResultsKpiGrid({
+export function ResultsKpiHeadline({
   summary,
   locale,
   t,
@@ -194,30 +193,63 @@ export function ResultsKpiGrid({
   const na = t("results.value.na");
 
   return (
-    <div className="space-y-8">
-      <section className="space-y-4" aria-labelledby="results-kpi-headline-heading">
-        <h3 id="results-kpi-headline-heading" className="text-base font-semibold tracking-tight text-foreground">
-          {t("results.section.kpisHeadline")}
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {HEADLINE_KEYS.map((key) => {
-            const { label, value, sub } = kpiContent(key, summary, locale, t, na);
-            return <HeadlineKpiCard key={key} label={label} value={value} sub={sub} />;
-          })}
-        </div>
-      </section>
+    <section className="space-y-4" aria-labelledby="results-kpi-headline-heading">
+      <h3 id="results-kpi-headline-heading" className="text-base font-semibold tracking-tight text-foreground">
+        {t("results.section.kpisHeadline")}
+      </h3>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {HEADLINE_KEYS.map((key) => {
+          const { label, value, sub } = kpiContent(key, summary, locale, t, na);
+          return <HeadlineKpiCard key={key} label={label} value={value} sub={sub} />;
+        })}
+      </div>
+    </section>
+  );
+}
 
-      <section className="space-y-4 border-t border-border/70 pt-8" aria-labelledby="results-kpi-secondary-heading">
+export function ResultsKpiSecondary({
+  summary,
+  locale,
+  t,
+}: {
+  readonly summary: ScenarioSummary;
+  readonly locale: Locale;
+  readonly t: TFn;
+}) {
+  const na = t("results.value.na");
+
+  return (
+    <section className="space-y-4 border-t border-border/70 pt-8" aria-labelledby="results-kpi-secondary-heading">
+      <div className="space-y-1">
         <h3 id="results-kpi-secondary-heading" className="text-sm font-semibold tracking-tight text-foreground">
           {t("results.section.kpisSecondary")}
         </h3>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {SECONDARY_KEYS.map((key) => {
-            const { label, value, sub } = kpiContent(key, summary, locale, t, na);
-            return <SecondaryKpiCard key={key} label={label} value={value} sub={sub} />;
-          })}
-        </div>
-      </section>
+        <p className="text-xs leading-relaxed text-muted-foreground">{t("results.kpiSecondary.lead")}</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {SECONDARY_KEYS.map((key) => {
+          const { label, value, sub } = kpiContent(key, summary, locale, t, na);
+          return <SecondaryKpiCard key={key} label={label} value={value} sub={sub} />;
+        })}
+      </div>
+    </section>
+  );
+}
+
+/** Renders both tiers; prefer `ResultsKpiHeadline` + `ResultsKpiSecondary` in the panel for layout control. */
+export function ResultsKpiGrid({
+  summary,
+  locale,
+  t,
+}: {
+  readonly summary: ScenarioSummary;
+  readonly locale: Locale;
+  readonly t: TFn;
+}) {
+  return (
+    <div className="space-y-8">
+      <ResultsKpiHeadline summary={summary} locale={locale} t={t} />
+      <ResultsKpiSecondary summary={summary} locale={locale} t={t} />
     </div>
   );
 }

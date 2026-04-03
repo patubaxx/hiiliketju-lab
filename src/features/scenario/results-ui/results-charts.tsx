@@ -70,10 +70,13 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
   const tickFormatter = React.useCallback((v: number) => String(v), []);
 
   return (
-    <section className="space-y-5" aria-labelledby="results-charts-heading">
-      <h3 id="results-charts-heading" className="text-base font-semibold tracking-tight text-foreground">
-        {t("results.section.charts")}
-      </h3>
+    <section className="space-y-5 border-t border-border/70 pt-10" aria-labelledby="results-charts-heading">
+      <div className="space-y-2">
+        <h3 id="results-charts-heading" className="text-base font-semibold tracking-tight text-foreground">
+          {t("results.section.charts")}
+        </h3>
+        <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">{t("results.section.chartsLead")}</p>
+      </div>
       <div className="grid gap-5 lg:grid-cols-2">
         <ChartCard title={t("results.chart.co2Availability")}>
           <ResponsiveContainer width="100%" height="100%">

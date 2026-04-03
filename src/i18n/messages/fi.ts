@@ -132,6 +132,10 @@ export const fi = {
     title: "Tulokset",
     empty: 'Paina yllä olevaa "Suorita laskenta" -painiketta nähdäksesi tunnusluvut, kuvaajat, taulukot ja viennit.',
     success: "Laskenta valmistui onnistuneesti.",
+    narrative: {
+      outcomeIntro:
+        "Lukujärjestys: keskeiset tulokset, polkuvertailu, täydentävät määrät, sitten aikasarjat ja taulukot auditointia varten.",
+    },
     summary: {
       lead: "Kaikki luvut alla luetaan suoraan kanonisesta moottoritulosteesta; käyttöliittymä ei laske niitä uudelleen.",
       scenarioName: "Skenaario",
@@ -147,7 +151,10 @@ export const fi = {
       kpisSecondary: "Täydentävät tunnusluvut",
       pathComparison: "Polkuvertailu (metaani vs vetykauppa)",
       charts: "Aikasarjat",
-      tables: "Taulukot",
+      chartsLead: "Moottorin päivitetty aikasarja (sama horisontti kuin alla olevissa taulukoissa).",
+      tables: "Taulukkotarkenne",
+      tablesDetailLead:
+        "Tarkat luvut vientiä ja auditointia varten. Vuosirivit vastaavat koko tunnuslukujoukkoa; kuukausi- ja päivänäkymät lisäävät tarkkuutta.",
       assumptions: "Prosessioletukset (syötteistä)",
       warnings: "Moottorin varoitukset",
     },
@@ -168,9 +175,13 @@ export const fi = {
       methanePrice30: "Metaanihinta 30 %:n kannattavuudella",
       deltaVsHydrogen: "Ero verrattuna vetykauppaan",
     },
+    kpiSecondary: {
+      lead: "Massa–energiatasapaino, kustannusrakenne ja kannattavuuskynnykset. Polkujen tuotot ovat seuraavassa osiossa.",
+    },
     pathComparison: {
-      help: "Vuositason tuotot ja metaanipolun marginaali verrattuna vedyn myyntiin, kuten moottori laskee.",
-      methaneRevenue: "Metaanipolun tuotot",
+      title: "Polkujen tuotot (vuosi)",
+      help: "Vuositason tuotto rinnakkain: CO₂ → CH₄ vs vedyn myynti. Ero verrattuna vetyvaihtoehtoon on yllä olevissa yhteenvetotunnusluvuissa.",
+      methaneRevenue: "Metaanipolku (CH₄-myynti)",
       hydrogenAltRevenue: "Vedyn myynnin vaihtoehto",
       delta: "Ero (metaani miinus H₂-vaihtoehto)",
     },
@@ -192,8 +203,11 @@ export const fi = {
     },
     table: {
       annualTitle: "Vuosiyhteenveto",
+      annualIntro: "Yksi rivi tunnuslukua kohti — vastaa moottorin vuosiyhteenvetokohdetta.",
       monthlyTitle: "Kuukausikohtaiset summat",
+      monthlyIntro: "Kuukausisummat samasta päivittäisestä moottoritulosteesta.",
       dailyPreviewTitle: "Päiväesikatselu",
+      dailyPreviewDetails: "Avaa ensimmäiset päivärivit (korkea tarkkuus).",
       dailyPreviewNote: "Näytetään {{total}} päivästä ensimmäiset {{shown}}.",
       dailyPreviewEmpty: "Päivittäisiä rivejä ei ole moottorin tulosteessa.",
       column: {
