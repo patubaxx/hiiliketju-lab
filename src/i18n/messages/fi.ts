@@ -4,6 +4,16 @@ export const fi = {
   app: {
     title: "Hiiliketju",
     tagline: "Teknis-taloudellinen skenaario­syöte (MVP)",
+    shell: {
+      setupTitle: "Skenaarion määritys",
+      setupLead:
+        "Syötä arvot 365 päivän horisontille. Suorita laskenta kun valmista; tulokset näkyvät alla olevassa tulososiossa.",
+      actionsCardTitle: "Laskenta",
+      resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
+      resultsPending: "Suorita laskenta täyttääksesi tulososion.",
+      outcomeLabel: "Skenaarion tulos",
+      mobileActionsLabel: "Skenaarion laskentatoiminnot",
+    },
   },
   locale: {
     label: "Kieli",

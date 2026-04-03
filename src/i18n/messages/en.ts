@@ -4,6 +4,16 @@ export const en = {
   app: {
     title: "Hiiliketju",
     tagline: "Techno-economic scenario input (MVP)",
+    shell: {
+      setupTitle: "Scenario setup",
+      setupLead:
+        "Define inputs for the 365-day horizon. When ready, run the calculation; outputs appear in the outcome section below.",
+      actionsCardTitle: "Calculation",
+      resultsReady: "Outcome section below is populated from the latest run.",
+      resultsPending: "Run the calculation to fill the outcome section.",
+      outcomeLabel: "Scenario outcome",
+      mobileActionsLabel: "Scenario calculation actions",
+    },
   },
   locale: {
     label: "Language",

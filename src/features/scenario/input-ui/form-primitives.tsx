@@ -2,6 +2,27 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/** Groups all scenario input sections with a calm page-level frame (layout shell). */
+export function ShellSetupRegion({
+  title,
+  lead,
+  children,
+}: {
+  title: string;
+  lead: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card/40 p-4 shadow-sm ring-1 ring-border/30 sm:p-6">
+      <header className="mb-6 border-b border-border/70 pb-5">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{lead}</p>
+      </header>
+      <div className="space-y-8">{children}</div>
+    </div>
+  );
+}
+
 export function Section({
   title,
   description,

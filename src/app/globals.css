@@ -127,5 +127,6 @@
   }
   html {
     @apply font-sans;
+    scroll-padding-top: 1.5rem;
   }
 }

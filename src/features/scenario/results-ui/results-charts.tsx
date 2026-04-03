@@ -16,11 +16,32 @@ import type { CalculationResult } from "@/core/domain/result";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
+/** Fixed chart height so ResponsiveContainer never depends on % height in a grid with indefinite width. */
+const CHART_HEIGHT_PX = 240;
+
+const responsiveChartProps = {
+  width: "100%" as const,
+  height: CHART_HEIGHT_PX,
+  minHeight: CHART_HEIGHT_PX,
+  minWidth: 0 as const,
+  /** Avoid first-paint width/height -1 and console warning before ResizeObserver runs. */
+  initialDimension: { width: 800, height: CHART_HEIGHT_PX },
+};
+
+/** Room for X-axis ticks + insideBottom axis label (was clipped at bottom: 0). */
+const chartMarginDefault = { top: 4, right: 12, left: 0, bottom: 28 };
+const chartMarginWithLegend = { top: 4, right: 12, left: 0, bottom: 36 };
+
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-sm">
       <h4 className="text-sm font-semibold leading-snug text-foreground">{title}</h4>
-      <div className="mt-4 h-[240px] w-full min-w-0">{children}</div>
+      <div
+        className="mt-4 w-full min-w-0"
+        style={{ height: CHART_HEIGHT_PX, minHeight: CHART_HEIGHT_PX }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -77,17 +98,17 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         </h3>
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">{t("results.section.chartsLead")}</p>
       </div>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-2">
         <ChartCard title={t("results.chart.co2Availability")}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={co2Data} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+          <ResponsiveContainer {...responsiveChartProps}>
+            <LineChart data={co2Data} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: -2, fontSize: 10 }}
+                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -120,15 +141,15 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         </ChartCard>
 
         <ChartCard title={t("results.chart.electricityPrice")}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={priceData} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+          <ResponsiveContainer {...responsiveChartProps}>
+            <LineChart data={priceData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: -2, fontSize: 10 }}
+                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip
@@ -157,15 +178,15 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         </ChartCard>
 
         <ChartCard title={t("results.chart.methaneProduction")}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={methaneData} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+          <ResponsiveContainer {...responsiveChartProps}>
+            <LineChart data={methaneData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: -2, fontSize: 10 }}
+                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip
@@ -194,15 +215,15 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         </ChartCard>
 
         <ChartCard title={t("results.chart.costVsRevenueDaily")}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={costRevData} margin={{ top: 4, right: 12, left: 0, bottom: 24 }}>
+          <ResponsiveContainer {...responsiveChartProps}>
+            <LineChart data={costRevData} margin={chartMarginWithLegend}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: -2, fontSize: 10 }}
+                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip

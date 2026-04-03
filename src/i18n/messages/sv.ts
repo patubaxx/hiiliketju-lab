@@ -4,6 +4,16 @@ export const sv = {
   app: {
     title: "Hiiliketju",
     tagline: "Teknik-ekonomisk scenariosinmatning (MVP)",
+    shell: {
+      setupTitle: "Scenarioinställning",
+      setupLead:
+        "Ange indata för 365-dagars horisonten. Kör beräkning när du är klar; resultat visas i utfallssektionen nedan.",
+      actionsCardTitle: "Beräkning",
+      resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
+      resultsPending: "Kör beräkningen för att fylla utfallssektionen.",
+      outcomeLabel: "Scenarioutfall",
+      mobileActionsLabel: "Beräkningsåtgärder för scenario",
+    },
   },
   locale: {
     label: "Språk",

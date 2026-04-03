@@ -26,7 +26,7 @@ export function ResultsPanel({
   const s = result.annualSummary;
 
   return (
-    <div className="space-y-12 rounded-xl border border-border/80 bg-muted/25 px-6 py-8 shadow-sm ring-1 ring-foreground/[0.03] sm:px-8 sm:py-10">
+    <div className="w-full space-y-12 rounded-xl border border-border/80 bg-muted/25 px-6 py-8 shadow-sm ring-1 ring-foreground/[0.03] sm:px-8 sm:py-10">
       {/* 1. Outcome + scenario context */}
       <header className="space-y-3 border-b border-border/80 pb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

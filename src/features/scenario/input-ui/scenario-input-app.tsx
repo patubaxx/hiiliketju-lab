@@ -17,6 +17,7 @@ import {
   FieldHint,
   FieldLabel,
   Section,
+  ShellSetupRegion,
   inputClassName,
   selectClassName,
   textAreaClassName,
@@ -195,8 +196,9 @@ export function ScenarioInputApp() {
   const hasErrors = errors.size > 0;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-12 px-4 py-12 pb-24 sm:px-6">
-      <header className="space-y-4 border-b border-border/80 pb-8">
+    <>
+      <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-12 pb-28 sm:px-6 md:pb-14 xl:space-y-12 xl:px-10 xl:pb-16">
+      <header className="max-w-3xl space-y-4 border-b border-border/80 pb-8">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("app.title")}</h1>
@@ -248,6 +250,9 @@ export function ScenarioInputApp() {
         </div>
       ) : null}
 
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_15.5rem] xl:items-start xl:gap-10">
+        <div className="min-w-0 space-y-8">
+          <ShellSetupRegion title={t("app.shell.setupTitle")} lead={t("app.shell.setupLead")}>
       <Section title={t("scenarioForm.title")} description={t("scenarioForm.description")}>
         <FieldHint>{t("scenarioForm.periodNote")}</FieldHint>
         <div>
@@ -850,26 +855,81 @@ export function ScenarioInputApp() {
           })}
         </div>
       </Section>
+          </ShellSetupRegion>
 
-      <div className="flex flex-wrap gap-3 pt-2">
-        <Button type="button" onClick={onRun}>
-          {t("scenarioForm.runCalculation")}
-        </Button>
-        <Button type="button" variant="outline" onClick={onReset}>
-          {t("scenarioForm.reset")}
-        </Button>
+          <div className="flex flex-wrap gap-3 pt-1 xl:hidden">
+            <Button type="button" onClick={onRun}>
+              {t("scenarioForm.runCalculation")}
+            </Button>
+            <Button type="button" variant="outline" onClick={onReset}>
+              {t("scenarioForm.reset")}
+            </Button>
+          </div>
+        </div>
+
+        <aside
+          className="mt-8 hidden xl:mt-0 xl:block"
+          aria-labelledby="scenario-shell-actions-heading"
+        >
+          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-card p-4 shadow-sm ring-1 ring-foreground/[0.03]">
+            <h2
+              id="scenario-shell-actions-heading"
+              className="text-sm font-semibold tracking-tight text-foreground"
+            >
+              {t("app.shell.actionsCardTitle")}
+            </h2>
+            <p className="truncate text-sm font-medium text-foreground" title={form.scenarioName}>
+              {form.scenarioName}
+            </p>
+            <div className="flex flex-col gap-2 border-t border-border/70 pt-4">
+              <Button type="button" className="w-full" onClick={onRun}>
+                {t("scenarioForm.runCalculation")}
+              </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={onReset}>
+                {t("scenarioForm.reset")}
+              </Button>
+            </div>
+            <p className="border-t border-border/70 pt-3 text-xs leading-relaxed text-muted-foreground">
+              {result ? t("app.shell.resultsReady") : t("app.shell.resultsPending")}
+            </p>
+          </div>
+        </aside>
       </div>
 
-      <Section
-        title={t("sections.results")}
-        className="border-border/90 bg-muted/20 shadow-none ring-1 ring-border/60"
+      <div
+        className="scroll-mt-8 border-t border-border/80 pt-10 xl:scroll-mt-10 xl:pt-14"
+        id="scenario-outcome"
       >
-        {!result ? (
-          <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
-        ) : (
-          <ResultsPanel result={result} locale={locale} t={t} />
-        )}
-      </Section>
-    </div>
+        <p className="mb-6 text-xs font-medium tracking-wide text-muted-foreground">
+          {t("app.shell.outcomeLabel")}
+        </p>
+        <Section
+          title={t("sections.results")}
+          className="border-border/90 bg-muted/20 shadow-none ring-1 ring-border/60"
+        >
+          {!result ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
+          ) : (
+            <ResultsPanel result={result} locale={locale} t={t} />
+          )}
+        </Section>
+      </div>
+      </div>
+
+      <div
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md supports-[backdrop-filter]:bg-background/75 md:hidden"
+        role="toolbar"
+        aria-label={t("app.shell.mobileActionsLabel")}
+      >
+        <div className="mx-auto flex w-full max-w-lg gap-2">
+          <Button type="button" className="min-h-11 min-w-0 flex-1" onClick={onRun}>
+            {t("scenarioForm.runCalculation")}
+          </Button>
+          <Button type="button" variant="outline" className="min-h-11 min-w-0 flex-1 shrink-0" onClick={onReset}>
+            {t("scenarioForm.reset")}
+          </Button>
+        </div>
+      </div>
+    </>
   );
 }
