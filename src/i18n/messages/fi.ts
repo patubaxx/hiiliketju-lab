@@ -4,6 +4,15 @@ export const fi = {
   app: {
     title: "Hiiliketju",
     tagline: "Teknis-taloudellinen skenaario­syöte (MVP)",
+    hero: {
+      headline: "Teknis-taloudelliset skenaariot biologisen CO₂:n ja vedyn arvoketjuille",
+      lead:
+        "Vertaa synteettistä metaania (CO₂ + H₂ → CH₄) vedyn myyntiin ja CO₂:n vapautumiseen. Mallinna CO₂:n saatavuutta ja sähkön hintaa vuoden yli, ja tarkastele metaanintuotantoa, energiankäyttöä, kustannuksia, kannattavuutta, kriittisiä ja tavoitehintoja—valinnaisella CAPEXilla—selaimessa tutkimusta ja päätöksentekoa varten.",
+      bullet1: "Rinnakkainen näkymä metaanireitille ja vedynmyyntivaihtoehdolle",
+      bullet2: "CO₂- ja sähkösyötteet tasaisina tai päivä- / tuntisarjoina, yhtenäistettynä päivätason moottoriin",
+      bullet3: "Tulokset kattavat tuotannon, energian, kustannusrakenteen, tulot ja hintaindikaattorit",
+      bullet4: "Oletusten metatiedot pysyvät näkyvissä läpinäkyvää, vientiin soveltuvaa analyysiä varten",
+    },
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:

@@ -4,6 +4,15 @@ export const en = {
   app: {
     title: "Hiiliketju",
     tagline: "Techno-economic scenario input (MVP)",
+    hero: {
+      headline: "Techno-economic scenarios for biogenic CO₂ and hydrogen value chains",
+      lead:
+        "Compare synthetic methane (CO₂ + H₂ → CH₄) with selling hydrogen while releasing CO₂. Model CO₂ availability and electricity prices over the year, then review methane production, energy use, costs, profitability, break-even and target prices—with optional CAPEX—in the browser for research and decision support.",
+      bullet1: "Side-by-side view of the methane pathway and the hydrogen-sales alternative",
+      bullet2: "CO₂ and electricity inputs as flat values or daily / hourly series, harmonized to a daily engine",
+      bullet3: "Outputs cover production, energy, cost stack, revenues, and price indicators",
+      bullet4: "Assumption metadata stays visible for transparent, export-aligned analysis",
+    },
     shell: {
       setupTitle: "Scenario setup",
       setupLead:

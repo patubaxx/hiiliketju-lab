@@ -198,24 +198,52 @@ export function ScenarioInputApp() {
   return (
     <>
       <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-12 pb-28 sm:px-6 md:pb-14 xl:space-y-12 xl:px-10 xl:pb-16">
-      <header className="max-w-3xl space-y-4 border-b border-border/80 pb-8">
-        <div className="flex flex-wrap items-start justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("app.title")}</h1>
-            <p className="max-w-xl text-base leading-relaxed text-muted-foreground">{t("app.tagline")}</p>
+      <header className="mb-2">
+        <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-1 ring-consultancy/20 sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
+            <div className="flex flex-col gap-1">
+              <FieldLabel htmlFor="locale-select">{t("locale.label")}</FieldLabel>
+              <select
+                id="locale-select"
+                className={selectClassName + " w-44"}
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as typeof locale)}
+              >
+                <option value="en">{t("locale.en")}</option>
+                <option value="fi">{t("locale.fi")}</option>
+                <option value="sv">{t("locale.sv")}</option>
+              </select>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <FieldLabel htmlFor="locale-select">{t("locale.label")}</FieldLabel>
-            <select
-              id="locale-select"
-              className={selectClassName + " w-44"}
-              value={locale}
-              onChange={(e) => setLocale(e.target.value as typeof locale)}
-            >
-              <option value="en">{t("locale.en")}</option>
-              <option value="fi">{t("locale.fi")}</option>
-              <option value="sv">{t("locale.sv")}</option>
-            </select>
+
+          <div className="mt-6 border-t border-consultancy/15 pt-6">
+            <div className="rounded-xl border border-consultancy/12 bg-consultancy-subtle/45 px-5 py-5 sm:max-w-[46rem] sm:px-6 sm:py-6">
+              <div className="border-l-[3px] border-l-consultancy/50 pl-5 sm:pl-6">
+                <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem] sm:leading-snug">
+                  {t("app.hero.headline")}
+                </h1>
+                <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("app.hero.lead")}</p>
+                <ul className="mt-5 grid gap-3 text-sm leading-snug text-muted-foreground sm:grid-cols-2 sm:gap-x-10 sm:gap-y-3">
+                  <li className="flex gap-3">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                    <span>{t("app.hero.bullet1")}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                    <span>{t("app.hero.bullet2")}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                    <span>{t("app.hero.bullet3")}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                    <span>{t("app.hero.bullet4")}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -710,7 +738,7 @@ export function ScenarioInputApp() {
       <Section
         title={t("sections.advanced")}
         description={t("sections.advancedIntro")}
-        className="border-dashed bg-muted/20"
+        className="border-dashed border-border/70 bg-muted/30 shadow-none ring-1 ring-border/50 dark:bg-muted/20"
       >
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
           <p className="font-medium text-amber-900 dark:text-amber-100">{t("advanced.inactiveFactorsTitle")}</p>
@@ -725,7 +753,7 @@ export function ScenarioInputApp() {
             return (
               <div
                 key={key}
-                className="rounded-lg border border-border/80 bg-background/60 p-4 space-y-3"
+                className="space-y-3 rounded-lg border border-border/75 bg-surface-inset p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] ring-1 ring-black/[0.03] dark:shadow-none dark:ring-white/[0.04]"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <input
@@ -871,7 +899,7 @@ export function ScenarioInputApp() {
           className="mt-8 hidden xl:mt-0 xl:block"
           aria-labelledby="scenario-shell-actions-heading"
         >
-          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-card p-4 shadow-sm ring-1 ring-foreground/[0.03]">
+          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-surface-shell p-4 shadow-[0_4px_24px_-10px_rgba(15,23,42,0.12)] ring-1 ring-consultancy/18">
             <h2
               id="scenario-shell-actions-heading"
               className="text-sm font-semibold tracking-tight text-foreground"
@@ -881,7 +909,7 @@ export function ScenarioInputApp() {
             <p className="truncate text-sm font-medium text-foreground" title={form.scenarioName}>
               {form.scenarioName}
             </p>
-            <div className="flex flex-col gap-2 border-t border-border/70 pt-4">
+            <div className="flex flex-col gap-2 border-t border-consultancy/12 pt-4">
               <Button type="button" className="w-full" onClick={onRun}>
                 {t("scenarioForm.runCalculation")}
               </Button>
@@ -889,7 +917,7 @@ export function ScenarioInputApp() {
                 {t("scenarioForm.reset")}
               </Button>
             </div>
-            <p className="border-t border-border/70 pt-3 text-xs leading-relaxed text-muted-foreground">
+            <p className="border-t border-border/60 pt-3 text-xs leading-relaxed text-muted-foreground">
               {result ? t("app.shell.resultsReady") : t("app.shell.resultsPending")}
             </p>
           </div>
@@ -897,22 +925,26 @@ export function ScenarioInputApp() {
       </div>
 
       <div
-        className="scroll-mt-8 border-t border-border/80 pt-10 xl:scroll-mt-10 xl:pt-14"
+        className="scroll-mt-8 pt-10 xl:scroll-mt-10 xl:pt-14"
         id="scenario-outcome"
       >
-        <p className="mb-6 text-xs font-medium tracking-wide text-muted-foreground">
-          {t("app.shell.outcomeLabel")}
-        </p>
-        <Section
-          title={t("sections.results")}
-          className="border-border/90 bg-muted/20 shadow-none ring-1 ring-border/60"
-        >
-          {!result ? (
-            <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
-          ) : (
-            <ResultsPanel result={result} locale={locale} t={t} />
-          )}
-        </Section>
+        <div className="rounded-2xl border border-consultancy/25 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-consultancy/12 sm:p-5 xl:p-6 dark:border-consultancy/30 dark:ring-consultancy/18">
+          <p className="mb-5 flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
+            <span className="h-px w-8 shrink-0 bg-consultancy/50" aria-hidden />
+            {t("app.shell.outcomeLabel")}
+          </p>
+          <Section
+            title={t("sections.results")}
+            headingAccent={false}
+            className="border-border/85 bg-card shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08)] ring-1 ring-consultancy/10 dark:ring-consultancy/15"
+          >
+            {!result ? (
+              <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
+            ) : (
+              <ResultsPanel result={result} locale={locale} t={t} />
+            )}
+          </Section>
+        </div>
       </div>
       </div>
 

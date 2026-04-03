@@ -13,12 +13,14 @@ export function ShellSetupRegion({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/40 p-4 shadow-sm ring-1 ring-border/30 sm:p-6">
-      <header className="mb-6 border-b border-border/70 pb-5">
+    <div className="rounded-2xl border border-border/75 bg-surface-shell p-4 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.12),0_2px_6px_-2px_rgba(15,23,42,0.05)] ring-1 ring-consultancy/16 sm:p-6">
+      <header className="mb-5 rounded-xl border border-consultancy/18 bg-consultancy-subtle/60 px-4 py-4 sm:px-5 sm:py-4">
         <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{lead}</p>
       </header>
-      <div className="space-y-8">{children}</div>
+      <div className="space-y-6 rounded-xl bg-surface-inset p-3 ring-1 ring-border/40 sm:space-y-7 sm:p-4 dark:ring-border/30">
+        {children}
+      </div>
     </div>
   );
 }
@@ -28,24 +30,37 @@ export function Section({
   description,
   children,
   className,
+  headingAccent = true,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
   className?: string;
+  /** Vertical accent bar beside the heading (setup sections); omit for outcome / plain blocks. */
+  headingAccent?: boolean;
 }) {
   return (
     <section
       className={cn(
-        "rounded-xl border border-border bg-card px-7 py-7 text-card-foreground shadow-sm",
+        "rounded-xl border border-border/90 bg-card px-6 py-6 text-card-foreground shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.04] sm:px-7 sm:py-7 dark:ring-white/[0.06]",
         className,
       )}
     >
-      <header className="mb-6 space-y-2">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
-        {description ? (
-          <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <header
+        className={cn("mb-6 flex gap-4 sm:gap-5", !headingAccent && "gap-0")}
+      >
+        {headingAccent ? (
+          <span
+            className="hidden w-[3px] shrink-0 self-stretch rounded-full bg-consultancy/55 sm:block"
+            aria-hidden
+          />
         ) : null}
+        <div className="min-w-0 flex-1 space-y-2">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+          {description ? (
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+          ) : null}
+        </div>
       </header>
       <div className="space-y-5">{children}</div>
     </section>

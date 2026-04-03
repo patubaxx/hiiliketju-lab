@@ -26,9 +26,9 @@ export function ResultsPanel({
   const s = result.annualSummary;
 
   return (
-    <div className="w-full space-y-12 rounded-xl border border-border/80 bg-muted/25 px-6 py-8 shadow-sm ring-1 ring-foreground/[0.03] sm:px-8 sm:py-10">
+    <div className="w-full space-y-12 rounded-xl border border-border/75 bg-surface-inset px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-black/[0.04] sm:px-8 sm:py-10 dark:shadow-none dark:ring-white/[0.05]">
       {/* 1. Outcome + scenario context */}
-      <header className="space-y-3 border-b border-border/80 pb-6">
+      <header className="space-y-3 border-b border-consultancy/12 pb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
           <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -58,7 +58,7 @@ export function ResultsPanel({
       </header>
 
       <p
-        className="rounded-lg border border-emerald-600/20 bg-emerald-500/[0.06] px-4 py-3 text-sm text-foreground"
+        className="rounded-lg border border-consultancy/22 bg-consultancy-subtle/70 px-4 py-3 text-sm text-foreground dark:bg-consultancy-subtle/40"
         role="status"
       >
         {t("results.success")}
@@ -71,7 +71,7 @@ export function ResultsPanel({
 
       {/* 3. Path comparison (revenues only — delta in headline) */}
       <section
-        className="rounded-xl border border-border bg-card/90 p-5 shadow-sm sm:p-6"
+        className="rounded-xl border border-consultancy/14 bg-card p-5 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-consultancy/8 sm:p-6 dark:ring-consultancy/12"
         aria-labelledby="results-path-heading"
       >
         <h3 id="results-path-heading" className="text-base font-semibold tracking-tight text-foreground">
@@ -79,13 +79,13 @@ export function ResultsPanel({
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("results.pathComparison.help")}</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-border/80 bg-background/80 px-5 py-4">
+          <div className="rounded-lg border border-consultancy/12 bg-consultancy-subtle/40 px-5 py-4 dark:bg-consultancy-subtle/25">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.methaneRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
               {formatResultEur(s.annualMethaneRevenueEur, locale)}
             </p>
           </div>
-          <div className="rounded-lg border border-border/80 bg-background/80 px-5 py-4">
+          <div className="rounded-lg border border-consultancy/12 bg-consultancy-subtle/40 px-5 py-4 dark:bg-consultancy-subtle/25">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.hydrogenAltRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
               {formatResultEur(s.hydrogenSalesAlternativeRevenueEur, locale)}

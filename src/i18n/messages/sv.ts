@@ -4,6 +4,15 @@ export const sv = {
   app: {
     title: "Hiiliketju",
     tagline: "Teknik-ekonomisk scenariosinmatning (MVP)",
+    hero: {
+      headline: "Teknik-ekonomiska scenarier för biogent CO₂ och väte i värdekedjor",
+      lead:
+        "Jämför syntetisk metan (CO₂ + H₂ → CH₄) med försäljning av väte med frigjort CO₂. Modellera CO₂-tillgång och elpris över året och följ metanproduktion, energianvändning, kostnader, lönsamhet, break-even och målpriser—valfritt med CAPEX—i webbläsaren för forskning och beslutsstöd.",
+      bullet1: "Samlad vy av metanvägen och alternativet med väteförsäljning",
+      bullet2: "CO₂- och elindata som konstanta värden eller dag- / timserier, harmoniserade till en daglig motor",
+      bullet3: "Resultat omfattar produktion, energi, kostnadsstack, intäkter och prisindikatorer",
+      bullet4: "Antagandemetadata förblir synligt för transparent, exportanpassad analys",
+    },
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
