@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { allocateCapex } from "@/core/calculation/allocate-capex";
 import { calculateDailyResults, usableCo2KgPerDay } from "@/core/calculation/calculate-daily-results";
-import { calculateScenario } from "@/core/calculation/calculate-scenario";
+import {
+  WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS,
+  calculateScenario,
+} from "@/core/calculation/calculate-scenario";
 import { resolveCo2Series } from "@/core/calculation/resolve-co2-series";
 import { resolveElectricityPriceSeries } from "@/core/calculation/resolve-electricity-price-series";
 import { resolveElectrolyzerSecMwhPerKgH2 } from "@/core/calculation/validate-sec-consistency";
@@ -81,6 +84,23 @@ describe("resolveCo2Series", () => {
     expect(sum).toBeCloseTo(annualKg, 6);
   });
 
+  it("time_series_daily passes through dailyAvailableCo2Kg per day", () => {
+    const dailyAvailableCo2Kg = Array.from({ length: 365 }, (_, d) => d * 3 + 7);
+    const series = resolveCo2Series(
+      baseScenario({
+        co2: {
+          annualAmountKtPerYear: 999,
+          utilizationRatePct: 100,
+          availability: { mode: "time_series_daily", dailyAvailableCo2Kg },
+        },
+      }).co2,
+    );
+    expect(series).toHaveLength(365);
+    for (let d = 0; d < 365; d++) {
+      expect(series[d]!.availableCO2Kg).toBe(dailyAvailableCo2Kg[d]);
+    }
+  });
+
   it("time_series_hourly aggregates CO2 by sum per day", () => {
     const hourly = Array.from({ length: 8760 }, (_, i) => (i % 24 === 0 ? 1 : 0));
     const series = resolveCo2Series(
@@ -109,6 +129,28 @@ describe("resolveElectricityPriceSeries", () => {
     const hourly = Array.from({ length: 8760 }, (_, i) => (i < 12 ? 200 : 0));
     const s = resolveElectricityPriceSeries({ mode: "hourly_series", hourlyPricesEurPerMwh: hourly });
     expect(s[0]!.electricityPriceEurPerMWh).toBeCloseTo(100, 10);
+  });
+
+  it("daily_series passes through dailyPricesEurPerMwh per day", () => {
+    const dailyPricesEurPerMwh = Array.from({ length: 365 }, (_, d) => 50 + d * 0.1);
+    const s = resolveElectricityPriceSeries({ mode: "daily_series", dailyPricesEurPerMwh });
+    expect(s).toHaveLength(365);
+    for (let d = 0; d < 365; d++) {
+      expect(s[d]!.electricityPriceEurPerMWh).toBe(dailyPricesEurPerMwh[d]);
+    }
+  });
+
+  it("historical_market_data_imported with daily resolution passes through prices", () => {
+    const pricesEurPerMwh = Array.from({ length: 365 }, (_, d) => 12 + d);
+    const s = resolveElectricityPriceSeries({
+      mode: "historical_market_data_imported",
+      resolution: "daily",
+      pricesEurPerMwh,
+    });
+    expect(s).toHaveLength(365);
+    for (let d = 0; d < 365; d++) {
+      expect(s[d]!.electricityPriceEurPerMWh).toBe(pricesEurPerMwh[d]);
+    }
   });
 
   it("historical_market_data_imported hourly matches hourly_series path", () => {
@@ -144,6 +186,17 @@ describe("allocateCapex", () => {
     });
     expect(r.annualCapexCostEur).toBe(150_000);
     expect(r.dailyAllocatedCapexEur).toBeCloseTo(150_000 / 365, 10);
+  });
+
+  it("throws when includeCapex is true and capexLifetimeYears is invalid", () => {
+    const econ = {
+      ...baseScenario().economics,
+      includeCapex: true,
+      electrolyzerCapexEur: 100,
+      methanationCapexEur: 0,
+    };
+    expect(() => allocateCapex({ ...econ, capexLifetimeYears: 0 })).toThrow(RangeError);
+    expect(() => allocateCapex({ ...econ, capexLifetimeYears: undefined })).toThrow(RangeError);
   });
 });
 
@@ -291,6 +344,18 @@ describe("aggregateMonthlyFromDaily", () => {
     const sumDaily = r.dailyResults.reduce((a, d) => a + d.methaneProducedKg, 0);
     expect(sumMonths).toBeCloseTo(sumDaily, 6);
   });
+
+  it("sums electricityCostEur across months to match daily total", () => {
+    const dailyPricesEurPerMwh = Array.from({ length: 365 }, (_, d) => (d % 31) + 1);
+    const r = calculateScenario(
+      baseScenario({
+        electricity: { mode: "daily_series", dailyPricesEurPerMwh },
+      }),
+    );
+    const fromDaily = r.dailyResults.reduce((a, d) => a + d.electricityCostEur, 0);
+    const fromMonthly = r.monthlySummary.reduce((a, m) => a + m.sums.electricityCostEur, 0);
+    expect(fromMonthly).toBeCloseTo(fromDaily, 6);
+  });
 });
 
 describe("calculateScenario integration", () => {
@@ -338,6 +403,11 @@ describe("calculateScenario integration", () => {
     expect(r.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.assumptionMeta.assumptionSource).toBe(
       "literature_based",
     );
+  });
+
+  it("adds a single literature-based estimated defaults warning for default process assumptions", () => {
+    const r = calculateScenario(baseScenario());
+    expect(r.warnings).toContain(WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS);
   });
 });
 

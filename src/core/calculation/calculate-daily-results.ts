@@ -98,6 +98,9 @@ export function calculateDailyResults(params: DailyCalculationParams): readonly 
 
   const h2Factor = process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.value;
   const ch4Factor = process.stoichiometricMethaneYieldFactorKgCh4PerKgCo2.value;
+  // plantAvailabilityPct and processEfficiencyPct are carried on `process` with full assumption metadata for
+  // UI/export traceability. They are not yet applied as multipliers in these daily formulas (MVP neutral 100%
+  // defaults); a future iteration may incorporate them without changing the harmonization contract.
 
   const out: DailyResult[] = [];
   for (let d = 0; d < SCENARIO_PERIOD_DAYS; d++) {

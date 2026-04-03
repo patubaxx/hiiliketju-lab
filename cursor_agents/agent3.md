@@ -10,9 +10,10 @@ Build a clean, maintainable testing foundation that supports:
 3. regression-safe tests for temporal harmonization
 4. regression-safe tests for locked stoichiometric formulas
 5. regression-safe tests for CAPEX allocation and aggregation
-6. a reusable golden scenario harness for later formula tightening
+6. regression-safe tests for warnings and assumption traceability
+7. a reusable golden scenario harness for later formula tightening
 
-This work must reflect the actual MVP calculation logic now locked in the project.
+This work must reflect the **actual implemented MVP calculation logic now locked in the repository**, including the current `CalculationResult` / `ScenarioSummary` contract and the Agent 2 remediation changes.
 
 ---
 
@@ -32,6 +33,7 @@ By the time you do this task, the codebase should already contain:
 - aggregation functions
 - top-level scenario calculation
 - canonical result model
+- soft warnings on `CalculationResult.warnings`
 
 The architecture direction is already decided:
 - Next.js + TypeScript
@@ -41,6 +43,26 @@ The architecture direction is already decided:
 - literature-based defaults and their propagation must be testable
 
 The implementation should be practical, lightweight, and maintainable.
+
+---
+
+## Important implementation reality to respect
+
+Use the **actual repository contract as source of truth**, especially:
+
+- `src/core/domain/result.ts` is the canonical output contract for:
+  - `DailyResult`
+  - `MonthlySummary`
+  - `ScenarioSummary`
+  - `CalculationResult`
+- `CalculationResult.warnings` already exists and is part of the contract
+- current warning sources include at least:
+  1. SEC inconsistency warning (`kWh/kg_H2` vs `MWh/kg_H2`)
+  2. literature-based estimated process defaults warning
+- `plantAvailabilityPct` and `processEfficiencyPct` are preserved on `ScenarioInput.process` with full `assumptionMeta`, but **are not yet applied as multipliers in daily formulas**
+- tests must verify the real current behavior, not an imagined future behavior
+
+Do not “fix” product logic in this task. Test and protect what is currently implemented.
 
 ---
 
@@ -92,6 +114,8 @@ Use these assumptions as fixed.
 - do not invent unsupported behaviors
 - use tolerances where floating-point distribution makes exact equality brittle
 - verify literature-based metadata propagation explicitly
+- verify warning behavior explicitly
+- do not assume `plantAvailabilityPct` or `processEfficiencyPct` affect formulas unless the implementation actually applies them
 
 ---
 
@@ -105,7 +129,8 @@ Create a testing structure that protects:
 5. aggregation correctness
 6. annual KPI correctness
 7. result shape and metadata integrity
-8. future regression safety through a reusable golden scenario harness
+8. warning behavior and traceability behavior
+9. future regression safety through a reusable golden scenario harness
 
 ---
 
@@ -131,7 +156,10 @@ Organize tests clearly by concern, for example:
 - CAPEX tests
 - aggregation tests
 - orchestration tests
+- warning / metadata tests
 - golden scenario harness
+
+Before adding new files, inspect what Agent 2 already added and extend that structure cleanly instead of duplicating the same assertions in multiple places.
 
 ### 2. Schema validation tests
 
@@ -173,6 +201,8 @@ Create focused tests for CO₂ and electricity harmonization.
 - hourly series aggregates to daily using **arithmetic mean**
 - imported historical series is normalized correctly if supported by current implementation
 - invalid hourly structure fails clearly
+
+If some of these already exist from Agent 2, keep them and extend only where necessary.
 
 ### 4. Stoichiometric formula tests
 
@@ -234,6 +264,8 @@ Coverage must include at least:
 - profitability KPIs compute correctly when methane production > 0
 - result is deterministic for identical input
 
+Also explicitly verify the current canonical output contract names from `src/core/domain/result.ts` where practical.
+
 ### 8. Assumption metadata propagation tests
 
 Create tests that verify:
@@ -244,7 +276,25 @@ Create tests that verify:
 
 This is an important part of the updated spec. Test it explicitly.
 
-### 9. Golden scenario harness
+### 9. Warning behavior tests
+
+Create tests that verify:
+
+#### SEC warning behavior
+- consistent SEC values -> no SEC mismatch warning
+- inconsistent SEC values -> warning appears
+- authoritative MWh behavior remains intact if current implementation exposes that path indirectly or directly
+
+#### Literature-based defaults warning behavior
+- default merged process assumptions produce the umbrella literature-based warning
+- the warning appears once per scenario result, not as repeated duplicates
+- warning remains compatible with SEC mismatch warning (both may appear together)
+
+#### Non-applied process modifier behavior
+- `plantAvailabilityPct` and `processEfficiencyPct` remain present in the input snapshot / traceability path
+- tests do **not** assume they change methane, H₂, or electricity results unless current implementation actually applies them
+
+### 10. Golden scenario harness
 
 Create the initial golden scenario harness so later agents can lock future formula changes against stable reference scenarios.
 
@@ -258,7 +308,9 @@ Implement:
 
 Do not overengineer a mini test framework.
 
-### 10. Golden scenario fixtures
+The harness should work against the **actual `CalculationResult` shape** now present in the repository.
+
+### 11. Golden scenario fixtures
 
 Create at least 2 useful golden scenarios.
 
@@ -280,6 +332,9 @@ These scenarios should lock:
 - CAPEX behavior
 - aggregation behavior
 - orchestration stability
+- warning behavior where relevant
+
+If helpful, add a third scenario for warning behavior, but do not overbuild.
 
 ---
 
@@ -308,12 +363,15 @@ The tests should lock:
 - simple CAPEX allocation behavior
 - annual KPI formula behavior
 - assumptions metadata presence
+- warning behavior
+- actual result contract field names
 
 ### What should not be overfit
 Do not make brittle tests around:
 - irrelevant internal helper implementation details
 - floating-point micro-differences beyond meaningful tolerance
 - hypothetical future fields that do not exist yet
+- future application of plant availability / process efficiency multipliers that are not currently active
 
 ---
 
@@ -346,6 +404,8 @@ Do **not** do these:
 - do not rely heavily on snapshots
 - do not weaken assertions so much that regressions slip through
 - do not ignore literature-based metadata propagation
+- do not rewrite production code unless a test exposes a real defect
+- do not rename canonical result fields unless there is a real bug and you justify it clearly
 
 ---
 
@@ -362,6 +422,7 @@ src/
         aggregate-results.test.ts
         calculate-scenario.test.ts
         core-formulas.test.ts
+        warnings-and-metadata.test.ts
   features/
     scenario/
       schemas/
@@ -372,9 +433,25 @@ src/
       golden-scenarios.ts
     helpers/
       assert-golden-scenario.ts
-````
+```
 
 You may adjust the exact structure slightly if needed to match the existing project conventions, but keep it logically equivalent and clean.
+
+If the repository already uses a different but coherent test layout, prefer extending that rather than forcing a restructure.
+
+---
+
+## Contract compatibility / awareness check
+
+Before finishing, explicitly verify and report:
+
+1. which tests were already covered by existing Agent 2 tests
+2. what new coverage Agent 3 added
+3. whether the tests now protect the actual `result.ts` contract
+4. whether warnings are covered
+5. whether any remaining gap should be addressed before UI/export agents
+
+This is part of the handoff quality.
 
 ---
 
@@ -385,7 +462,8 @@ When you finish, provide:
 1. a short summary of what you implemented
 2. the created/modified file list
 3. any assumptions you made
-4. any open issues or recommendations for the next agent
+4. any contract-related observations
+5. any open issues or recommendations for the next agent
 
 ---
 
@@ -399,9 +477,9 @@ This task is done when:
 * CAPEX allocation tests exist
 * aggregation tests exist
 * scenario orchestration tests exist
+* warning behavior tests exist
 * assumption metadata propagation tests exist
 * a reusable golden scenario harness exists
 * at least 2 useful golden scenarios exist
 * tests reflect the updated MVP logic honestly and help prevent regression
-
-```
+* the actual canonical result contract is protected against accidental breaking changes

@@ -4,8 +4,37 @@ import { calculateDailyResults } from "@/core/calculation/calculate-daily-result
 import { resolveCo2Series } from "@/core/calculation/resolve-co2-series";
 import { resolveElectricityPriceSeries } from "@/core/calculation/resolve-electricity-price-series";
 import { resolveElectrolyzerSecMwhPerKgH2 } from "@/core/calculation/validate-sec-consistency";
+import type { AssumptionValue, ProcessAssumptionsInput } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
 import type { ScenarioInput } from "@/core/domain/scenario";
+
+/** Single soft warning when any active process assumption is literature-based and not customer-confirmed. */
+export const WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS =
+  "Literature-based estimated process defaults are in use; confirm or replace with project-specific data where applicable.";
+
+function isLiteratureEstimated(av: AssumptionValue<number>): boolean {
+  const m = av.assumptionMeta;
+  return (
+    m.assumptionSource === "literature_based" &&
+    (m.assumptionStatus === "estimated" || m.assumptionStatus === "pending_customer_confirmation")
+  );
+}
+
+/**
+ * Returns one umbrella warning if merged process inputs still include literature-based estimated values
+ * (stoichiometry, SEC, plant availability, process efficiency, etc.).
+ */
+export function literatureEstimatedProcessWarning(process: ProcessAssumptionsInput): string | undefined {
+  const candidates: readonly AssumptionValue<number>[] = [
+    process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2,
+    process.stoichiometricMethaneYieldFactorKgCh4PerKgCo2,
+    process.electrolyzerSpecificEnergyConsumptionKwhPerKgH2,
+    process.electrolyzerSpecificEnergyConsumptionMwhPerKgH2,
+    process.plantAvailabilityPct,
+    process.processEfficiencyPct,
+  ];
+  return candidates.some(isLiteratureEstimated) ? WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS : undefined;
+}
 
 /**
  * End-to-end MVP scenario calculation: harmonize inputs, daily engine, aggregations.
@@ -15,6 +44,11 @@ export function calculateScenario(input: ScenarioInput): CalculationResult {
 
   const sec = resolveElectrolyzerSecMwhPerKgH2(input.process);
   warnings.push(...sec.warnings);
+
+  const literatureWarning = literatureEstimatedProcessWarning(input.process);
+  if (literatureWarning !== undefined) {
+    warnings.push(literatureWarning);
+  }
 
   const resolvedDailyCo2 = resolveCo2Series(input.co2);
   const resolvedDailyElectricityPrice = resolveElectricityPriceSeries(input.electricity);

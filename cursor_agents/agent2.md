@@ -373,6 +373,14 @@ When you finish, provide:
 
 ---
 
+## Agent 2 → Agent 3 handoff (remediation)
+
+- **`plantAvailabilityPct` and `processEfficiencyPct`:** Still present on `ScenarioInput.process` with full `assumptionMeta` for traceability. They are **not** applied as multipliers in the daily cost/production formulas yet (see comment in `calculate-daily-results.ts`). MVP defaults remain neutral 100%.
+- **Literature defaults warning:** `calculateScenario` pushes a single soft string on `CalculationResult.warnings` when any merged process `AssumptionValue` is `literature_based` with status `estimated` or `pending_customer_confirmation` (see `literatureEstimatedProcessWarning` / `WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS` in `calculate-scenario.ts`). SEC kWh/MWh mismatch warnings are unchanged and may appear together with this message.
+- **Canonical output shape:** Use `src/core/domain/result.ts` as the contract for `DailyResult`, `MonthlySummary`, `ScenarioSummary`, and `CalculationResult` field names (Agent 3 UI/export should bind to those identifiers).
+
+---
+
 ## Definition of done
 
 This task is done when:
