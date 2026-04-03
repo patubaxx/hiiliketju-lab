@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/messages";
 
 import { formatResultEur } from "./format-result-values";
 import { ResultsAssumptions } from "./results-assumptions";
+import { ResultsExcelExportButton } from "./results-excel-export-button";
 import { ResultsCharts } from "./results-charts";
 import { ResultsKpiGrid } from "./results-kpi-grid";
 import { ResultsTables } from "./results-tables";
@@ -24,7 +25,10 @@ export function ResultsPanel({
   return (
     <div className="space-y-10">
       <header className="space-y-1 border-b border-border pb-4">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">{t("results.title")}</h2>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">{t("results.title")}</h2>
+          <ResultsExcelExportButton result={result} t={t} />
+        </div>
         <p className="text-sm text-muted-foreground">{t("results.summary.lead")}</p>
         <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
           <div>

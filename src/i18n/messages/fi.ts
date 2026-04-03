@@ -210,5 +210,10 @@ export const fi = {
     warnings: {
       empty: "Ei moottorin varoituksia.",
     },
+    export: {
+      downloadExcel: "Lataa Excel",
+      exporting: "Viedään…",
+      error: "Excel-vienti epäonnistui. Yritä uudelleen.",
+    },
   },
 } satisfies MessageTree;

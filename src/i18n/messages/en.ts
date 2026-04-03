@@ -210,5 +210,10 @@ export const en = {
     warnings: {
       empty: "No engine warnings.",
     },
+    export: {
+      downloadExcel: "Download Excel",
+      exporting: "Exporting…",
+      error: "Excel export failed. Please try again.",
+    },
   },
 } as const satisfies MessageTree;

@@ -210,5 +210,10 @@ export const sv = {
     warnings: {
       empty: "Inga motorvarningar.",
     },
+    export: {
+      downloadExcel: "Ladda ner Excel",
+      exporting: "Exporterar…",
+      error: "Excel-exporten misslyckades. Försök igen.",
+    },
   },
 } satisfies MessageTree;
