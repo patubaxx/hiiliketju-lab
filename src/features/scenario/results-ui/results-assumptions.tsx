@@ -23,15 +23,15 @@ export function ResultsAssumptions({
   readonly t: TFn;
 }) {
   return (
-    <section className="space-y-3" aria-labelledby="results-assumptions-heading">
-      <h3 id="results-assumptions-heading" className="text-sm font-semibold tracking-tight text-foreground">
+    <section className="space-y-5" aria-labelledby="results-assumptions-heading">
+      <h3 id="results-assumptions-heading" className="text-base font-semibold tracking-tight text-foreground">
         {t("results.section.assumptions")}
       </h3>
-      <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-3 py-2 text-xs text-foreground/90">
+      <div className="rounded-lg border border-amber-500/25 bg-amber-500/[0.04] px-4 py-3 text-sm text-foreground/90">
         <p className="font-medium text-amber-950 dark:text-amber-100">{t("advanced.inactiveFactorsTitle")}</p>
-        <p className="mt-1 text-muted-foreground">{t("advanced.inactiveFactorsBody")}</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{t("advanced.inactiveFactorsBody")}</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {PROCESS_FIELD_ORDER.map(({ key, labelId }) => {
           const field = process[key];
           const meta = field.assumptionMeta;
@@ -39,35 +39,41 @@ export function ResultsAssumptions({
           return (
             <div
               key={key}
-              className={`rounded-xl border p-4 shadow-sm ${literatureClass(meta.assumptionSource)}`}
+              className={`rounded-xl border px-4 py-4 shadow-sm ${literatureClass(meta.assumptionSource)}`}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <h4 className="text-sm font-medium text-foreground">{t(labelId)}</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t(labelId)}</h4>
                 {lit ? (
-                  <span className="rounded-md border border-amber-600/30 bg-amber-500/10 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-amber-900 dark:text-amber-200">
+                  <span className="rounded-md border border-amber-600/35 bg-amber-500/12 px-2 py-0.5 text-xs font-medium text-amber-950 dark:text-amber-100">
                     {t("results.assumptions.literatureBadge")}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-foreground">
+              <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
                 {formatResultNumber(field.value, locale, { maximumFractionDigits: 6 })}
               </p>
-              <dl className="mt-3 space-y-1 text-xs text-muted-foreground">
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="font-medium text-foreground/80">{t("results.assumptions.source")}</dt>
+              <dl className="mt-4 space-y-2 text-xs leading-relaxed text-muted-foreground">
+                <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                  <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.source")}</dt>
                   <dd>{t(`assumptionSource.${meta.assumptionSource}`)}</dd>
                 </div>
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="font-medium text-foreground/80">{t("results.assumptions.status")}</dt>
+                <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                  <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.status")}</dt>
                   <dd>{t(`assumptionStatus.${meta.assumptionStatus}`)}</dd>
                 </div>
                 {meta.assumptionNote ? (
                   <div>
-                    <dt className="font-medium text-foreground/80">{t("results.assumptions.note")}</dt>
-                    <dd className="mt-0.5 text-[0.7rem] leading-snug text-foreground/85">{meta.assumptionNote}</dd>
+                    <dt className="font-medium text-foreground/85">{t("results.assumptions.note")}</dt>
+                    <dd className="mt-0.5 text-[0.8125rem] leading-snug text-foreground/90">{meta.assumptionNote}</dd>
                   </div>
                 ) : null}
               </dl>
+              <details className="mt-3 border-t border-border/60 pt-3 text-xs">
+                <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                  {t("advanced.internalKey")}
+                </summary>
+                <p className="mt-1.5 break-all font-mono text-[0.65rem] leading-relaxed text-muted-foreground">{key}</p>
+              </details>
             </div>
           );
         })}

@@ -21,6 +21,7 @@ import {
   selectClassName,
   textAreaClassName,
 } from "@/features/scenario/input-ui/form-primitives";
+import { friendlyLabelForValidationPath } from "@/features/scenario/input-ui/validation-field-label";
 import {
   PROCESS_FIELD_ORDER,
   type Co2AvailabilityModeForm,
@@ -194,12 +195,12 @@ export function ScenarioInputApp() {
   const hasErrors = errors.size > 0;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 pb-20">
-      <header className="space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">{t("app.title")}</h1>
-            <p className="mt-1 text-sm text-muted-foreground max-w-xl">{t("app.tagline")}</p>
+    <div className="mx-auto max-w-6xl space-y-12 px-4 py-12 pb-24 sm:px-6">
+      <header className="space-y-4 border-b border-border/80 pb-8">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("app.title")}</h1>
+            <p className="max-w-xl text-base leading-relaxed text-muted-foreground">{t("app.tagline")}</p>
           </div>
           <div className="flex flex-col gap-1">
             <FieldLabel htmlFor="locale-select">{t("locale.label")}</FieldLabel>
@@ -219,16 +220,30 @@ export function ScenarioInputApp() {
 
       {hasErrors ? (
         <div
-          className="rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          className="rounded-xl border border-destructive/35 bg-destructive/[0.04] px-5 py-4 text-destructive"
           role="alert"
         >
-          <p className="font-medium">{t("scenarioForm.generalValidation")}</p>
-          <ul className="mt-2 list-inside list-disc text-xs space-y-0.5 opacity-90">
-            {[...errors.entries()].map(([path, msgs]) => (
-              <li key={path}>
-                <span className="font-mono text-[0.7rem]">{path}</span>: {msgs.join(" · ")}
-              </li>
-            ))}
+          <p className="text-sm font-semibold text-destructive">{t("scenarioForm.generalValidation")}</p>
+          <ul className="mt-4 space-y-4">
+            {[...errors.entries()].map(([path, msgs]) => {
+              const friendly = friendlyLabelForValidationPath(path, t);
+              return (
+                <li key={path} className="border-t border-destructive/15 pt-4 first:border-t-0 first:pt-0">
+                  <p className="text-sm font-medium leading-snug text-destructive">{msgs.join(" · ")}</p>
+                  {friendly ? (
+                    <p className="mt-1.5 text-xs leading-relaxed text-destructive/85">{friendly}</p>
+                  ) : null}
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                      {t("validation.technicalReference")}
+                    </summary>
+                    <p className="mt-1 break-all font-mono text-[0.65rem] leading-relaxed text-muted-foreground">
+                      {path}
+                    </p>
+                  </details>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : null}
@@ -730,7 +745,14 @@ export function ScenarioInputApp() {
                     </span>
                   ) : null}
                 </div>
-                <p className="text-[0.7rem] font-mono text-muted-foreground break-all">{key}</p>
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                    {t("advanced.internalKey")}
+                  </summary>
+                  <p className="mt-1.5 break-all font-mono text-[0.65rem] leading-relaxed text-muted-foreground">
+                    {key}
+                  </p>
+                </details>
                 {row.override ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="sm:col-span-2">
@@ -829,7 +851,7 @@ export function ScenarioInputApp() {
         </div>
       </Section>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 pt-2">
         <Button type="button" onClick={onRun}>
           {t("scenarioForm.runCalculation")}
         </Button>
@@ -838,9 +860,12 @@ export function ScenarioInputApp() {
         </Button>
       </div>
 
-      <Section title={t("sections.results")}>
+      <Section
+        title={t("sections.results")}
+        className="border-border/90 bg-muted/20 shadow-none ring-1 ring-border/60"
+      >
         {!result ? (
-          <p className="text-sm text-muted-foreground">{t("results.empty")}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
         ) : (
           <ResultsPanel result={result} locale={locale} t={t} />
         )}

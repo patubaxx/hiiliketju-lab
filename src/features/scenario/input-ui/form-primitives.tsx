@@ -16,15 +16,17 @@ export function Section({
   return (
     <section
       className={cn(
-        "rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm",
+        "rounded-xl border border-border bg-card px-7 py-7 text-card-foreground shadow-sm",
         className,
       )}
     >
-      <header className="mb-4 space-y-1">
-        <h2 className="text-base font-semibold tracking-tight">{title}</h2>
-        {description ? <p className="text-sm text-muted-foreground leading-relaxed">{description}</p> : null}
+      <header className="mb-6 space-y-2">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+        {description ? (
+          <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+        ) : null}
       </header>
-      <div className="space-y-4">{children}</div>
+      <div className="space-y-5">{children}</div>
     </section>
   );
 }

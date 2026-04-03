@@ -24,68 +24,72 @@ export function ResultsPanel({
   readonly t: TFn;
 }) {
   return (
-    <div className="space-y-10">
-      <header className="space-y-1 border-b border-border pb-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h3 className="text-lg font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
+    <div className="space-y-12 rounded-xl border border-border/80 bg-muted/25 px-6 py-8 shadow-sm ring-1 ring-foreground/[0.03] sm:px-8 sm:py-10">
+      <header className="space-y-3 border-b border-border/80 pb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
           <div className="flex flex-wrap gap-2 sm:justify-end">
             <ResultsExcelExportButton result={result} t={t} />
             <ResultsPdfExportButton result={result} t={t} />
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">{t("results.summary.lead")}</p>
-        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("results.summary.lead")}</p>
+        <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t("results.summary.scenarioName")}
-            </dt>
-            <dd className="font-medium text-foreground">{result.input.scenarioName}</dd>
+            <dt className="text-xs font-medium text-muted-foreground">{t("results.summary.scenarioName")}</dt>
+            <dd className="mt-1 font-medium text-foreground">{result.input.scenarioName}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t("results.summary.assumptionsVersion")}
-            </dt>
-            <dd className="font-mono text-xs text-foreground">{result.input.assumptionsMeta.assumptionsVersion}</dd>
+            <dt className="text-xs font-medium text-muted-foreground">{t("results.summary.assumptionsVersion")}</dt>
+            <dd className="mt-1 font-mono text-xs text-foreground">{result.input.assumptionsMeta.assumptionsVersion}</dd>
           </div>
           {result.input.assumptionsMeta.notes ? (
             <div className="sm:col-span-2">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t("results.summary.scenarioNotes")}
-              </dt>
-              <dd className="mt-1 text-sm text-foreground/90 whitespace-pre-wrap">{result.input.assumptionsMeta.notes}</dd>
+              <dt className="text-xs font-medium text-muted-foreground">{t("results.summary.scenarioNotes")}</dt>
+              <dd className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                {result.input.assumptionsMeta.notes}
+              </dd>
             </div>
           ) : null}
         </dl>
       </header>
 
-      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">{t("results.success")}</p>
+      <p
+        className="rounded-lg border border-emerald-600/20 bg-emerald-500/[0.06] px-4 py-3 text-sm text-foreground"
+        role="status"
+      >
+        {t("results.success")}
+      </p>
 
-      <ResultsKpiGrid summary={result.annualSummary} locale={locale} t={t} />
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold text-foreground">{t("results.section.kpis")}</h4>
+        <ResultsKpiGrid summary={result.annualSummary} locale={locale} t={t} />
+      </div>
 
       <section
-        className="rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
+        className="rounded-xl border border-border bg-card/90 p-5 shadow-sm sm:p-6"
         aria-labelledby="results-path-heading"
       >
-        <h3 id="results-path-heading" className="text-sm font-semibold tracking-tight text-foreground">
+        <h3 id="results-path-heading" className="text-base font-semibold tracking-tight text-foreground">
           {t("results.section.pathComparison")}
         </h3>
-        <p className="mt-1 text-xs text-muted-foreground">{t("results.pathComparison.help")}</p>
-        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card p-3">
-            <dt className="text-xs text-muted-foreground">{t("results.pathComparison.methaneRevenue")}</dt>
-            <dd className="mt-1 font-mono text-sm font-semibold tabular-nums">
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("results.pathComparison.help")}</p>
+        <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-lg border border-border/80 bg-background/80 px-4 py-3">
+            <dt className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.methaneRevenue")}</dt>
+            <dd className="mt-1.5 font-mono text-sm font-semibold tabular-nums text-foreground">
               {formatResultEur(result.annualSummary.annualMethaneRevenueEur, locale)}
             </dd>
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <dt className="text-xs text-muted-foreground">{t("results.pathComparison.hydrogenAltRevenue")}</dt>
-            <dd className="mt-1 font-mono text-sm font-semibold tabular-nums">
+          <div className="rounded-lg border border-border/80 bg-background/80 px-4 py-3">
+            <dt className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.hydrogenAltRevenue")}</dt>
+            <dd className="mt-1.5 font-mono text-sm font-semibold tabular-nums text-foreground">
               {formatResultEur(result.annualSummary.hydrogenSalesAlternativeRevenueEur, locale)}
             </dd>
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <dt className="text-xs text-muted-foreground">{t("results.pathComparison.delta")}</dt>
-            <dd className="mt-1 font-mono text-sm font-semibold tabular-nums">
+          <div className="rounded-lg border border-border/80 bg-background/80 px-4 py-3">
+            <dt className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.delta")}</dt>
+            <dd className="mt-1.5 font-mono text-sm font-semibold tabular-nums text-foreground">
               {formatResultEur(result.annualSummary.deltaVsHydrogenSaleEur, locale)}
             </dd>
           </div>

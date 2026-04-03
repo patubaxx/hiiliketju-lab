@@ -88,6 +88,7 @@ export const en = {
     capexLifetime: "CAPEX lifetime (years)",
   },
   advanced: {
+    internalKey: "Parameter id",
     inactiveFactorsTitle: "Not yet applied in daily formulas",
     inactiveFactorsBody:
       "Plant availability and process efficiency are carried with assumption metadata for transparency, but the current MVP daily engine does not multiply outputs by these values (defaults are neutral 100%).",
@@ -121,6 +122,11 @@ export const en = {
     seriesNonNumeric: "Could not parse all entries as finite numbers.",
     invalidNumber: "Enter a valid finite number.",
     fieldRequired: "This field is required.",
+    technicalReference: "Technical reference",
+    field: {
+      general: "Inputs",
+      periodDays: "Analysis period",
+    },
   },
   results: {
     title: "Results",
@@ -137,6 +143,8 @@ export const en = {
     },
     section: {
       kpis: "Key performance indicators",
+      kpisHeadline: "Summary",
+      kpisSecondary: "Supporting metrics",
       pathComparison: "Path comparison (methane vs hydrogen sales)",
       charts: "Time series",
       tables: "Tables",

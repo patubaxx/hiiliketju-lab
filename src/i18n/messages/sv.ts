@@ -88,6 +88,7 @@ export const sv = {
     capexLifetime: "CAPEX-livslängd (år)",
   },
   advanced: {
+    internalKey: "Parameter-id",
     inactiveFactorsTitle: "Används ännu inte i dagliga formler",
     inactiveFactorsBody:
       "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
@@ -121,6 +122,11 @@ export const sv = {
     seriesNonNumeric: "Kunde inte tolka alla poster som ändliga tal.",
     invalidNumber: "Ange ett giltigt ändligt tal.",
     fieldRequired: "Detta fält är obligatoriskt.",
+    technicalReference: "Teknisk referens",
+    field: {
+      general: "Indata",
+      periodDays: "Analysperiod",
+    },
   },
   results: {
     title: "Resultat",
@@ -137,6 +143,8 @@ export const sv = {
     },
     section: {
       kpis: "Nyckeltal",
+      kpisHeadline: "Sammanfattning",
+      kpisSecondary: "Kompletterande nyckeltal",
       pathComparison: "Jämförelse mellan vägar (metan vs vätgasförsäljning)",
       charts: "Tidsserier",
       tables: "Tabeller",

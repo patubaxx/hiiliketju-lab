@@ -18,9 +18,9 @@ type TFn = (id: string, vars?: Record<string, string>) => string;
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h4>
-      <div className="mt-3 h-[240px] w-full min-w-0">{children}</div>
+    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+      <h4 className="text-sm font-semibold leading-snug text-foreground">{title}</h4>
+      <div className="mt-4 h-[240px] w-full min-w-0">{children}</div>
     </div>
   );
 }
@@ -70,11 +70,11 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
   const tickFormatter = React.useCallback((v: number) => String(v), []);
 
   return (
-    <section className="space-y-3" aria-labelledby="results-charts-heading">
-      <h3 id="results-charts-heading" className="text-sm font-semibold tracking-tight text-foreground">
+    <section className="space-y-5" aria-labelledby="results-charts-heading">
+      <h3 id="results-charts-heading" className="text-base font-semibold tracking-tight text-foreground">
         {t("results.section.charts")}
       </h3>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <ChartCard title={t("results.chart.co2Availability")}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={co2Data} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>

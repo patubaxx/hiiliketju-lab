@@ -88,6 +88,7 @@ export const fi = {
     capexLifetime: "Investoinnin elinikä (vuotta)",
   },
   advanced: {
+    internalKey: "Parametrin tunniste",
     inactiveFactorsTitle: "Ei vielä päivittäisissä kaavoissa",
     inactiveFactorsBody:
       "Laitoksen käytettävyys ja prosessin hyötysuhde kulkevat metatietoineen läpinäkyvyyden vuoksi, mutta nykyinen MVP-päivämoottori ei kerro näillä arvoilla (oletukset ovat neutraalit 100 %).",
@@ -121,6 +122,11 @@ export const fi = {
     seriesNonNumeric: "Kaikkia kohtia ei voitu tulkita äärellisiksi luvuiksi.",
     invalidNumber: "Anna kelvollinen äärellinen luku.",
     fieldRequired: "Tämä kenttä on pakollinen.",
+    technicalReference: "Tekninen viite",
+    field: {
+      general: "Syötteet",
+      periodDays: "Analyysijakso",
+    },
   },
   results: {
     title: "Tulokset",
@@ -137,6 +143,8 @@ export const fi = {
     },
     section: {
       kpis: "Keskeiset tunnusluvut",
+      kpisHeadline: "Yhteenveto",
+      kpisSecondary: "Täydentävät tunnusluvut",
       pathComparison: "Polkuvertailu (metaani vs vetykauppa)",
       charts: "Aikasarjat",
       tables: "Taulukot",

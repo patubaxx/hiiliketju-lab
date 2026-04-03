@@ -8,8 +8,10 @@ type TFn = (id: string, vars?: Record<string, string>) => string;
 const DAILY_PREVIEW_ROWS = 21;
 
 const tableClass = "w-full border-collapse text-sm";
-const thClass = "border-b border-border bg-muted/40 px-2 py-2 text-left text-xs font-medium text-muted-foreground";
-const tdClass = "border-b border-border/80 px-2 py-2 font-mono text-xs tabular-nums text-foreground";
+const thClass =
+  "border-b border-border bg-muted/50 px-3 py-2.5 text-left text-xs font-medium text-muted-foreground first:pl-4 last:pr-4";
+const tdClass =
+  "border-b border-border/70 px-3 py-2.5 font-mono text-xs tabular-nums text-foreground first:pl-4 last:pr-4 align-top";
 
 export function ResultsTables({
   result,
@@ -65,28 +67,30 @@ export function ResultsTables({
   ];
 
   return (
-    <section className="space-y-6" aria-labelledby="results-tables-heading">
-      <h3 id="results-tables-heading" className="text-sm font-semibold tracking-tight text-foreground">
+    <section className="space-y-8" aria-labelledby="results-tables-heading">
+      <h3 id="results-tables-heading" className="text-base font-semibold tracking-tight text-foreground">
         {t("results.section.tables")}
       </h3>
 
-      <div className="space-y-2">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t("results.table.annualTitle")}
-        </h4>
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-foreground">{t("results.table.annualTitle")}</h4>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className={tableClass}>
             <thead>
               <tr>
                 <th className={thClass}>{t("results.table.column.metric")}</th>
-                <th className={thClass}>{t("results.table.column.value")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.value")}</th>
               </tr>
             </thead>
             <tbody>
               {annualRows.map((row) => (
-                <tr key={row.label}>
-                  <td className={`${tdClass} max-w-[min(280px,55vw)] whitespace-normal text-foreground/90`}>{row.label}</td>
-                  <td className={tdClass}>{row.value}</td>
+                <tr key={row.label} className="hover:bg-muted/30">
+                  <td
+                    className={`${tdClass} max-w-[min(280px,55vw)] whitespace-normal font-sans text-foreground/90`}
+                  >
+                    {row.label}
+                  </td>
+                  <td className={`${tdClass} text-right`}>{row.value}</td>
                 </tr>
               ))}
             </tbody>
@@ -94,35 +98,33 @@ export function ResultsTables({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t("results.table.monthlyTitle")}
-        </h4>
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-foreground">{t("results.table.monthlyTitle")}</h4>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className={`${tableClass} min-w-[720px]`}>
             <thead>
               <tr>
                 <th className={thClass}>{t("results.table.column.month")}</th>
-                <th className={thClass}>{t("results.table.column.methaneT")}</th>
-                <th className={thClass}>{t("results.table.column.electricityMwh")}</th>
-                <th className={thClass}>{t("results.table.column.totalCostEur")}</th>
-                <th className={thClass}>{t("results.table.column.methaneRevenueEur")}</th>
-                <th className={thClass}>{t("results.table.column.hydrogenAltRevenueEur")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.methaneT")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.electricityMwh")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.totalCostEur")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.methaneRevenueEur")}</th>
+                <th className={`${thClass} text-right`}>{t("results.table.column.hydrogenAltRevenueEur")}</th>
               </tr>
             </thead>
             <tbody>
               {result.monthlySummary.map((m) => (
-                <tr key={m.monthIndex}>
-                  <td className={tdClass}>
+                <tr key={m.monthIndex} className="hover:bg-muted/30">
+                  <td className={`${tdClass} font-sans`}>
                     {t("co2.month")} {m.monthIndex + 1}
                   </td>
-                  <td className={tdClass}>{formatResultTonnesFromKg(m.sums.methaneProducedKg, locale)}</td>
-                  <td className={tdClass}>
+                  <td className={`${tdClass} text-right`}>{formatResultTonnesFromKg(m.sums.methaneProducedKg, locale)}</td>
+                  <td className={`${tdClass} text-right`}>
                     {formatResultNumber(m.sums.electricityConsumedMwh, locale, { maximumFractionDigits: 4 })}
                   </td>
-                  <td className={tdClass}>{formatResultEur(m.sums.totalCostEur, locale)}</td>
-                  <td className={tdClass}>{formatResultEur(m.sums.methaneRevenueEur, locale)}</td>
-                  <td className={tdClass}>{formatResultEur(m.sums.hydrogenAlternativeRevenueEur, locale)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.totalCostEur, locale)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.methaneRevenueEur, locale)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.hydrogenAlternativeRevenueEur, locale)}</td>
                 </tr>
               ))}
             </tbody>
@@ -130,10 +132,8 @@ export function ResultsTables({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t("results.table.dailyPreviewTitle")}
-        </h4>
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-foreground">{t("results.table.dailyPreviewTitle")}</h4>
         {totalDays === 0 ? (
           <p className="text-sm text-muted-foreground">{t("results.table.dailyPreviewEmpty")}</p>
         ) : (
@@ -146,22 +146,28 @@ export function ResultsTables({
                 <thead>
                   <tr>
                     <th className={thClass}>{t("results.table.column.date")}</th>
-                    <th className={thClass}>{t("results.table.column.availableCo2Kg")}</th>
-                    <th className={thClass}>{t("results.table.column.methaneKg")}</th>
-                    <th className={thClass}>{t("results.table.column.electricityMwh")}</th>
-                    <th className={thClass}>{t("results.table.column.totalCostEur")}</th>
-                    <th className={thClass}>{t("results.table.column.methaneRevenueEur")}</th>
+                    <th className={`${thClass} text-right`}>{t("results.table.column.availableCo2Kg")}</th>
+                    <th className={`${thClass} text-right`}>{t("results.table.column.methaneKg")}</th>
+                    <th className={`${thClass} text-right`}>{t("results.table.column.electricityMwh")}</th>
+                    <th className={`${thClass} text-right`}>{t("results.table.column.totalCostEur")}</th>
+                    <th className={`${thClass} text-right`}>{t("results.table.column.methaneRevenueEur")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {previewRows.map((row) => (
-                    <tr key={row.dayIndex}>
-                      <td className={tdClass}>{row.dateLabel}</td>
-                      <td className={tdClass}>{formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}</td>
-                      <td className={tdClass}>{formatResultNumber(row.methaneProducedKg, locale, { maximumFractionDigits: 4 })}</td>
-                      <td className={tdClass}>{formatResultNumber(row.electricityConsumedMwh, locale, { maximumFractionDigits: 6 })}</td>
-                      <td className={tdClass}>{formatResultEur(row.totalCostEur, locale)}</td>
-                      <td className={tdClass}>{formatResultEur(row.methaneRevenueEur, locale)}</td>
+                    <tr key={row.dayIndex} className="hover:bg-muted/30">
+                      <td className={`${tdClass} font-sans`}>{row.dateLabel}</td>
+                      <td className={`${tdClass} text-right`}>
+                        {formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}
+                      </td>
+                      <td className={`${tdClass} text-right`}>
+                        {formatResultNumber(row.methaneProducedKg, locale, { maximumFractionDigits: 4 })}
+                      </td>
+                      <td className={`${tdClass} text-right`}>
+                        {formatResultNumber(row.electricityConsumedMwh, locale, { maximumFractionDigits: 6 })}
+                      </td>
+                      <td className={`${tdClass} text-right`}>{formatResultEur(row.totalCostEur, locale)}</td>
+                      <td className={`${tdClass} text-right`}>{formatResultEur(row.methaneRevenueEur, locale)}</td>
                     </tr>
                   ))}
                 </tbody>
