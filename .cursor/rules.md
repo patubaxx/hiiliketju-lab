@@ -1,5 +1,9 @@
 # Hiiliketju Repository Rules
 
+**Navigation:** Human onboarding and commands live in **[`README.md`](../README.md)**; full doc listing in **[`docs/index.md`](../docs/index.md)**. Canonical automation rules are **[`AGENTS.md`](../AGENTS.md)** (repo root). This file mirrors core policy for Cursor.
+
+---
+
 ## 1. Architectural intent
 
 This repository implements a layered techno-economic scenario calculator.

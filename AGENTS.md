@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Documentation map
+
+- **[`README.md`](README.md)** — Project entry: architecture summary, folder map, run/test commands, export flow.
+- **[`docs/index.md`](docs/index.md)** — Index of all human-facing specs and maintainer docs.
+- **[`docs/solution-spec-v2.md`](docs/solution-spec-v2.md)** — Product / MVP scope and principles.
+- **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** — Calculation contracts, units, formulas.
+- **[`docs/repository-invariants.md`](docs/repository-invariants.md)** — Current export boundary and regression checklist (consolidated from former milestone handoffs).
+- **[`.cursor/rules.md`](.cursor/rules.md)** — Cursor workspace copy of core policy (keep for tool discoverability).
+- **[`cursor_agents/README.md`](cursor_agents/README.md)** — Optional legacy prompts; not required for runtime.
+
+---
+
 ## Project Context
 
 This repository implements the Hiiliketju techno-economic calculation application.

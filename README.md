@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hiiliketju Site
 
-## Getting Started
+Browser-based **techno-economic scenario calculator** for biogenic CO₂ utilization: compare **Path A** (CO₂ + H₂ → CH₄) vs **Path B** (CO₂ released + H₂ sold). This repository is the **customer-deliverable** Next.js application (UI, calculation engine, assumptions layer, and Excel/PDF reporting).
 
-First, run the development server:
+## Architecture (four layers)
+
+1. **UI** — `src/features/scenario/`, `src/app/` — forms, results presentation, i18n. No business formulas; displays `CalculationResult` only.
+2. **Calculation engine** — `src/core/calculation/` — `calculateScenario`, daily rows, harmonization, aggregations, CAPEX allocation.
+3. **Assumptions / parameters** — `src/core/domain/` (types, metadata), wired through Zod in `src/features/scenario/schemas/`.
+4. **Reporting / export** — `src/core/reporting/` — maps canonical result to Excel/PDF; **no independent KPI math**.
+
+**Canonical rule:** `calculateScenario(validated ScenarioInput) → CalculationResult` is the **only** source of business numbers for UI and exports.
+
+## Folder map (high level)
+
+| Area | Path | Role |
+|------|------|------|
+| App shell & API routes | `src/app/` | Pages, `layout`, **`api/export/excel`**, **`api/export/pdf`** |
+| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, charts/tables |
+| Wire validation | `src/features/scenario/schemas/` | Zod schemas aligned with `ScenarioInput` |
+| Domain | `src/core/domain/` | Types, units, temporal constants, assumption shapes |
+| Engine | `src/core/calculation/` | Harmonization, daily engine, monthly/annual roll-ups |
+| Reporting | `src/core/reporting/` | Export models, workbook/PDF builders |
+| Tests | `test/` | Vitest unit/integration tests |
+| Human specs | `docs/` | Solution spec, calculation spec, index, invariants |
+| Agent rules | `AGENTS.md` (root) | Non-negotiable rules for humans and automation |
+| Cursor policy | `.cursor/rules.md` | Cursor-specific copy of core policy |
+
+## Calculation flow (high level)
+
+1. User edits scenario; on run, the UI builds a wire payload and validates with **`safeParseScenarioInput`** (same schema as exports).
+2. **`mergeProcessAssumptionsInput`** fills omitted process fields with flagged MVP defaults.
+3. **`calculateScenario`** runs: SEC resolution (and warnings) → CO₂/electricity **daily** series (365 points) → optional CAPEX → per-day rows → monthly and annual summaries.
+4. UI renders **`CalculationResult`** (KPIs, series, assumptions, opaque `warnings: string[]`).
+
+Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ hourly → daily **sum**; electricity hourly → daily **arithmetic mean**).
+
+## Export flow (high level)
+
+1. Client POSTs **`{ "scenario": <wire> }`** to **`/api/export/excel`** or **`/api/export/pdf`** (see `src/app/api/export/parse-export-body.ts`).
+2. Server validates with Zod, merges process defaults, runs **`calculateScenario`**, then builds bytes from that result only.
+3. The API does **not** accept a client-sent `CalculationResult` or KPI snapshot as authoritative. Extra JSON keys are ignored.
+
+Details and regression checklist: **[`docs/repository-invariants.md`](docs/repository-invariants.md)**.
+
+## Run the project
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build and production server
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Tests and lint
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm test    # Vitest
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Where specs and policies live
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Document | Purpose |
+|----------|---------|
+| **[`docs/index.md`](docs/index.md)** | Documentation hub and navigation |
+| **[`docs/solution-spec-v2.md`](docs/solution-spec-v2.md)** | Product scope, UX intent, MVP decisions |
+| **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** | Formulas, units, result shape, calculation contracts |
+| **[`docs/repository-invariants.md`](docs/repository-invariants.md)** | Export boundary, “do not regress”, known gaps |
+| **[`AGENTS.md`](AGENTS.md)** | Mandatory rules for implementation (including agents) |
+| **[`.cursor/rules.md`](.cursor/rules.md)** | Same policy, Cursor workspace entry |
 
-## Deploy on Vercel
+## Agent and automation files
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **`AGENTS.md`** (repository root) — primary; keep discoverable for tools and humans.
+- **`.cursor/rules.md`** — Cursor reads this path by convention; do not remove without updating team workflow.
+- **`cursor_agents/`** — optional **internal** prompts and notes (legacy Cursor task splits, audits). **Not required** to run or build the app. See **[`cursor_agents/README.md`](cursor_agents/README.md)**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License / meta
+
+`package.json` declares this package as private. Extend this section if the customer contract requires explicit license text.

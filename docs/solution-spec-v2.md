@@ -5,6 +5,8 @@
 **Language of UI:** UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally with i18n.
 **Core principle:** daily-first engine, hourly-capable input contract
 
+**Related:** [`docs/index.md`](index.md) · [`repository-invariants.md`](repository-invariants.md) · [`AGENTS.md`](../AGENTS.md) · root [`README.md`](../README.md)
+
 ---
 
 ## 1. Goal
@@ -608,7 +610,9 @@ Before that, protect:
 
 ---
 
-## 16. Delivery Order
+## 16. Delivery order (historical reference)
+
+The labels below describe the **original implementation sequence** for the MVP. **Current behaviour** is defined by the repository code and by **[`docs/repository-invariants.md`](repository-invariants.md)** (export boundary, regression checklist). Use **[`docs/index.md`](index.md)** to find all specs.
 
 ### WP1 — Solution refinement
 
@@ -681,7 +685,9 @@ Before that, protect:
 
 ---
 
-## 17. Cursor Agent Work Split
+## 17. Automation and agent guidance
+
+Historical note: the following **agent split** described an early parallel workflow. For current work, follow **[`AGENTS.md`](../AGENTS.md)** (repository root), **[`.cursor/rules.md`](../.cursor/rules.md)**, and optional legacy prompts under **`cursor_agents/`** (see **`cursor_agents/README.md`**).
 
 ### Agent 1 — Domain & schemas
 

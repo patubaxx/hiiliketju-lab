@@ -3,6 +3,8 @@
 **Version:** 2.0  
 **Status:** implementation-ready baseline with flagged literature defaults
 
+**Related:** [`docs/index.md`](index.md) · [`repository-invariants.md`](repository-invariants.md) (export + checklist) · [`AGENTS.md`](../AGENTS.md)
+
 ---
 
 ## 1. Purpose
