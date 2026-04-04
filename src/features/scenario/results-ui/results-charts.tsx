@@ -16,32 +16,45 @@ import type { CalculationResult } from "@/core/domain/result";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
-/** Fixed chart height so ResponsiveContainer never depends on % height in a grid with indefinite width. */
-const CHART_HEIGHT_PX = 240;
+/** Fixed SVG height; X-axis title is rendered below the chart (HTML) to avoid tick/label overlap inside Recharts. */
+const CHART_CONTAINER_HEIGHT_PX = 300;
 
 const responsiveChartProps = {
   width: "100%" as const,
-  height: CHART_HEIGHT_PX,
-  minHeight: CHART_HEIGHT_PX,
+  height: CHART_CONTAINER_HEIGHT_PX,
+  minHeight: CHART_CONTAINER_HEIGHT_PX,
   minWidth: 0 as const,
   /** Avoid first-paint width/height -1 and console warning before ResizeObserver runs. */
-  initialDimension: { width: 800, height: CHART_HEIGHT_PX },
+  initialDimension: { width: 800, height: CHART_CONTAINER_HEIGHT_PX },
 };
 
-/** Room for X-axis ticks + insideBottom axis label (was clipped at bottom: 0). */
-const chartMarginDefault = { top: 4, right: 12, left: 0, bottom: 28 };
-const chartMarginWithLegend = { top: 4, right: 12, left: 0, bottom: 36 };
+const chartMarginDefault = { top: 8, right: 12, left: 4, bottom: 36 };
+const chartMarginWithLegend = { top: 8, right: 12, left: 4, bottom: 52 };
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ChartCard({
+  title,
+  xAxisCaption,
+  children,
+}: {
+  title: string;
+  xAxisCaption: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-sm">
       <h4 className="text-sm font-semibold leading-snug text-foreground">{title}</h4>
-      <div
-        className="mt-4 w-full min-w-0"
-        style={{ height: CHART_HEIGHT_PX, minHeight: CHART_HEIGHT_PX }}
-      >
-        {children}
+      <div className="mt-4 w-full min-w-0 overflow-x-auto overscroll-x-contain sm:overflow-x-visible [-webkit-overflow-scrolling:touch]">
+        <div
+          className="w-full max-sm:min-w-[600px] sm:min-w-0"
+          style={{
+            height: CHART_CONTAINER_HEIGHT_PX,
+            minHeight: CHART_CONTAINER_HEIGHT_PX,
+          }}
+        >
+          {children}
+        </div>
       </div>
+      <p className="mt-2 text-center text-xs leading-snug text-muted-foreground">{xAxisCaption}</p>
     </div>
   );
 }
@@ -99,7 +112,7 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">{t("results.section.chartsLead")}</p>
       </div>
       <div className="grid min-w-0 gap-5 lg:grid-cols-2">
-        <ChartCard title={t("results.chart.co2Availability")}>
+        <ChartCard title={t("results.chart.co2Availability")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={co2Data} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -107,8 +120,8 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tickMargin={6}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -140,7 +153,7 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.electricityPrice")}>
+        <ChartCard title={t("results.chart.electricityPrice")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={priceData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -148,8 +161,8 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tickMargin={6}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip
@@ -177,7 +190,7 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.methaneProduction")}>
+        <ChartCard title={t("results.chart.methaneProduction")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={methaneData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -185,8 +198,8 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tickMargin={6}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip
@@ -214,7 +227,7 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.costVsRevenueDaily")}>
+        <ChartCard title={t("results.chart.costVsRevenueDaily")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={costRevData} margin={chartMarginWithLegend}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -222,8 +235,8 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                 dataKey="x"
                 tickFormatter={tickFormatter}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tickMargin={6}
                 interval={30}
-                label={{ value: t("results.chart.axis.dayOfYear"), position: "insideBottom", offset: 0, fontSize: 10 }}
               />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
               <Tooltip
