@@ -33,6 +33,12 @@ export const sv = {
     fi: "Finska",
     sv: "Svenska",
   },
+  units: {
+    co2KtPerYear: "kt/år",
+    co2KgPerYear: "kg/år",
+    electricityEurPerMwh: "EUR/MWh",
+    electricityCPerKwh: "c/kWh",
+  },
   scenarioForm: {
     title: "Scenario",
     description:
@@ -48,10 +54,10 @@ export const sv = {
   sections: {
     co2: "Koldioxidtillgång",
     co2Intro:
-      "Årlig tillgång, utnyttjande och hur CO₂ fördelas över året. I tidsserielägen kommer daglig tillgång från den serie du anger; fältet kt/år krävs fortfarande i formuläret men skalar inte serien i nuvarande motor.",
+      "Årlig tillgång, utnyttjande och hur CO₂ fördelas över året. I tidsserielägen kommer daglig tillgång från den serie du anger; det årliga totalvärdet krävs fortfarande i formuläret men skalar inte serien i nuvarande motor. Du kan ange det årliga värdet i kt/år eller kg/år; internt lagras kt/år.",
     electricity: "Els inköpspris",
     electricityIntro:
-      "Hur els inköpspris anges över MVP-horisonten. Timdata harmoniseras till dagliga medelvärden internt.",
+      "Hur els inköpspris anges över MVP-horisonten. Timdata harmoniseras till dagliga medelvärden internt. För konstant pris kan du ange EUR/MWh eller c/kWh; serier ligger i EUR/MWh.",
     economics: "Ekonomi",
     economicsIntro:
       "Antagna försäljningspriser för metan och väte, övrig driftkostnad och valfri investering (CAPEX).",
@@ -61,6 +67,10 @@ export const sv = {
     results: "Beräkningsresultat",
   },
   co2: {
+    annualAmount: "Årlig CO₂",
+    annualAmountUnitAria: "Enhet för årlig CO₂-mängd",
+    annualAmountHint:
+      "Välj kt/år eller kg/år endast för inmatning; motorn och exporten använder kt/år. Byte av enhet omvandlar talet till samma fysiska total.",
     annualKt: "Årlig CO₂ (kt/år)",
     utilization: "Utnyttjandegrad (%)",
     mode: "Tidsprofil",
@@ -78,7 +88,7 @@ export const sv = {
     seriesHourlyHelp:
       "Ange exakt 8760 icke-negativa tal. Timmar summeras till kalenderdagar i motorn.",
     timeSeriesAnnualHint:
-      "I tidsserielägen använder motorn endast serien för tillgång; håll kt/år i linje med egna rapporter om du använder det.",
+      "I tidsserielägen använder motorn endast serien för tillgång; håll det årliga värdet i linje med egna rapporter om du använder det.",
     fillOnes365: "Fyll med 365 × 1",
     fillOnes8760: "Fyll med 8760 × 1",
   },
@@ -88,7 +98,10 @@ export const sv = {
     mode_daily_series: "Daglig serie (365 EUR/MWh inköpspriser)",
     mode_hourly_series: "Timserie (8760 EUR/MWh inköpspriser)",
     mode_historical_imported: "Importerade marknadsdata (daglig eller timserie med inköpspriser)",
-    constantPrice: "Els inköpspris (EUR/MWh)",
+    constantPrice: "Els inköpspris",
+    constantPriceUnitAria: "Enhet för konstant inköpspris",
+    constantPriceHint:
+      "Endast konstant läge: ange EUR/MWh eller c/kWh (eurocent per kWh); motorn använder EUR/MWh. Serier ligger i EUR/MWh.",
     seriesDailyLabel: "Dagliga inköpspriser (EUR/MWh × 365)",
     seriesHourlyLabel: "Timvisa inköpspriser (EUR/MWh × 8760)",
     seriesHelp:

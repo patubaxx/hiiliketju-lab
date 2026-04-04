@@ -3,6 +3,10 @@
  * parsing issues are returned for field-level UX. Zod on submit remains authoritative for run/export.
  */
 import type { AssumptionMeta } from "@/core/domain/assumptions";
+import {
+  annualCo2InputToKtPerYear,
+  electricityPriceInputToEurPerMwh,
+} from "@/core/domain/input-display-unit-conversions";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 
 import { type ProcessSchemaKey, type ScenarioFormState } from "@/features/scenario/input-ui/form-state";
@@ -25,7 +29,9 @@ export function buildScenarioPayload(
 ): { ok: true; payload: unknown } | { ok: false; issues: BuildPayloadIssue[] } {
   const issues: BuildPayloadIssue[] = [];
 
-  const annualAmountKtPerYear = parseFiniteNumber(state.annualAmountKtPerYear);
+  const rawAnnual = parseFiniteNumber(state.annualAmountKtPerYear);
+  const annualAmountKtPerYear =
+    rawAnnual === undefined ? undefined : annualCo2InputToKtPerYear(rawAnnual, state.annualCo2DisplayUnit);
   const utilizationRatePct = parseFiniteNumber(state.utilizationRatePct);
 
   const availabilityResult = buildAvailability(state, issues);
@@ -155,10 +161,12 @@ function buildElectricity(
   const b = state.electricity;
   switch (b.mode) {
     case "constant": {
-      const p = parseFiniteNumber(b.priceEurPerMwh);
+      const raw = parseFiniteNumber(b.priceEurPerMwh);
+      const priceEurPerMwh =
+        raw === undefined ? undefined : electricityPriceInputToEurPerMwh(raw, b.priceDisplayUnit);
       return {
         mode: "constant" as const,
-        priceEurPerMwh: p ?? Number.NaN,
+        priceEurPerMwh: priceEurPerMwh ?? Number.NaN,
       };
     }
     case "daily_series": {

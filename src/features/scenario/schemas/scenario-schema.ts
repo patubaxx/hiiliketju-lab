@@ -32,7 +32,7 @@ export const scenarioInputSchema = z
       annualAmountKtPerYear: z
         .number("Annual CO₂ must be a number")
         .finite("Annual CO₂ must be a finite number")
-        .min(0, "Annual CO₂ (kt/year) cannot be negative"),
+        .min(0, "Annual CO₂ amount cannot be negative"),
       utilizationRatePct: z
         .number("Utilization rate must be a number")
         .finite("Utilization rate must be a finite number")

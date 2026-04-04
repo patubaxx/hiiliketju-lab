@@ -33,6 +33,12 @@ export const en = {
     fi: "Finnish",
     sv: "Swedish",
   },
+  units: {
+    co2KtPerYear: "kt/year",
+    co2KgPerYear: "kg/year",
+    electricityEurPerMwh: "EUR/MWh",
+    electricityCPerKwh: "c/kWh",
+  },
   scenarioForm: {
     title: "Scenario",
     description:
@@ -48,10 +54,10 @@ export const en = {
   sections: {
     co2: "Carbon dioxide availability",
     co2Intro:
-      "Annual availability, utilization, and how CO₂ is distributed over the year. For time-series modes, daily availability comes from the series you provide; the annual kt/year field is still required by the form but does not rescale that series in the current engine.",
+      "Annual availability, utilization, and how CO₂ is distributed over the year. For time-series modes, daily availability comes from the series you provide; the annual total field is still required but does not rescale that series in the current engine. You can enter the annual total in kt/year or kg/year; internally it is stored as kt/year.",
     electricity: "Electricity purchase price",
     electricityIntro:
-      "How the electricity purchase price is supplied over the MVP horizon. Hourly inputs are harmonized to daily averages internally.",
+      "How the electricity purchase price is supplied over the MVP horizon. Hourly inputs are harmonized to daily averages internally. For a constant price, you can enter EUR/MWh or c/kWh; time series stay in EUR/MWh.",
     economics: "Economics",
     economicsIntro:
       "Assumed sales prices for methane and hydrogen, other operating cost, and optional capital expenditure.",
@@ -61,6 +67,10 @@ export const en = {
     results: "Calculation output",
   },
   co2: {
+    annualAmount: "Annual CO₂",
+    annualAmountUnitAria: "Unit for annual CO₂ amount",
+    annualAmountHint:
+      "Choose kt/year or kg/year for entry only; the engine and exports use kt/year. Switching unit converts the number to the same physical total.",
     annualKt: "Annual CO₂ (kt/year)",
     utilization: "Utilization rate (%)",
     mode: "Temporal profile",
@@ -78,7 +88,7 @@ export const en = {
     seriesHourlyHelp:
       "Enter exactly 8760 non-negative numbers. Hours are summed to each calendar day in the engine.",
     timeSeriesAnnualHint:
-      "In time-series modes, the engine uses only the series for availability; keep annual kt/year aligned with your own records if you use it for reporting.",
+      "In time-series modes, the engine uses only the series for availability; keep the annual total aligned with your own records if you use it for reporting.",
     fillOnes365: "Fill with 365 × 1",
     fillOnes8760: "Fill with 8760 × 1",
   },
@@ -88,7 +98,10 @@ export const en = {
     mode_daily_series: "Daily series (365 EUR/MWh purchase prices)",
     mode_hourly_series: "Hourly series (8760 EUR/MWh purchase prices)",
     mode_historical_imported: "Imported market data (daily or hourly purchase-price series)",
-    constantPrice: "Electricity purchase price (EUR/MWh)",
+    constantPrice: "Electricity purchase price",
+    constantPriceUnitAria: "Unit for constant electricity purchase price",
+    constantPriceHint:
+      "Constant mode only: choose EUR/MWh or c/kWh (euro-cent per kWh) for entry; the engine uses EUR/MWh. Series modes stay in EUR/MWh.",
     seriesDailyLabel: "Daily purchase prices (EUR/MWh × 365)",
     seriesHourlyLabel: "Hourly purchase prices (EUR/MWh × 8760)",
     seriesHelp:

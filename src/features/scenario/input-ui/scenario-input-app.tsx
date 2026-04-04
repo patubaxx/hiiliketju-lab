@@ -14,6 +14,14 @@ import { Button } from "@/components/ui/button";
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
+import {
+  annualCo2InputToKtPerYear,
+  annualCo2KtPerYearToInputDisplay,
+  electricityPriceEurPerMwhToInputDisplay,
+  electricityPriceInputToEurPerMwh,
+  type AnnualCo2InputDisplayUnit,
+  type ElectricityPriceInputDisplayUnit,
+} from "@/core/domain/input-display-unit-conversions";
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 import {
@@ -41,6 +49,7 @@ import {
   defaultCo2Branch,
   defaultElectricityBranch,
 } from "@/features/scenario/input-ui/form-state";
+import { parseFiniteNumber } from "@/features/scenario/input-ui/parse-number-series";
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { useLocale } from "@/i18n/locale-context";
@@ -311,14 +320,41 @@ export function ScenarioInputApp() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <FieldLabel htmlFor="annualKt">{t("co2.annualKt")}</FieldLabel>
-            <input
-              id="annualKt"
-              className={inputClassName}
-              inputMode="decimal"
-              value={form.annualAmountKtPerYear}
-              onChange={(e) => setForm((s) => ({ ...s, annualAmountKtPerYear: e.target.value }))}
-            />
+            <FieldLabel htmlFor="annualKt">{t("co2.annualAmount")}</FieldLabel>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                id="annualKt"
+                className={inputClassName + " min-w-0 flex-1 sm:max-w-[14rem]"}
+                inputMode="decimal"
+                value={form.annualAmountKtPerYear}
+                onChange={(e) => setForm((s) => ({ ...s, annualAmountKtPerYear: e.target.value }))}
+              />
+              <select
+                className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
+                value={form.annualCo2DisplayUnit}
+                aria-label={t("co2.annualAmountUnitAria")}
+                onChange={(e) => {
+                  const next = e.target.value as AnnualCo2InputDisplayUnit;
+                  setForm((s) => {
+                    const v = parseFiniteNumber(s.annualAmountKtPerYear);
+                    if (v === undefined) {
+                      return { ...s, annualCo2DisplayUnit: next };
+                    }
+                    const kt = annualCo2InputToKtPerYear(v, s.annualCo2DisplayUnit);
+                    const newDisplay = annualCo2KtPerYearToInputDisplay(kt, next);
+                    return {
+                      ...s,
+                      annualCo2DisplayUnit: next,
+                      annualAmountKtPerYear: String(newDisplay),
+                    };
+                  });
+                }}
+              >
+                <option value="kt_per_year">{t("units.co2KtPerYear")}</option>
+                <option value="kg_per_year">{t("units.co2KgPerYear")}</option>
+              </select>
+            </div>
+            <FieldHint>{t("co2.annualAmountHint")}</FieldHint>
             <FieldError message={getErrors(errors, "co2.annualAmountKtPerYear")} />
           </div>
           <div>
@@ -483,19 +519,60 @@ export function ScenarioInputApp() {
         {form.electricity.mode === "constant" ? (
           <div>
             <FieldLabel htmlFor="elprice">{t("electricity.constantPrice")}</FieldLabel>
-            <input
-              id="elprice"
-              className={inputClassName}
-              inputMode="decimal"
-              value={form.electricity.priceEurPerMwh}
-              onChange={(e) =>
-                setForm((s) =>
-                  s.electricity.mode === "constant"
-                    ? { ...s, electricity: { mode: "constant", priceEurPerMwh: e.target.value } }
-                    : s,
-                )
-              }
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                id="elprice"
+                className={inputClassName + " min-w-0 flex-1 sm:max-w-[14rem]"}
+                inputMode="decimal"
+                value={form.electricity.priceEurPerMwh}
+                onChange={(e) =>
+                  setForm((s) =>
+                    s.electricity.mode === "constant"
+                      ? {
+                          ...s,
+                          electricity: {
+                            mode: "constant",
+                            priceEurPerMwh: e.target.value,
+                            priceDisplayUnit: s.electricity.priceDisplayUnit,
+                          },
+                        }
+                      : s,
+                  )
+                }
+              />
+              <select
+                className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
+                value={form.electricity.priceDisplayUnit}
+                aria-label={t("electricity.constantPriceUnitAria")}
+                onChange={(e) => {
+                  const next = e.target.value as ElectricityPriceInputDisplayUnit;
+                  setForm((s) => {
+                    if (s.electricity.mode !== "constant") return s;
+                    const v = parseFiniteNumber(s.electricity.priceEurPerMwh);
+                    if (v === undefined) {
+                      return {
+                        ...s,
+                        electricity: { ...s.electricity, priceDisplayUnit: next },
+                      };
+                    }
+                    const eurMwh = electricityPriceInputToEurPerMwh(v, s.electricity.priceDisplayUnit);
+                    const newDisplay = electricityPriceEurPerMwhToInputDisplay(eurMwh, next);
+                    return {
+                      ...s,
+                      electricity: {
+                        mode: "constant",
+                        priceDisplayUnit: next,
+                        priceEurPerMwh: String(newDisplay),
+                      },
+                    };
+                  });
+                }}
+              >
+                <option value="eur_per_mwh">{t("units.electricityEurPerMwh")}</option>
+                <option value="c_per_kwh">{t("units.electricityCPerKwh")}</option>
+              </select>
+            </div>
+            <FieldHint>{t("electricity.constantPriceHint")}</FieldHint>
             <FieldError message={getErrors(errors, "electricity.priceEurPerMwh")} />
           </div>
         ) : null}

@@ -33,6 +33,12 @@ export const fi = {
     fi: "Suomi",
     sv: "Ruotsi",
   },
+  units: {
+    co2KtPerYear: "kt/v",
+    co2KgPerYear: "kg/v",
+    electricityEurPerMwh: "EUR/MWh",
+    electricityCPerKwh: "c/kWh",
+  },
   scenarioForm: {
     title: "Skenaario",
     description:
@@ -48,10 +54,10 @@ export const fi = {
   sections: {
     co2: "Hiilidioksidin saatavuus",
     co2Intro:
-      "Vuosittainen saatavuus, hyötysuhde ja CO₂:n jakautuminen vuoden aikana. Aikasarjamodeissa päivittäinen saatavuus tulee antamastasi sarjasta; kt/v-kenttä on lomakkeella edelleen pakollinen, mutta nykyinen moottori ei skaalaa sarjaa sen mukaan.",
+      "Vuosittainen saatavuus, hyötysuhde ja CO₂:n jakautuminen vuoden aikana. Aikasarjamodeissa päivittäinen saatavuus tulee antamastasi sarjasta; vuosittainen kokonaismäärä on lomakkeella edelleen pakollinen, mutta nykyinen moottori ei skaalaa sarjaa sen mukaan. Voit syöttää vuosimäärän joko kt/v tai kg/v; sisäisesti käytetään kt/v.",
     electricity: "Sähkön hankintahinta",
     electricityIntro:
-      "Miten sähkön hankintahinta annetaan MVP-horisontilla. Tuntidata harmonisoidaan päivittäisiksi keskiarvoiksi.",
+      "Miten sähkön hankintahinta annetaan MVP-horisontilla. Tuntidata harmonisoidaan päivittäisiksi keskiarvoiksi. Vakiomoodissa voit käyttää EUR/MWh tai c/kWh; sarjat ovat EUR/MWh.",
     economics: "Taloudelliset tiedot",
     economicsIntro:
       "Metaanin ja vedyn oletetut myyntihinnat, muut käyttökulut ja valinnainen investointi.",
@@ -61,6 +67,10 @@ export const fi = {
     results: "Laskentatulos",
   },
   co2: {
+    annualAmount: "Vuotuinen CO₂",
+    annualAmountUnitAria: "Vuotuisen CO₂-määrän yksikkö",
+    annualAmountHint:
+      "Valitse kt/v tai kg/v vain syöttöä varten; moottori ja viennit käyttävät kt/v. Yksikön vaihto muuntaa luvun samaan fysikaaliseen määrään.",
     annualKt: "Vuotuinen CO₂ (kt/v)",
     utilization: "Hyötysuhde (%)",
     mode: "Ajallinen profiili",
@@ -78,7 +88,7 @@ export const fi = {
     seriesHourlyHelp:
       "Syötä tasan 8760 ei-negatiivista lukua. Tunnit summataan kalenteripäiviksi moottorissa.",
     timeSeriesAnnualHint:
-      "Aikasarjamodeissa moottori käyttää vain sarjaa saatavuuteen; pidä kt/v linjassa omien raporttiesi kanssa, jos käytät sitä.",
+      "Aikasarjamodeissa moottori käyttää vain sarjaa saatavuuteen; pidä vuosimäärä linjassa omien raporttiesi kanssa, jos käytät sitä.",
     fillOnes365: "Täytä 365 × 1",
     fillOnes8760: "Täytä 8760 × 1",
   },
@@ -88,7 +98,10 @@ export const fi = {
     mode_daily_series: "Päiväsarja (365 EUR/MWh hankintahintaa)",
     mode_hourly_series: "Tuntisarja (8760 EUR/MWh hankintahintaa)",
     mode_historical_imported: "Tuodut markkinatiedot (päivä- tai tuntikohtainen hankintahintasarja)",
-    constantPrice: "Sähkön hankintahinta (EUR/MWh)",
+    constantPrice: "Sähkön hankintahinta",
+    constantPriceUnitAria: "Vakiohankintahinnan yksikkö",
+    constantPriceHint:
+      "Vain vakiomoodi: syötä EUR/MWh tai c/kWh (eurosenttiä per kWh); moottori käyttää EUR/MWh. Sarjat ovat EUR/MWh.",
     seriesDailyLabel: "Päivittäiset hankintahinnat (EUR/MWh × 365)",
     seriesHourlyLabel: "Tuntikohtaiset hankintahinnat (EUR/MWh × 8760)",
     seriesHelp:

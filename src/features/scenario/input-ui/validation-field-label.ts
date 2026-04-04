@@ -28,7 +28,7 @@ export function friendlyLabelForValidationPath(path: string, t: TFn): string | n
   const exact: Record<string, string> = {
     scenarioName: "scenarioForm.scenarioName",
     periodDays: "validation.field.periodDays",
-    "co2.annualAmountKtPerYear": "co2.annualKt",
+    "co2.annualAmountKtPerYear": "co2.annualAmount",
     "co2.utilizationRatePct": "co2.utilization",
     "co2.availability": "sections.co2",
     "assumptionsMeta.assumptionsVersion": "scenarioForm.assumptionsVersion",

@@ -1,5 +1,11 @@
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
+import type {
+  AnnualCo2InputDisplayUnit,
+  ElectricityPriceInputDisplayUnit,
+} from "@/core/domain/input-display-unit-conversions";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
+
+export type { AnnualCo2InputDisplayUnit, ElectricityPriceInputDisplayUnit };
 
 export type Co2AvailabilityModeForm =
   | "flat_annual"
@@ -20,7 +26,7 @@ export type Co2FormBranch =
   | { mode: "time_series_hourly"; seriesText: string };
 
 export type ElectricityFormBranch =
-  | { mode: "constant"; priceEurPerMwh: string }
+  | { mode: "constant"; priceEurPerMwh: string; priceDisplayUnit: ElectricityPriceInputDisplayUnit }
   | { mode: "daily_series"; seriesText: string }
   | { mode: "hourly_series"; seriesText: string }
   | { mode: "historical_market_data_imported"; resolution: "daily" | "hourly"; seriesText: string };
@@ -43,7 +49,9 @@ export type ProcessFieldFormState = {
 
 export type ScenarioFormState = {
   scenarioName: string;
+  /** Annual CO₂ numeric string in `annualCo2DisplayUnit` (wire remains kt/year after payload build). */
   annualAmountKtPerYear: string;
+  annualCo2DisplayUnit: AnnualCo2InputDisplayUnit;
   utilizationRatePct: string;
   assumptionsVersion: string;
   assumptionsNotes: string;
@@ -95,11 +103,12 @@ export function createInitialFormState(): ScenarioFormState {
   return {
     scenarioName: "New scenario",
     annualAmountKtPerYear: "1",
+    annualCo2DisplayUnit: "kt_per_year",
     utilizationRatePct: "100",
     assumptionsVersion: "HIILIKETJU_ASSUMPTIONS_v2_2026-04",
     assumptionsNotes: "",
     co2: { mode: "flat_annual" },
-    electricity: { mode: "constant", priceEurPerMwh: "80" },
+    electricity: { mode: "constant", priceEurPerMwh: "80", priceDisplayUnit: "eur_per_mwh" },
     economics: {
       methanePriceEurPerTch4: "120",
       hydrogenPriceEurPerKg: "6",
@@ -139,7 +148,7 @@ export function defaultCo2Branch(mode: Co2AvailabilityModeForm): Co2FormBranch {
 export function defaultElectricityBranch(mode: ElectricityModeForm): ElectricityFormBranch {
   switch (mode) {
     case "constant":
-      return { mode: "constant", priceEurPerMwh: "80" };
+      return { mode: "constant", priceEurPerMwh: "80", priceDisplayUnit: "eur_per_mwh" };
     case "daily_series":
       return {
         mode: "daily_series",
