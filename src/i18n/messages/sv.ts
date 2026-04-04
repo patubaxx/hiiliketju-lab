@@ -39,6 +39,26 @@ export const sv = {
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
+  csvImport: {
+    button: "Importera CSV…",
+    success: "{{count}} värden importerades.",
+    hint:
+      "CSV: ett värde per rad i MVP-ordning (365 eller 8760 rader), eller tidsstämpel;värde. Datum: YYYY-MM-DD (månad/dag följer MVP:s icke-skottår; år ignoreras). Timserie kräver klockslag, t.ex. YYYY-MM-DDT00:00:00. CO₂ i kg/dygn eller kg/h; el i EUR/MWh. Avgränsare komma eller semikolon; decimalpunkt eller ett enstaka kommatecken i talet.",
+    errors: {
+      emptyFile: "Filen är tom.",
+      noDataRows: "Inga datarader hittades efter rubriken.",
+      invalidFirstRow: "Kunde inte tolka första dataraden (rad {{line}}).",
+      mixedFormats: "Blandade enkolumnsrader och tidsstämpel/värde-rader (rad {{line}}).",
+      invalidNumber: "Ogiltigt tal (rad {{line}}).",
+      invalidTimestamp:
+        "Ogiltig tidsstämpel (rad {{line}}). Använd YYYY-MM-DD, eller för timmar YYYY-MM-DDThh:mm:ss med minuter och sekunder 00.",
+      hourlyNeedsDateTime: "Timserie kräver tidsstämpel med timme (rad {{line}}), inte endast datum.",
+      duplicateTimestamp: "Dubblerad tidsstämpel (rad {{line}}).",
+      incompleteSeries: "Alla tidssteg finns inte ({{missing}} saknas).",
+      wrongRowCount: "Förväntade {{expected}} värden, hittade {{actual}} rader.",
+      readFailed: "Kunde inte läsa filen.",
+    },
+  },
   scenarioForm: {
     title: "Scenario",
     description:
@@ -110,7 +130,7 @@ export const sv = {
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",
     historicalHelp:
-      "Klistra in normaliserade EUR/MWh inköpspriser i MVP-ordning. Filimport och datarensning ingår ännu inte i denna vy.",
+      "Klistra in normaliserade EUR/MWh inköpspriser i MVP-ordning, eller använd CSV-import med samma format som manuell inmatning. Vidare datarensning ligger utanför denna vy.",
     fillOnes365: "Fyll med 365 × 50",
     fillOnes8760: "Fyll med 8760 × 50",
   },

@@ -39,6 +39,27 @@ export const en = {
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
+  csvImport: {
+    button: "Import CSV…",
+    success: "Imported {{count}} values.",
+    hint:
+      "CSV: one value per line in MVP order (365 or 8760 rows), or timestamp;value rows. Dates: YYYY-MM-DD (month/day align with the MVP non-leap calendar; year is ignored). Hourly timestamps need a clock time, e.g. YYYY-MM-DDT00:00:00. CO₂ values are kg/day or kg/h; electricity values are EUR/MWh. Use comma or semicolon between columns; numbers may use . or a single , as decimal.",
+    errors: {
+      emptyFile: "The file is empty.",
+      noDataRows: "No data rows found after the header.",
+      invalidFirstRow: "Could not parse the first data row (line {{line}}).",
+      mixedFormats: "Mixed single-column and timestamp/value rows (line {{line}}).",
+      invalidNumber: "Invalid number (line {{line}}).",
+      invalidTimestamp:
+        "Invalid timestamp (line {{line}}). Use YYYY-MM-DD, or for hourly include time as YYYY-MM-DDThh:mm:ss with minutes and seconds 00.",
+      hourlyNeedsDateTime:
+        "Hourly series needs a timestamp with hour (line {{line}}), not date-only.",
+      duplicateTimestamp: "Duplicate timestamp (line {{line}}).",
+      incompleteSeries: "Not all time steps are present ({{missing}} missing).",
+      wrongRowCount: "Expected {{expected}} values, found {{actual}} rows.",
+      readFailed: "Could not read the file.",
+    },
+  },
   scenarioForm: {
     title: "Scenario",
     description:
@@ -110,7 +131,7 @@ export const en = {
     resolution_daily: "Daily (365 values)",
     resolution_hourly: "Hourly (8760 values)",
     historicalHelp:
-      "Paste normalized EUR/MWh purchase prices in MVP order. File import and data cleaning are not part of this screen yet.",
+      "Paste normalized EUR/MWh purchase prices in MVP order, or use Import CSV for the same shapes as manual entry. Further data cleaning is outside this screen.",
     fillOnes365: "Fill with 365 × 50",
     fillOnes8760: "Fill with 8760 × 50",
   },

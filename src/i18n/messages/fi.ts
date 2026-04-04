@@ -39,6 +39,26 @@ export const fi = {
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
+  csvImport: {
+    button: "Tuo CSV…",
+    success: "Tuotiin {{count}} arvoa.",
+    hint:
+      "CSV: yksi arvo riville MVP-järjestyksessä (365 tai 8760 riviä) tai aikaleima;arvo. Päivät: YYYY-MM-DD (kuukausi/päivä vastaa MVP:n ei-karkauskalenteria; vuosi ohitetaan). Tuntisarjassa tarvitaan kellonaika, esim. YYYY-MM-DDT00:00:00. CO₂ on kg/päivä tai kg/h; sähkö on EUR/MWh. Erotin pilkku tai puolipiste; desimaalina piste tai yksi pilkku luvussa.",
+    errors: {
+      emptyFile: "Tiedosto on tyhjä.",
+      noDataRows: "Datarivejä ei löytynyt otsikon jälkeen.",
+      invalidFirstRow: "Ensimmäistä datarivia ei voitu tulkita (rivi {{line}}).",
+      mixedFormats: "Sekä yksiarvoisia että aikaleima/arvo -rivejä (rivi {{line}}).",
+      invalidNumber: "Virheellinen luku (rivi {{line}}).",
+      invalidTimestamp:
+        "Virheellinen aikaleima (rivi {{line}}). Käytä YYYY-MM-DD tai tunneille YYYY-MM-DDThh:mm:ss (minuutit ja sekunnit 00).",
+      hourlyNeedsDateTime: "Tuntisarja vaatii aikaleiman tuntiosalla (rivi {{line}}), ei pelkkää päivämäärää.",
+      duplicateTimestamp: "Päällekkäinen aikaleima (rivi {{line}}).",
+      incompleteSeries: "Kaikki aika-askeleet eivät ole mukana ({{missing}} puuttuu).",
+      wrongRowCount: "Odotettiin {{expected}} arvoa, löytyi {{actual}} riviä.",
+      readFailed: "Tiedoston lukeminen epäonnistui.",
+    },
+  },
   scenarioForm: {
     title: "Skenaario",
     description:
@@ -110,7 +130,7 @@ export const fi = {
     resolution_daily: "Päivittäinen (365 arvoa)",
     resolution_hourly: "Tuntikohtainen (8760 arvoa)",
     historicalHelp:
-      "Liitä normalisoidut EUR/MWh hankintahinnat MVP-järjestyksessä. Tiedoston tuonti ja puhdistus eivät kuulu tähän näkymään.",
+      "Liitä normalisoidut EUR/MWh hankintahinnat MVP-järjestyksessä tai käytä CSV-tuontia samoilla muodoilla kuin manuaalisessa syötteessä. Laajempi puhdistus on tämän näkymän ulkopuolella.",
     fillOnes365: "Täytä 365 × 50",
     fillOnes8760: "Täytä 8760 × 50",
   },

@@ -50,6 +50,7 @@ import {
   defaultElectricityBranch,
 } from "@/features/scenario/input-ui/form-state";
 import { parseFiniteNumber } from "@/features/scenario/input-ui/parse-number-series";
+import { SeriesCsvImportControl } from "@/features/scenario/input-ui/series-csv-import-control";
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { useLocale } from "@/i18n/locale-context";
@@ -462,7 +463,25 @@ export function ScenarioInputApp() {
               >
                 {t("co2.fillOnes8760")}
               </Button>
+              <SeriesCsvImportControl
+                inputId="co2-series-csv"
+                resolution={form.co2.mode === "time_series_daily" ? "daily" : "hourly"}
+                expectedCount={
+                  form.co2.mode === "time_series_daily" ? SCENARIO_PERIOD_DAYS : SCENARIO_HOURLY_SLOTS
+                }
+                t={t}
+                onImported={(seriesText) =>
+                  setForm((s) =>
+                    s.co2.mode === "time_series_daily"
+                      ? { ...s, co2: { mode: "time_series_daily", seriesText } }
+                      : s.co2.mode === "time_series_hourly"
+                        ? { ...s, co2: { mode: "time_series_hourly", seriesText } }
+                        : s,
+                  )
+                }
+              />
             </div>
+            <FieldHint>{t("csvImport.hint")}</FieldHint>
             <div>
               <FieldLabel htmlFor="co2series">
                 {form.co2.mode === "time_series_daily"
@@ -674,7 +693,47 @@ export function ScenarioInputApp() {
               >
                 {t("electricity.fillOnes8760")}
               </Button>
+              <SeriesCsvImportControl
+                inputId="electricity-series-csv"
+                resolution={
+                  form.electricity.mode === "hourly_series" ||
+                  (form.electricity.mode === "historical_market_data_imported" &&
+                    form.electricity.resolution === "hourly")
+                    ? "hourly"
+                    : "daily"
+                }
+                expectedCount={
+                  form.electricity.mode === "hourly_series" ||
+                  (form.electricity.mode === "historical_market_data_imported" &&
+                    form.electricity.resolution === "hourly")
+                    ? SCENARIO_HOURLY_SLOTS
+                    : SCENARIO_PERIOD_DAYS
+                }
+                t={t}
+                onImported={(seriesText) =>
+                  setForm((s) => {
+                    if (s.electricity.mode === "daily_series") {
+                      return { ...s, electricity: { mode: "daily_series", seriesText } };
+                    }
+                    if (s.electricity.mode === "hourly_series") {
+                      return { ...s, electricity: { mode: "hourly_series", seriesText } };
+                    }
+                    if (s.electricity.mode === "historical_market_data_imported") {
+                      return {
+                        ...s,
+                        electricity: {
+                          mode: "historical_market_data_imported",
+                          resolution: s.electricity.resolution,
+                          seriesText,
+                        },
+                      };
+                    }
+                    return s;
+                  })
+                }
+              />
             </div>
+            <FieldHint>{t("csvImport.hint")}</FieldHint>
 
             <div>
               <FieldLabel htmlFor="elseries">
