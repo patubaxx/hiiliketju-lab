@@ -440,6 +440,7 @@ The UI must show user-friendly errors, not technical exceptions.
 - no heavy multi-step navigation
 - quick to use with defaults
 - advanced assumptions should be available without overwhelming the main workflow
+- primary chrome is a **sticky top bar**: run, reset, language, jump to outcome, and Excel/PDF export (exports disabled until a successful run exists); a successful run **scrolls** to the outcome section (`#scenario-outcome`); this is layout/UX only and does not change calculation or export contracts
 
 ### 12.2 Performance
 - a single scenario calculation should complete effectively instantly in a normal browser

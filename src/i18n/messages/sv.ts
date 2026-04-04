@@ -16,12 +16,15 @@ export const sv = {
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
-        "Ange indata för 365-dagars horisonten. Kör beräkning när du är klar; resultat visas i utfallssektionen nedan.",
+        "Ange indata för 365-dagars horisonten. Det fasta fältet överst kör beräkningen, återställer indata, byter språk, exporterar och hoppar till utfallssektionen nedan.",
       actionsCardTitle: "Beräkning",
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",
       outcomeLabel: "Scenarioutfall",
       mobileActionsLabel: "Beräkningsåtgärder för scenario",
+      toolbarAriaLabel: "Scenarioåtgärder",
+      jumpToOutcome: "Gå till utfall",
+      exportGroupLabel: "Exportera",
     },
   },
   locale: {
@@ -259,6 +262,7 @@ export const sv = {
       downloadPdf: "Ladda ner PDF",
       pdfExporting: "Förbereder PDF…",
       pdfError: "PDF-exporten misslyckades. Försök igen.",
+      unavailableUntilRun: "Otillgängligt förrän en beräkning körts framgångsrikt.",
     },
   },
 } satisfies MessageTree;

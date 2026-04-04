@@ -16,12 +16,15 @@ export const fi = {
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:
-        "Syötä arvot 365 päivän horisontille. Suorita laskenta kun valmista; tulokset näkyvät alla olevassa tulososiossa.",
+        "Syötä arvot 365 päivän horisontille. Kiinteä yläpalkki suorittaa laskennan, nollaa syötteet, vaihtaa kieltä, vie tiedostoja ja hyppää alla olevaan tulososioon.",
       actionsCardTitle: "Laskenta",
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",
       outcomeLabel: "Skenaarion tulos",
       mobileActionsLabel: "Skenaarion laskentatoiminnot",
+      toolbarAriaLabel: "Skenaarion toiminnot",
+      jumpToOutcome: "Hyppää tuloksiin",
+      exportGroupLabel: "Vienti",
     },
   },
   locale: {
@@ -259,6 +262,7 @@ export const fi = {
       downloadPdf: "Lataa PDF",
       pdfExporting: "Valmistellaan PDF:ää…",
       pdfError: "PDF-vienti epäonnistui. Yritä uudelleen.",
+      unavailableUntilRun: "Ei käytettävissä ennen onnistunutta laskentaa.",
     },
   },
 } satisfies MessageTree;

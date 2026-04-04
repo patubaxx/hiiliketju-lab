@@ -16,12 +16,15 @@ export const en = {
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "Define inputs for the 365-day horizon. When ready, run the calculation; outputs appear in the outcome section below.",
+        "Define inputs for the 365-day horizon. The sticky bar at the top runs the calculation, resets inputs, switches language, exports, and jumps to the outcome section below.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
       outcomeLabel: "Scenario outcome",
       mobileActionsLabel: "Scenario calculation actions",
+      toolbarAriaLabel: "Scenario actions",
+      jumpToOutcome: "Jump to outcome",
+      exportGroupLabel: "Export downloads",
     },
   },
   locale: {
@@ -259,6 +262,7 @@ export const en = {
       downloadPdf: "Download PDF",
       pdfExporting: "Preparing PDF…",
       pdfError: "PDF export failed. Please try again.",
+      unavailableUntilRun: "Unavailable until a calculation has run successfully.",
     },
   },
 } as const satisfies MessageTree;

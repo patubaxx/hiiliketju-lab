@@ -2,7 +2,7 @@
 
 /**
  * Read-only presentation of `CalculationResult`: KPIs, tables, charts, assumptions, warnings.
- * Download buttons POST the wire scenario for server-side `calculateScenario` + export; they do not send client KPIs as truth.
+ * Exports are triggered from the sticky scenario navbar; this panel only presents `CalculationResult`.
  */
 import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
@@ -10,8 +10,6 @@ import type { Locale } from "@/i18n/messages";
 import { formatResultEur } from "./format-result-values";
 import { ResultsAssumptions } from "./results-assumptions";
 import { ResultsCharts } from "./results-charts";
-import { ResultsExcelExportButton } from "./results-excel-export-button";
-import { ResultsPdfExportButton } from "./results-pdf-export-button";
 import { ResultsKpiHeadline, ResultsKpiSecondary } from "./results-kpi-grid";
 import { ResultsTables } from "./results-tables";
 import { ResultsWarnings } from "./results-warnings";
@@ -33,13 +31,7 @@ export function ResultsPanel({
     <div className="w-full space-y-12 rounded-xl border border-border/75 bg-surface-inset px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-structural/22 sm:px-8 sm:py-10 dark:shadow-none dark:ring-structural/28">
       {/* 1. Outcome + scenario context */}
       <header className="space-y-3 border-b border-structural/26 pb-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
-          <div className="flex flex-wrap gap-2 sm:justify-end">
-            <ResultsExcelExportButton result={result} t={t} />
-            <ResultsPdfExportButton result={result} t={t} />
-          </div>
-        </div>
+        <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("results.summary.lead")}</p>
         <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
           <div>

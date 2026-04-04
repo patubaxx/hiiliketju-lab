@@ -15,13 +15,15 @@ export function ResultsExcelExportButton({
   result,
   t,
 }: {
-  readonly result: CalculationResult;
+  readonly result: CalculationResult | null;
   readonly t: TFn;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const disabled = result === null;
 
   const onClick = useCallback(async () => {
+    if (!result) return;
     setBusy(true);
     setError(null);
     try {
@@ -52,15 +54,18 @@ export function ResultsExcelExportButton({
     }
   }, [result, t]);
 
+  const ariaLabel =
+    disabled ? `${t("results.export.downloadExcel")} — ${t("results.export.unavailableUntilRun")}` : busy ? t("results.export.exporting") : t("results.export.downloadExcel");
+
   return (
     <div className="flex flex-col items-stretch gap-1 sm:items-end">
       <Button
         type="button"
         variant="outline"
         size="sm"
-        disabled={busy}
+        disabled={disabled || busy}
         aria-busy={busy}
-        aria-label={busy ? t("results.export.exporting") : t("results.export.downloadExcel")}
+        aria-label={ariaLabel}
         onClick={() => void onClick()}
         className="gap-1.5"
       >

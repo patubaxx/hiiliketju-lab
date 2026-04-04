@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sourceSans.variable} ${sourceSerif.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${sourceSans.variable} ${sourceSerif.variable} ${geistMono.variable} h-full scroll-smooth scroll-pt-24 antialiased`}
     >
       <body className="app-page-surface flex min-h-full flex-col text-foreground">
         <main className="min-h-0 flex-1">{children}</main>

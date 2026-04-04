@@ -8,6 +8,8 @@
  */
 import * as React from "react";
 
+import { ScenarioAppNavbar } from "./scenario-app-navbar";
+
 import { Button } from "@/components/ui/button";
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
@@ -157,6 +159,17 @@ export function ScenarioInputApp() {
   const [form, setForm] = React.useState<ScenarioFormState>(() => createInitialFormState());
   const [errors, setErrors] = React.useState<Map<string, string[]>>(new Map());
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+  const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
+  const scrollToOutcomeAfterRunRef = React.useRef(false);
+
+  React.useLayoutEffect(() => {
+    if (!scrollToOutcomeAfterRunRef.current || !result) return;
+    scrollToOutcomeAfterRunRef.current = false;
+    const el = outcomeSectionRef.current;
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.focus({ preventScroll: true });
+  }, [result]);
 
   const setCo2Mode = (mode: Co2AvailabilityModeForm) => {
     setForm((s) => ({ ...s, co2: defaultCo2Branch(mode) }));
@@ -190,6 +203,7 @@ export function ScenarioInputApp() {
       ...parsed.data,
       process: mergeProcessAssumptionsInput(parsed.data.process),
     };
+    scrollToOutcomeAfterRunRef.current = true;
     setResult(calculateScenario(input));
   };
 
@@ -203,26 +217,19 @@ export function ScenarioInputApp() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-12 pb-28 sm:px-6 md:pb-14 xl:space-y-12 xl:px-10 xl:pb-16">
-      {/* --- Page header + hero --- */}
-      <header className="mb-2">
+      <ScenarioAppNavbar
+        locale={locale}
+        setLocale={setLocale}
+        onRun={onRun}
+        onReset={onReset}
+        result={result}
+        t={t}
+      />
+      <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-8 sm:px-6 xl:space-y-12 xl:px-10">
+      {/* --- Page hero (app `banner` landmark is the sticky navbar) --- */}
+      <div className="mb-2">
         <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/42 ring-offset-0 sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
-            <div className="flex flex-col gap-1">
-              <FieldLabel htmlFor="locale-select">{t("locale.label")}</FieldLabel>
-              <select
-                id="locale-select"
-                className={selectClassName + " w-44"}
-                value={locale}
-                onChange={(e) => setLocale(e.target.value as typeof locale)}
-              >
-                <option value="en">{t("locale.en")}</option>
-                <option value="fi">{t("locale.fi")}</option>
-                <option value="sv">{t("locale.sv")}</option>
-              </select>
-            </div>
-          </div>
+          <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
 
           <div className="mt-6 border-t border-consultancy/15 pt-6">
             <div className="rounded-xl border border-consultancy/12 bg-consultancy-subtle/45 px-5 py-5 sm:max-w-[46rem] sm:px-6 sm:py-6">
@@ -253,7 +260,7 @@ export function ScenarioInputApp() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* --- Validation summary (payload parse + Zod) --- */}
       {hasErrors ? (
@@ -286,9 +293,8 @@ export function ScenarioInputApp() {
         </div>
       ) : null}
 
-      {/* --- Main layout: setup form (left) + desktop action aside --- */}
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_15.5rem] xl:items-start xl:gap-10">
-        <div className="min-w-0 space-y-8">
+      {/* --- Main layout: setup form --- */}
+      <div className="min-w-0 space-y-8">
           <ShellSetupRegion title={t("app.shell.setupTitle")} lead={t("app.shell.setupLead")}>
       {/* --- Scenario identity + assumptions meta --- */}
       <Section title={t("scenarioForm.title")} description={t("scenarioForm.description")}>
@@ -898,51 +904,16 @@ export function ScenarioInputApp() {
         </div>
       </Section>
           </ShellSetupRegion>
-
-          <div className="flex flex-wrap gap-3 pt-1 xl:hidden">
-            <Button type="button" onClick={onRun}>
-              {t("scenarioForm.runCalculation")}
-            </Button>
-            <Button type="button" variant="outline" onClick={onReset}>
-              {t("scenarioForm.reset")}
-            </Button>
-        </div>
-      </div>
-
-        {/* --- Desktop sticky: run / reset --- */}
-        <aside
-          className="mt-8 hidden xl:mt-0 xl:block"
-          aria-labelledby="scenario-shell-actions-heading"
-        >
-          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-surface-shell p-4 shadow-[0_4px_24px_-10px_rgba(15,23,42,0.12)] ring-2 ring-structural/38 ring-offset-0">
-            <h2
-              id="scenario-shell-actions-heading"
-              className="text-sm font-semibold tracking-tight text-foreground"
-            >
-              {t("app.shell.actionsCardTitle")}
-            </h2>
-            <p className="truncate text-sm font-medium text-foreground" title={form.scenarioName}>
-              {form.scenarioName}
-            </p>
-            <div className="flex flex-col gap-2 border-t border-structural/28 pt-4">
-              <Button type="button" className="w-full" onClick={onRun}>
-                {t("scenarioForm.runCalculation")}
-              </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={onReset}>
-                {t("scenarioForm.reset")}
-              </Button>
-            </div>
-            <p className="border-t border-border/60 pt-3 text-xs leading-relaxed text-muted-foreground">
-              {result ? t("app.shell.resultsReady") : t("app.shell.resultsPending")}
-            </p>
-          </div>
-        </aside>
       </div>
 
       {/* --- Outcome: `ResultsPanel` from canonical result only --- */}
       <div
-        className="scroll-mt-8 pt-10 xl:scroll-mt-10 xl:pt-14"
+        ref={outcomeSectionRef}
+        tabIndex={-1}
         id="scenario-outcome"
+        role="region"
+        aria-label={t("app.shell.outcomeLabel")}
+        className="scroll-mt-24 pt-10 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 xl:pt-14"
       >
         <div className="rounded-2xl border border-structural/38 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/32 ring-offset-0 sm:p-5 xl:p-6 dark:border-structural/45 dark:ring-structural/40">
           <p className="mb-5 flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
@@ -962,22 +933,6 @@ export function ScenarioInputApp() {
           </Section>
         </div>
       </div>
-      </div>
-
-      {/* --- Mobile: fixed run / reset --- */}
-      <div
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md supports-[backdrop-filter]:bg-background/75 md:hidden"
-        role="toolbar"
-        aria-label={t("app.shell.mobileActionsLabel")}
-      >
-        <div className="mx-auto flex w-full max-w-lg gap-2">
-          <Button type="button" className="min-h-11 min-w-0 flex-1" onClick={onRun}>
-            {t("scenarioForm.runCalculation")}
-          </Button>
-          <Button type="button" variant="outline" className="min-h-11 min-w-0 flex-1 shrink-0" onClick={onReset}>
-            {t("scenarioForm.reset")}
-          </Button>
-        </div>
       </div>
     </>
   );
