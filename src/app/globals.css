@@ -13,6 +13,9 @@
   --color-consultancy: var(--consultancy);
   --color-consultancy-muted: var(--consultancy-muted);
   --color-consultancy-subtle: var(--consultancy-subtle);
+  /* Darker grounded framing for canvas-adjacent shells (not inner card emphasis). */
+  --color-structural: var(--structural);
+  --color-structural-muted: var(--structural-muted);
   /* Material hierarchy: canvas < shells < cards < inset (see :root values). */
   --color-surface-hero: var(--surface-hero);
   --color-surface-shell: var(--surface-shell);
@@ -61,6 +64,9 @@
   --consultancy: oklch(0.46 0.062 201);
   --consultancy-muted: oklch(0.56 0.048 201);
   --consultancy-subtle: oklch(0.965 0.022 198);
+  /* #067668 — outer shell grounding / broad framing; inner hierarchy stays consultancy. */
+  --structural: #067668;
+  --structural-muted: color-mix(in srgb, #067668 78%, #ffffff 22%);
   /* Layered surfaces (light): shell vs card must not collapse to the same white. */
   --surface-hero: oklch(1 0 0);
   --surface-shell: oklch(0.975 0.014 200);
@@ -105,6 +111,9 @@
   --consultancy: oklch(0.64 0.075 201);
   --consultancy-muted: oklch(0.54 0.058 201);
   --consultancy-subtle: oklch(0.24 0.035 205);
+  /* Lighter structural on dark canvas so rings/borders remain legible. */
+  --structural: #3dc4b0;
+  --structural-muted: color-mix(in srgb, #3dc4b0 70%, #ffffff 30%);
   --surface-hero: oklch(0.21 0.018 205);
   --surface-shell: oklch(0.185 0.022 205);
   --surface-inset: oklch(0.165 0.02 205);
@@ -166,9 +175,9 @@
 }
 
 /**
- * Page depth: very soft cool wash + faint grid; content stays primary.
+ * Canvas: atmospheric 75deg wash (#8c52ff → #0097b2), perceptible but still behind shells/grid.
+ * Last image layer sits above background-color only.
  */
-/* Canvas stays subordinate: lighter wash + fainter grid so shells read first. */
 .app-page-surface {
   background-color: var(--background);
   background-image:
@@ -184,8 +193,16 @@
       0deg,
       oklch(0.25 0.02 250 / 0.018) 0 1px,
       transparent 1px 56px
+    ),
+    linear-gradient(
+      75deg,
+      rgb(140 82 255 / 0.09) 0%,
+      rgb(140 82 255 / 0.02) 32%,
+      transparent 44%,
+      rgb(0 151 178 / 0.02) 62%,
+      rgb(0 151 178 / 0.085) 100%
     );
-  background-size: 100% 100%, 100% 100%, 100% 100%, 56px 56px, 56px 56px;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 56px 56px, 56px 56px, 100% 100%;
   background-attachment: fixed;
 }
 
@@ -203,5 +220,13 @@
       0deg,
       oklch(1 0 0 / 0.022) 0 1px,
       transparent 1px 56px
+    ),
+    linear-gradient(
+      75deg,
+      rgb(140 82 255 / 0.14) 0%,
+      rgb(140 82 255 / 0.035) 30%,
+      transparent 45%,
+      rgb(0 151 178 / 0.035) 58%,
+      rgb(0 151 178 / 0.12) 100%
     );
 }

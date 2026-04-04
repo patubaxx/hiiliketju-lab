@@ -26,9 +26,9 @@ export function ResultsPanel({
   const s = result.annualSummary;
 
   return (
-    <div className="w-full space-y-12 rounded-xl border border-border/75 bg-surface-inset px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-black/[0.04] sm:px-8 sm:py-10 dark:shadow-none dark:ring-white/[0.05]">
+    <div className="w-full space-y-12 rounded-xl border border-border/75 bg-surface-inset px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-structural/22 sm:px-8 sm:py-10 dark:shadow-none dark:ring-structural/28">
       {/* 1. Outcome + scenario context */}
-      <header className="space-y-3 border-b border-consultancy/12 pb-6">
+      <header className="space-y-3 border-b border-structural/26 pb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
           <div className="flex flex-wrap gap-2 sm:justify-end">

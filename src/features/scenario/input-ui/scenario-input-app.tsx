@@ -199,7 +199,7 @@ export function ScenarioInputApp() {
     <>
       <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-12 pb-28 sm:px-6 md:pb-14 xl:space-y-12 xl:px-10 xl:pb-16">
       <header className="mb-2">
-        <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-1 ring-consultancy/20 sm:p-8">
+        <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/42 ring-offset-0 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
             <div className="flex flex-col gap-1">
@@ -899,7 +899,7 @@ export function ScenarioInputApp() {
           className="mt-8 hidden xl:mt-0 xl:block"
           aria-labelledby="scenario-shell-actions-heading"
         >
-          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-surface-shell p-4 shadow-[0_4px_24px_-10px_rgba(15,23,42,0.12)] ring-1 ring-consultancy/18">
+          <div className="sticky top-6 z-20 max-h-[calc(100vh-1.5rem)] space-y-4 overflow-y-auto rounded-xl border border-border/80 bg-surface-shell p-4 shadow-[0_4px_24px_-10px_rgba(15,23,42,0.12)] ring-2 ring-structural/38 ring-offset-0">
             <h2
               id="scenario-shell-actions-heading"
               className="text-sm font-semibold tracking-tight text-foreground"
@@ -909,7 +909,7 @@ export function ScenarioInputApp() {
             <p className="truncate text-sm font-medium text-foreground" title={form.scenarioName}>
               {form.scenarioName}
             </p>
-            <div className="flex flex-col gap-2 border-t border-consultancy/12 pt-4">
+            <div className="flex flex-col gap-2 border-t border-structural/28 pt-4">
               <Button type="button" className="w-full" onClick={onRun}>
                 {t("scenarioForm.runCalculation")}
               </Button>
@@ -928,9 +928,9 @@ export function ScenarioInputApp() {
         className="scroll-mt-8 pt-10 xl:scroll-mt-10 xl:pt-14"
         id="scenario-outcome"
       >
-        <div className="rounded-2xl border border-consultancy/25 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-consultancy/12 sm:p-5 xl:p-6 dark:border-consultancy/30 dark:ring-consultancy/18">
+        <div className="rounded-2xl border border-structural/38 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/32 ring-offset-0 sm:p-5 xl:p-6 dark:border-structural/45 dark:ring-structural/40">
           <p className="mb-5 flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
-            <span className="h-px w-8 shrink-0 bg-consultancy/50" aria-hidden />
+            <span className="h-px w-10 shrink-0 bg-structural/60" aria-hidden />
             {t("app.shell.outcomeLabel")}
           </p>
           <Section
