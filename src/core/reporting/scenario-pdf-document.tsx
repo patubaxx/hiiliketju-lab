@@ -249,7 +249,7 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
             <Text style={styles.chartCaption}>X: day index 0–364</Text>
           </View>
           <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Electricity price (EUR/MWh)</Text>
+            <Text style={styles.chartTitle}>Electricity purchase price (EUR/MWh)</Text>
             <MiniLineChart series={charts.priceEurPerMwh} width={CHART_W} height={CHART_H} stroke="#7c3aed" />
             <Text style={styles.chartCaption}>X: day index 0–364</Text>
           </View>

@@ -7,10 +7,10 @@ export const sv = {
     hero: {
       headline: "Teknik-ekonomiska scenarier för biogent CO₂ och väte i värdekedjor",
       lead:
-        "Jämför syntetisk metan (CO₂ + H₂ → CH₄) med försäljning av väte med frigjort CO₂. Modellera CO₂-tillgång och elpris över året och följ metanproduktion, energianvändning, kostnader, lönsamhet, break-even och målpriser—valfritt med CAPEX—i webbläsaren för forskning och beslutsstöd.",
+        "Jämför syntetisk metan (CO₂ + H₂ → CH₄) med försäljning av väte med frigjort CO₂. Modellera CO₂-tillgång och els inköpspris över året och följ metanproduktion, energianvändning, kostnader, lönsamhet samt härledda break-even- och målrelaterade lönsamhetsindikatorer—valfritt med CAPEX—i webbläsaren för forskning och beslutsstöd.",
       bullet1: "Samlad vy av metanvägen och alternativet med väteförsäljning",
       bullet2: "CO₂- och elindata som konstanta värden eller dag- / timserier, harmoniserade till en daglig motor",
-      bullet3: "Resultat omfattar produktion, energi, kostnadsstack, intäkter och prisindikatorer",
+      bullet3: "Resultat omfattar produktion, energi, kostnadsstack, intäkter och härledda lönsamhetsindikatorer",
       bullet4: "Antagandemetadata förblir synligt för transparent, exportanpassad analys",
     },
     shell: {
@@ -49,11 +49,12 @@ export const sv = {
     co2: "Koldioxidtillgång",
     co2Intro:
       "Årlig tillgång, utnyttjande och hur CO₂ fördelas över året. I tidsserielägen kommer daglig tillgång från den serie du anger; fältet kt/år krävs fortfarande i formuläret men skalar inte serien i nuvarande motor.",
-    electricity: "Elpris",
+    electricity: "Els inköpspris",
     electricityIntro:
-      "Hur elpriset anges över MVP-horisonten. Timdata harmoniseras till dagliga medelvärden internt.",
+      "Hur els inköpspris anges över MVP-horisonten. Timdata harmoniseras till dagliga medelvärden internt.",
     economics: "Ekonomi",
-    economicsIntro: "Råvarupriser, driftkostnad och valfri investering (CAPEX).",
+    economicsIntro:
+      "Antagna försäljningspriser för metan och väte, övrig driftkostnad och valfri investering (CAPEX).",
     advanced: "Avancerade processantaganden",
     advancedIntro:
       "Åsidosätt litteraturstandardvärden endast när du har projektspecifika data. Metadata sparas med varje värde för spårbarhet.",
@@ -82,27 +83,27 @@ export const sv = {
     fillOnes8760: "Fyll med 8760 × 1",
   },
   electricity: {
-    mode: "Prisläge",
-    mode_constant: "Konstant (EUR/MWh)",
-    mode_daily_series: "Daglig serie (365 EUR/MWh-värden)",
-    mode_hourly_series: "Timserie (8760 EUR/MWh-värden)",
-    mode_historical_imported: "Importerade marknadsdata (daglig eller timserie)",
-    constantPrice: "Elpris (EUR/MWh)",
-    seriesDailyLabel: "Dagpriser (EUR/MWh × 365)",
-    seriesHourlyLabel: "Timpriser (EUR/MWh × 8760)",
+    mode: "Inköpsprisläge",
+    mode_constant: "Konstant inköpspris (EUR/MWh)",
+    mode_daily_series: "Daglig serie (365 EUR/MWh inköpspriser)",
+    mode_hourly_series: "Timserie (8760 EUR/MWh inköpspriser)",
+    mode_historical_imported: "Importerade marknadsdata (daglig eller timserie med inköpspriser)",
+    constantPrice: "Els inköpspris (EUR/MWh)",
+    seriesDailyLabel: "Dagliga inköpspriser (EUR/MWh × 365)",
+    seriesHourlyLabel: "Timvisa inköpspriser (EUR/MWh × 8760)",
     seriesHelp:
       "Ange det krävda antalet icke-negativa tal separerade med komma, semikolon eller radbrytning.",
     historicalResolution: "Upplösning för importerad serie",
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",
     historicalHelp:
-      "Klistra in normaliserade EUR/MWh-värden i MVP-ordning. Filimport och datarensning ingår ännu inte i denna vy.",
+      "Klistra in normaliserade EUR/MWh inköpspriser i MVP-ordning. Filimport och datarensning ingår ännu inte i denna vy.",
     fillOnes365: "Fyll med 365 × 50",
     fillOnes8760: "Fyll med 8760 × 50",
   },
   economics: {
-    methanePrice: "Metanpris (EUR/t CH₄)",
-    hydrogenPrice: "Vätepris (EUR/kg H₂)",
+    methanePrice: "Antaget försäljningspris metan (EUR/t CH₄)",
+    hydrogenPrice: "Antaget försäljningspris vätgas (EUR/kg H₂)",
     otherOpex: "Övrig OPEX (EUR/år)",
     includeCapex: "Inkludera CAPEX i kostnadsstacken",
     electrolyzerCapex: "Elektrolysör CAPEX (EUR)",
@@ -198,7 +199,8 @@ export const sv = {
       deltaVsHydrogen: "Skillnad mot vätgasförsäljning",
     },
     kpiSecondary: {
-      lead: "Massa–energibalans, kostnadsstack och lönsamhetströsklar. Vägintäkterna jämförs i nästa avsnitt.",
+      lead:
+        "Massa–energibalans, kostnadsstack och lönsamhetströsklar. Metanpriserna här är härledda från resultaten (break-even och målmarginaler), inte samma som de antagna försäljningspriserna du angav ovan. Vägintäkterna jämförs i nästa avsnitt.",
     },
     pathComparison: {
       title: "Vägintäkter (år)",
@@ -209,7 +211,7 @@ export const sv = {
     },
     chart: {
       co2Availability: "CO₂-tillgång (daglig upplösning)",
-      electricityPrice: "Elpris (daglig upplösning)",
+      electricityPrice: "Els inköpspris (daglig upplösning)",
       methaneProduction: "Metanproduktion (daglig)",
       costVsRevenueDaily: "Daglig total kostnad vs metanintäkt",
       axis: {
@@ -217,7 +219,7 @@ export const sv = {
       },
       series: {
         availableCo2Kg: "Tillgänglig CO₂ (kg/dag)",
-        electricityPrice: "Pris (EUR/MWh)",
+        electricityPrice: "Inköpspris (EUR/MWh)",
         methaneProducedKg: "Producerad CH₄ (kg/dag)",
         totalCostEur: "Total kostnad (EUR/dag)",
         methaneRevenueEur: "Metanintäkt (EUR/dag)",

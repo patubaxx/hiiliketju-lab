@@ -7,10 +7,10 @@ export const en = {
     hero: {
       headline: "Techno-economic scenarios for biogenic CO₂ and hydrogen value chains",
       lead:
-        "Compare synthetic methane (CO₂ + H₂ → CH₄) with selling hydrogen while releasing CO₂. Model CO₂ availability and electricity prices over the year, then review methane production, energy use, costs, profitability, break-even and target prices—with optional CAPEX—in the browser for research and decision support.",
+        "Compare synthetic methane (CO₂ + H₂ → CH₄) with selling hydrogen while releasing CO₂. Model CO₂ availability and electricity purchase prices over the year, then review methane production, energy use, costs, profitability, break-even and target profitability indicators—with optional CAPEX—in the browser for research and decision support.",
       bullet1: "Side-by-side view of the methane pathway and the hydrogen-sales alternative",
       bullet2: "CO₂ and electricity inputs as flat values or daily / hourly series, harmonized to a daily engine",
-      bullet3: "Outputs cover production, energy, cost stack, revenues, and price indicators",
+      bullet3: "Outputs cover production, energy, cost stack, revenues, and derived profitability indicators",
       bullet4: "Assumption metadata stays visible for transparent, export-aligned analysis",
     },
     shell: {
@@ -49,11 +49,12 @@ export const en = {
     co2: "Carbon dioxide availability",
     co2Intro:
       "Annual availability, utilization, and how CO₂ is distributed over the year. For time-series modes, daily availability comes from the series you provide; the annual kt/year field is still required by the form but does not rescale that series in the current engine.",
-    electricity: "Electricity price",
+    electricity: "Electricity purchase price",
     electricityIntro:
-      "How electricity price is supplied over the MVP horizon. Hourly inputs are harmonized to daily averages internally.",
+      "How the electricity purchase price is supplied over the MVP horizon. Hourly inputs are harmonized to daily averages internally.",
     economics: "Economics",
-    economicsIntro: "Commodity prices, operating cost, and optional capital expenditure.",
+    economicsIntro:
+      "Assumed sales prices for methane and hydrogen, other operating cost, and optional capital expenditure.",
     advanced: "Advanced process assumptions",
     advancedIntro:
       "Override literature-based defaults only when you have project-specific data. Metadata is stored with each value for traceability.",
@@ -82,27 +83,27 @@ export const en = {
     fillOnes8760: "Fill with 8760 × 1",
   },
   electricity: {
-    mode: "Price mode",
-    mode_constant: "Constant (EUR/MWh)",
-    mode_daily_series: "Daily series (365 EUR/MWh values)",
-    mode_hourly_series: "Hourly series (8760 EUR/MWh values)",
-    mode_historical_imported: "Imported market data (daily or hourly series)",
-    constantPrice: "Electricity price (EUR/MWh)",
-    seriesDailyLabel: "Daily prices (EUR/MWh × 365)",
-    seriesHourlyLabel: "Hourly prices (EUR/MWh × 8760)",
+    mode: "Purchase price mode",
+    mode_constant: "Constant purchase price (EUR/MWh)",
+    mode_daily_series: "Daily series (365 EUR/MWh purchase prices)",
+    mode_hourly_series: "Hourly series (8760 EUR/MWh purchase prices)",
+    mode_historical_imported: "Imported market data (daily or hourly purchase-price series)",
+    constantPrice: "Electricity purchase price (EUR/MWh)",
+    seriesDailyLabel: "Daily purchase prices (EUR/MWh × 365)",
+    seriesHourlyLabel: "Hourly purchase prices (EUR/MWh × 8760)",
     seriesHelp:
       "Enter the required count of non-negative numbers, separated by commas, semicolons, or line breaks.",
     historicalResolution: "Imported series resolution",
     resolution_daily: "Daily (365 values)",
     resolution_hourly: "Hourly (8760 values)",
     historicalHelp:
-      "Paste normalized EUR/MWh values in MVP order. File import and data cleaning are not part of this screen yet.",
+      "Paste normalized EUR/MWh purchase prices in MVP order. File import and data cleaning are not part of this screen yet.",
     fillOnes365: "Fill with 365 × 50",
     fillOnes8760: "Fill with 8760 × 50",
   },
   economics: {
-    methanePrice: "Methane price (EUR/t CH₄)",
-    hydrogenPrice: "Hydrogen price (EUR/kg H₂)",
+    methanePrice: "Methane sales price assumption (EUR/t CH₄)",
+    hydrogenPrice: "Hydrogen sales price assumption (EUR/kg H₂)",
     otherOpex: "Other OPEX (EUR/year)",
     includeCapex: "Include CAPEX in cost stack",
     electrolyzerCapex: "Electrolyzer CAPEX (EUR)",
@@ -198,7 +199,8 @@ export const en = {
       deltaVsHydrogen: "Delta vs hydrogen sales alternative",
     },
     kpiSecondary: {
-      lead: "Mass–energy balance, cost stack, and profitability thresholds. Pathway revenues are compared in the next section.",
+      lead:
+        "Mass–energy balance, cost stack, and profitability thresholds. Methane price figures here are derived from results (break-even and target margins), not the sales price assumptions entered above. Pathway revenues are compared in the next section.",
     },
     pathComparison: {
       title: "Pathway revenues (annual)",
@@ -209,7 +211,7 @@ export const en = {
     },
     chart: {
       co2Availability: "CO₂ availability (resolved daily)",
-      electricityPrice: "Electricity price (resolved daily)",
+      electricityPrice: "Electricity purchase price (resolved daily)",
       methaneProduction: "Methane production (daily)",
       costVsRevenueDaily: "Daily total cost vs methane revenue",
       axis: {
@@ -217,7 +219,7 @@ export const en = {
       },
       series: {
         availableCo2Kg: "Available CO₂ (kg/day)",
-        electricityPrice: "Price (EUR/MWh)",
+        electricityPrice: "Purchase price (EUR/MWh)",
         methaneProducedKg: "CH₄ produced (kg/day)",
         totalCostEur: "Total cost (EUR/day)",
         methaneRevenueEur: "Methane revenue (EUR/day)",

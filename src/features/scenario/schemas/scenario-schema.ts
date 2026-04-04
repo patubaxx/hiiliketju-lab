@@ -44,13 +44,13 @@ export const scenarioInputSchema = z
     economics: z
       .object({
         methanePriceEurPerTch4: z
-          .number("Methane price must be a number")
-          .finite("Methane price must be a finite number")
-          .min(0, "Methane price (EUR/t_CH4) cannot be negative"),
+          .number("Methane sales price assumption must be a number")
+          .finite("Methane sales price assumption must be a finite number")
+          .min(0, "Methane sales price assumption (EUR/t_CH4) cannot be negative"),
         hydrogenPriceEurPerKg: z
-          .number("Hydrogen price must be a number")
-          .finite("Hydrogen price must be a finite number")
-          .min(0, "Hydrogen price (EUR/kg_H2) cannot be negative"),
+          .number("Hydrogen sales price assumption must be a number")
+          .finite("Hydrogen sales price assumption must be a finite number")
+          .min(0, "Hydrogen sales price assumption (EUR/kg_H2) cannot be negative"),
         otherOpexEurPerYear: z
           .number("Other OPEX must be a number")
           .finite("Other OPEX must be a finite number")

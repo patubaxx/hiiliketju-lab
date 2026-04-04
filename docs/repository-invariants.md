@@ -10,7 +10,7 @@
 
 1. **`calculateScenario(validated ScenarioInput) → CalculationResult`** is the **only** numerical source of truth for KPIs, daily/monthly series, and summaries shown in the UI.
 2. The interactive UI validates with **`safeParseScenarioInput`**, applies **`mergeProcessAssumptionsInput`**, then calls **`calculateScenario`** (`src/features/scenario/input-ui/scenario-input-app.tsx`). **Primary actions** (run, reset, locale, jump to `#scenario-outcome`, Excel/PDF export) live in the **sticky navbar** (`scenario-app-navbar.tsx`); export controls are **disabled** when no result exists. A successful run **scrolls** to the outcome region; this is UX only and does not alter engine or export pipelines.
-3. **Internal engine is daily-first** (365 days). Hourly CO₂ is harmonized with **sum** per day; hourly electricity price with **arithmetic mean** per day (see domain constants and `resolve-co2-series` / `resolve-electricity-price-series`).
+3. **Internal engine is daily-first** (365 days). Hourly CO₂ is harmonized with **sum** per day; hourly electricity **purchase** price (EUR/MWh) with **arithmetic mean** per day (see domain constants and `resolve-co2-series` / `resolve-electricity-price-series`).
 
 ---
 

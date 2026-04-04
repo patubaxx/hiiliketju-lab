@@ -461,7 +461,7 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
-      {/* --- Electricity price: mode + series / historical resolution --- */}
+      {/* --- Electricity purchase price: mode + series / historical resolution --- */}
       <Section title={t("sections.electricity")} description={t("sections.electricityIntro")}>
         <div>
           <FieldLabel htmlFor="elmode">{t("electricity.mode")}</FieldLabel>

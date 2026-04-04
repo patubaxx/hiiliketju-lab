@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Hiiliketju",
   description:
-    "Techno-economic scenario calculator: compare CO₂ + H₂ → CH₄ with hydrogen sales, with time-varying electricity and CO₂ inputs.",
+    "Techno-economic scenario calculator: compare CO₂ + H₂ → CH₄ with hydrogen sales, with time-varying electricity purchase prices and CO₂ inputs.",
 };
 
 export default function RootLayout({

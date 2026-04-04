@@ -60,7 +60,7 @@ describe("Excel export model (WP7)", () => {
       "Inputs",
       "Assumptions",
       "CO2 Profile",
-      "Electricity Price",
+      "Electricity purchase price",
       "Daily Results",
       "Annual Summary",
       "Comparison",

@@ -138,7 +138,7 @@ function serializeScenarioInputSnapshot(input: ScenarioInput): readonly InputSna
     pushKv(rows, "availability.hourlyAvailableCo2Kg.length", String(av.hourlyAvailableCo2Kg.length));
   }
 
-  pushSection(rows, "Electricity price input");
+  pushSection(rows, "Electricity purchase price input");
   const el = input.electricity;
   pushKv(rows, "electricity.mode", el.mode);
   if (el.mode === ELECTRICITY_MODE_CONSTANT) {
@@ -152,7 +152,7 @@ function serializeScenarioInputSnapshot(input: ScenarioInput): readonly InputSna
     pushKv(rows, "pricesEurPerMwh.length", String(el.pricesEurPerMwh.length));
   }
 
-  pushSection(rows, "Economics input");
+  pushSection(rows, "Economics input (sales price assumptions and OPEX)");
   pushKv(rows, "methanePriceEurPerTch4", String(input.economics.methanePriceEurPerTch4));
   pushKv(rows, "hydrogenPriceEurPerKg", String(input.economics.hydrogenPriceEurPerKg));
   pushKv(rows, "otherOpexEurPerYear", String(input.economics.otherOpexEurPerYear));

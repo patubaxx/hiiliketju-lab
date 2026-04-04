@@ -105,8 +105,8 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
   }
   setColumnWidths(co2, [10, 14, 18, 12]);
 
-  // --- Electricity Price ---
-  const elec = wb.addWorksheet("Electricity Price", {
+  // --- Electricity purchase price ---
+  const elec = wb.addWorksheet("Electricity purchase price", {
     views: [{ state: "frozen", ySplit: 1 }],
   });
   elec.addRow([...model.electricityPrice.headers]);

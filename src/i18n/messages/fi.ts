@@ -7,10 +7,10 @@ export const fi = {
     hero: {
       headline: "Teknis-taloudelliset skenaariot biologisen CO₂:n ja vedyn arvoketjuille",
       lead:
-        "Vertaa synteettistä metaania (CO₂ + H₂ → CH₄) vedyn myyntiin ja CO₂:n vapautumiseen. Mallinna CO₂:n saatavuutta ja sähkön hintaa vuoden yli, ja tarkastele metaanintuotantoa, energiankäyttöä, kustannuksia, kannattavuutta, kriittisiä ja tavoitehintoja—valinnaisella CAPEXilla—selaimessa tutkimusta ja päätöksentekoa varten.",
+        "Vertaa synteettistä metaania (CO₂ + H₂ → CH₄) vedyn myyntiin ja CO₂:n vapautumiseen. Mallinna CO₂:n saatavuutta ja sähkön hankintahintaa vuoden yli, ja tarkastele metaanintuotantoa, energiankäyttöä, kustannuksia, kannattavuutta sekä tuloksista johdettuja kriittisiä ja tavoitekannattavuusindikaattoreita—valinnaisella CAPEXilla—selaimessa tutkimusta ja päätöksentekoa varten.",
       bullet1: "Rinnakkainen näkymä metaanireitille ja vedynmyyntivaihtoehdolle",
       bullet2: "CO₂- ja sähkösyötteet tasaisina tai päivä- / tuntisarjoina, yhtenäistettynä päivätason moottoriin",
-      bullet3: "Tulokset kattavat tuotannon, energian, kustannusrakenteen, tulot ja hintaindikaattorit",
+      bullet3: "Tulokset kattavat tuotannon, energian, kustannusrakenteen, tulot ja johdetut kannattavuusindikaattorit",
       bullet4: "Oletusten metatiedot pysyvät näkyvissä läpinäkyvää, vientiin soveltuvaa analyysiä varten",
     },
     shell: {
@@ -49,11 +49,12 @@ export const fi = {
     co2: "Hiilidioksidin saatavuus",
     co2Intro:
       "Vuosittainen saatavuus, hyötysuhde ja CO₂:n jakautuminen vuoden aikana. Aikasarjamodeissa päivittäinen saatavuus tulee antamastasi sarjasta; kt/v-kenttä on lomakkeella edelleen pakollinen, mutta nykyinen moottori ei skaalaa sarjaa sen mukaan.",
-    electricity: "Sähkön hinta",
+    electricity: "Sähkön hankintahinta",
     electricityIntro:
-      "Miten sähkön hinta annetaan MVP-horisontilla. Tuntidata harmonisoidaan päivittäisiksi keskiarvoiksi.",
+      "Miten sähkön hankintahinta annetaan MVP-horisontilla. Tuntidata harmonisoidaan päivittäisiksi keskiarvoiksi.",
     economics: "Taloudelliset tiedot",
-    economicsIntro: "Hyödykkeiden hinnat, käyttökulut ja valinnainen investointi.",
+    economicsIntro:
+      "Metaanin ja vedyn oletetut myyntihinnat, muut käyttökulut ja valinnainen investointi.",
     advanced: "Edistyneet prosessioletukset",
     advancedIntro:
       "Korvaa kirjallisuusoletukset vain kun sinulla on kohteeseen sidottuja tietoja. Metatieto tallentuu jokaisen arvon mukana jäljitettävyyttä varten.",
@@ -82,27 +83,27 @@ export const fi = {
     fillOnes8760: "Täytä 8760 × 1",
   },
   electricity: {
-    mode: "Hintatapa",
-    mode_constant: "Vakio (EUR/MWh)",
-    mode_daily_series: "Päiväsarja (365 EUR/MWh-arvoa)",
-    mode_hourly_series: "Tuntisarja (8760 EUR/MWh-arvoa)",
-    mode_historical_imported: "Tuodut markkinatiedot (päivä- tai tuntisarja)",
-    constantPrice: "Sähkön hinta (EUR/MWh)",
-    seriesDailyLabel: "Päivähinnat (EUR/MWh × 365)",
-    seriesHourlyLabel: "Tuntihinnat (EUR/MWh × 8760)",
+    mode: "Hankintahintatapa",
+    mode_constant: "Vakio hankintahinta (EUR/MWh)",
+    mode_daily_series: "Päiväsarja (365 EUR/MWh hankintahintaa)",
+    mode_hourly_series: "Tuntisarja (8760 EUR/MWh hankintahintaa)",
+    mode_historical_imported: "Tuodut markkinatiedot (päivä- tai tuntikohtainen hankintahintasarja)",
+    constantPrice: "Sähkön hankintahinta (EUR/MWh)",
+    seriesDailyLabel: "Päivittäiset hankintahinnat (EUR/MWh × 365)",
+    seriesHourlyLabel: "Tuntikohtaiset hankintahinnat (EUR/MWh × 8760)",
     seriesHelp:
       "Syötä vaadittu määrä ei-negatiivisia lukuja pilkuilla, puolipisteillä tai rivinvaihdoilla eroteltuna.",
     historicalResolution: "Tuodun sarjan resoluutio",
     resolution_daily: "Päivittäinen (365 arvoa)",
     resolution_hourly: "Tuntikohtainen (8760 arvoa)",
     historicalHelp:
-      "Liitä normalisoidut EUR/MWh-arvot MVP-järjestyksessä. Tiedoston tuonti ja puhdistus eivät kuulu tähän näkymään.",
+      "Liitä normalisoidut EUR/MWh hankintahinnat MVP-järjestyksessä. Tiedoston tuonti ja puhdistus eivät kuulu tähän näkymään.",
     fillOnes365: "Täytä 365 × 50",
     fillOnes8760: "Täytä 8760 × 50",
   },
   economics: {
-    methanePrice: "Metaanin hinta (EUR/t CH₄)",
-    hydrogenPrice: "Vedyn hinta (EUR/kg H₂)",
+    methanePrice: "Metaanin oletettu myyntihinta (EUR/t CH₄)",
+    hydrogenPrice: "Vedyn oletettu myyntihinta (EUR/kg H₂)",
     otherOpex: "Muut käyttökulut (EUR/v)",
     includeCapex: "Laske investointi mukaan kustannuksiin",
     electrolyzerCapex: "Elektrolyyserin CAPEX (EUR)",
@@ -192,13 +193,14 @@ export const fi = {
       annualTotalCost: "Vuosittaiset kokonaiskustannukset",
       annualMethaneRevenue: "Vuosittaiset metaanituotot",
       hydrogenAltRevenue: "Vedyn myynnin vaihtoehtoiset tuotot",
-      breakEvenMethanePrice: "Kriittinen metaanihinta",
-      methanePrice10: "Metaanihinta 10 %:n kannattavuudella",
-      methanePrice30: "Metaanihinta 30 %:n kannattavuudella",
+      breakEvenMethanePrice: "Tasapainomyyntihinta metaanille",
+      methanePrice10: "Metaanin hinta 10 %:n tavoitekannattavuudella",
+      methanePrice30: "Metaanin hinta 30 %:n tavoitekannattavuudella",
       deltaVsHydrogen: "Ero verrattuna vetykauppaan",
     },
     kpiSecondary: {
-      lead: "Massa–energiatasapaino, kustannusrakenne ja kannattavuuskynnykset. Polkujen tuotot ovat seuraavassa osiossa.",
+      lead:
+        "Massa–energiatasapaino, kustannusrakenne ja kannattavuuskynnykset. Tässä näytetyt metaanihinnat johdetaan tuloksista (tasapaino ja tavoitemarginaalit), eivätkä ole samat kuin yllä syötetyt myyntihinta-oletukset. Polkujen tuotot ovat seuraavassa osiossa.",
     },
     pathComparison: {
       title: "Polkujen tuotot (vuosi)",
@@ -209,7 +211,7 @@ export const fi = {
     },
     chart: {
       co2Availability: "CO₂-saatavuus (päivitetty päivittäin)",
-      electricityPrice: "Sähkön hinta (päivitetty päivittäin)",
+      electricityPrice: "Sähkön hankintahinta (päivitetty päivittäin)",
       methaneProduction: "Metaanituotanto (päivittäin)",
       costVsRevenueDaily: "Päivittäinen kokonaiskustannus vs metaanituotto",
       axis: {
@@ -217,7 +219,7 @@ export const fi = {
       },
       series: {
         availableCo2Kg: "Saatavilla oleva CO₂ (kg/päivä)",
-        electricityPrice: "Hinta (EUR/MWh)",
+        electricityPrice: "Hankintahinta (EUR/MWh)",
         methaneProducedKg: "Tuotettu CH₄ (kg/päivä)",
         totalCostEur: "Kokonaiskustannus (EUR/päivä)",
         methaneRevenueEur: "Metaanituotto (EUR/päivä)",
