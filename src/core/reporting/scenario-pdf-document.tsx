@@ -1,11 +1,12 @@
-import { Document, Page, Path, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
+import { Document, G, Line, Page, Path, StyleSheet, Svg, Text, Tspan, View } from "@react-pdf/renderer";
 
 import type { PdfReportModel } from "./build-pdf-report-model";
-import { pathDFromPoints, projectCostRevenueSeries, projectDayValueSeries } from "./pdf-chart-geometry";
-import { formatPdfEur, formatPdfMetricCell, formatPdfNumber } from "./pdf-format";
+import { buildPdfCostRevenueChartLayout, buildPdfDayValueChartLayout } from "./pdf-chart-geometry";
+import { formatPdfChartAxisTick, formatPdfEur, formatPdfMetricCell, formatPdfNumber } from "./pdf-format";
 
 const CHART_W = 230;
-const CHART_H = 88;
+/** SVG height includes space for X tick labels below the plot. */
+const CHART_H = 106;
 
 const PDF_PROCESS_TRANSPARENCY_NOTE =
   "Plant availability and process efficiency are stored with assumption metadata for traceability. The current MVP daily engine does not multiply daily outputs by these factors (defaults are neutral 100%).";
@@ -95,47 +96,146 @@ const styles = StyleSheet.create({
   monthlyCellFirst: { fontSize: 7, textAlign: "left" },
 });
 
-function MiniLineChart({
+const PDF_CHART_AXIS_STROKE = "#9ca3af";
+const PDF_CHART_GRID_STROKE = "#e5e7eb";
+const PDF_CHART_TICK_STYLE = { fontSize: 5.8, fill: "#6b7280", fontFamily: "Helvetica" } as const;
+const PDF_CHART_X_LABEL_STYLE = { fontSize: 5.8, fill: "#6b7280", fontFamily: "Helvetica" } as const;
+
+function PdfDayValueLineChart({
   series,
   width,
   height,
+  lastDayIndex,
   stroke,
 }: {
   readonly series: readonly { dayIndex: number; value: number }[];
   readonly width: number;
   readonly height: number;
+  readonly lastDayIndex: number;
   readonly stroke: string;
 }) {
-  const d = pathDFromPoints(projectDayValueSeries(series, width, height));
-  if (!d) {
+  const layout = buildPdfDayValueChartLayout(series, width, height, lastDayIndex);
+  const { plot, yAxisX, xAxisY, yTicks, xTicks, linePathD } = layout;
+  if (!linePathD) {
     return <Text style={{ fontSize: 7, color: "#9ca3af" }}>No data</Text>;
   }
   return (
     <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      <Path d={d} stroke={stroke} strokeWidth={1.2} fill="none" />
+      <G>
+        {yTicks.map((yt) => (
+          <Line
+            key={`gy-${yt.value}`}
+            x1={plot.x0}
+            y1={yt.y}
+            x2={plot.x0 + plot.w}
+            y2={yt.y}
+            stroke={PDF_CHART_GRID_STROKE}
+            strokeWidth={0.35}
+          />
+        ))}
+        {xTicks.map((xt) => (
+          <Line
+            key={`gx-${xt.day}`}
+            x1={xt.x}
+            y1={plot.y0}
+            x2={xt.x}
+            y2={xAxisY}
+            stroke={PDF_CHART_GRID_STROKE}
+            strokeWidth={0.35}
+          />
+        ))}
+      </G>
+      <Path d={linePathD} stroke={stroke} strokeWidth={1.2} fill="none" />
+      <Line x1={yAxisX} y1={plot.y0} x2={yAxisX} y2={xAxisY} stroke={PDF_CHART_AXIS_STROKE} strokeWidth={0.75} />
+      <Line x1={plot.x0} y1={xAxisY} x2={plot.x0 + plot.w} y2={xAxisY} stroke={PDF_CHART_AXIS_STROKE} strokeWidth={0.75} />
+      {yTicks.map((yt) => (
+        <Text
+          key={`yl-${yt.value}`}
+          x={yAxisX - 3}
+          y={yt.y}
+          style={PDF_CHART_TICK_STYLE}
+        >
+          <Tspan textAnchor="end" dominantBaseline="middle">
+            {formatPdfChartAxisTick(yt.value)}
+          </Tspan>
+        </Text>
+      ))}
+      {xTicks.map((xt) => (
+        <Text key={`xl-${xt.day}`} x={xt.x} y={xAxisY + 11} style={PDF_CHART_X_LABEL_STYLE}>
+          <Tspan textAnchor="middle" dominantBaseline="middle">
+            {String(xt.day)}
+          </Tspan>
+        </Text>
+      ))}
     </Svg>
   );
 }
 
-function CostRevenueChart({
+function PdfCostRevenueLineChart({
   series,
   width,
   height,
+  lastDayIndex,
 }: {
   readonly series: readonly { dayIndex: number; totalCostEur: number; methaneRevenueEur: number }[];
   readonly width: number;
   readonly height: number;
+  readonly lastDayIndex: number;
 }) {
-  const { cost, revenue } = projectCostRevenueSeries(series, width, height);
-  const dCost = pathDFromPoints(cost);
-  const dRev = pathDFromPoints(revenue);
-  if (!dCost && !dRev) {
+  const layout = buildPdfCostRevenueChartLayout(series, width, height, lastDayIndex);
+  const { plot, yAxisX, xAxisY, yTicks, xTicks, costPathD, revenuePathD } = layout;
+  if (!costPathD && !revenuePathD) {
     return <Text style={{ fontSize: 7, color: "#9ca3af" }}>No data</Text>;
   }
   return (
     <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      {dCost ? <Path d={dCost} stroke="#b91c1c" strokeWidth={1.2} fill="none" /> : null}
-      {dRev ? <Path d={dRev} stroke="#15803d" strokeWidth={1.2} fill="none" /> : null}
+      <G>
+        {yTicks.map((yt) => (
+          <Line
+            key={`gy-${yt.value}`}
+            x1={plot.x0}
+            y1={yt.y}
+            x2={plot.x0 + plot.w}
+            y2={yt.y}
+            stroke={PDF_CHART_GRID_STROKE}
+            strokeWidth={0.35}
+          />
+        ))}
+        {xTicks.map((xt) => (
+          <Line
+            key={`gx-${xt.day}`}
+            x1={xt.x}
+            y1={plot.y0}
+            x2={xt.x}
+            y2={xAxisY}
+            stroke={PDF_CHART_GRID_STROKE}
+            strokeWidth={0.35}
+          />
+        ))}
+      </G>
+      {costPathD ? <Path d={costPathD} stroke="#b91c1c" strokeWidth={1.2} fill="none" /> : null}
+      {revenuePathD ? <Path d={revenuePathD} stroke="#15803d" strokeWidth={1.2} fill="none" /> : null}
+      <Line x1={yAxisX} y1={plot.y0} x2={yAxisX} y2={xAxisY} stroke={PDF_CHART_AXIS_STROKE} strokeWidth={0.75} />
+      <Line x1={plot.x0} y1={xAxisY} x2={plot.x0 + plot.w} y2={xAxisY} stroke={PDF_CHART_AXIS_STROKE} strokeWidth={0.75} />
+      {yTicks.map((yt) => (
+        <Text
+          key={`yl-${yt.value}`}
+          x={yAxisX - 3}
+          y={yt.y}
+          style={PDF_CHART_TICK_STYLE}
+        >
+          <Tspan textAnchor="end" dominantBaseline="middle">
+            {formatPdfChartAxisTick(yt.value)}
+          </Tspan>
+        </Text>
+      ))}
+      {xTicks.map((xt) => (
+        <Text key={`xl-${xt.day}`} x={xt.x} y={xAxisY + 11} style={PDF_CHART_X_LABEL_STYLE}>
+          <Tspan textAnchor="middle" dominantBaseline="middle">
+            {String(xt.day)}
+          </Tspan>
+        </Text>
+      ))}
     </Svg>
   );
 }
@@ -143,6 +243,7 @@ function CostRevenueChart({
 export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel }) {
   const { overview, excelModel, charts } = model;
   const genDate = model.generatedAtIso.slice(0, 19).replace("T", " ") + " UTC";
+  const lastDayIndex = Math.max(0, overview.periodDays - 1);
 
   return (
     <Document title={`Hiiliketju — ${overview.scenarioName}`} author="Hiiliketju" subject="Scenario report">
@@ -245,23 +346,41 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
         <View style={styles.chartGrid}>
           <View style={styles.chartBox}>
             <Text style={styles.chartTitle}>CO₂ available (kg/day)</Text>
-            <MiniLineChart series={charts.co2KgPerDay} width={CHART_W} height={CHART_H} stroke="#2563eb" />
-            <Text style={styles.chartCaption}>X: day index 0–364</Text>
+            <PdfDayValueLineChart
+              series={charts.co2KgPerDay}
+              width={CHART_W}
+              height={CHART_H}
+              lastDayIndex={lastDayIndex}
+              stroke="#2563eb"
+            />
+            <Text style={styles.chartCaption}>Y: kg/day · X: day index (0 = first day)</Text>
           </View>
           <View style={styles.chartBox}>
             <Text style={styles.chartTitle}>Electricity purchase price (EUR/MWh)</Text>
-            <MiniLineChart series={charts.priceEurPerMwh} width={CHART_W} height={CHART_H} stroke="#7c3aed" />
-            <Text style={styles.chartCaption}>X: day index 0–364</Text>
+            <PdfDayValueLineChart
+              series={charts.priceEurPerMwh}
+              width={CHART_W}
+              height={CHART_H}
+              lastDayIndex={lastDayIndex}
+              stroke="#7c3aed"
+            />
+            <Text style={styles.chartCaption}>Y: EUR/MWh · X: day index (0 = first day)</Text>
           </View>
           <View style={styles.chartBox}>
             <Text style={styles.chartTitle}>Methane produced (kg/day)</Text>
-            <MiniLineChart series={charts.methaneKgPerDay} width={CHART_W} height={CHART_H} stroke="#059669" />
-            <Text style={styles.chartCaption}>X: day index 0–364</Text>
+            <PdfDayValueLineChart
+              series={charts.methaneKgPerDay}
+              width={CHART_W}
+              height={CHART_H}
+              lastDayIndex={lastDayIndex}
+              stroke="#059669"
+            />
+            <Text style={styles.chartCaption}>Y: kg/day · X: day index (0 = first day)</Text>
           </View>
           <View style={styles.chartBox}>
             <Text style={styles.chartTitle}>Daily total cost vs methane revenue (EUR/day)</Text>
-            <CostRevenueChart series={charts.costRevenue} width={CHART_W} height={CHART_H} />
-            <Text style={styles.chartCaption}>Red: total cost · Green: methane revenue</Text>
+            <PdfCostRevenueLineChart series={charts.costRevenue} width={CHART_W} height={CHART_H} lastDayIndex={lastDayIndex} />
+            <Text style={styles.chartCaption}>Y: EUR/day · Red: total cost · Green: methane revenue</Text>
           </View>
         </View>
       </Page>
