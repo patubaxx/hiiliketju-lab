@@ -227,7 +227,7 @@ export function ScenarioInputApp() {
       />
       <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-8 sm:px-6 xl:space-y-12 xl:px-10">
       {/* --- Page hero (app `banner` landmark is the sticky navbar) --- */}
-      <div className="mb-2">
+      <div className="mb-10 xl:mb-12">
         <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/42 ring-offset-0 sm:p-8">
           <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
 
