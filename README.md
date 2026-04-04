@@ -16,7 +16,7 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 | Area | Path | Role |
 |------|------|------|
 | App shell & API routes | `src/app/` | Pages, `layout`, **`api/export/excel`**, **`api/export/pdf`** |
-| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, sticky action bar (`scenario-app-navbar.tsx`), charts/tables |
+| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, sticky action bar (`scenario-app-navbar.tsx`), charts/tables; optional **display units** (annual CO₂ kt/year or kg/year; constant electricity EUR/MWh or c/kWh) convert in **`buildScenarioPayload`** to canonical wire; browser **CSV import** for time-series fills the same bulk `seriesText` path as paste (see [`docs/repository-invariants.md`](docs/repository-invariants.md)) |
 | Wire validation | `src/features/scenario/schemas/` | Zod schemas aligned with `ScenarioInput` |
 | Domain | `src/core/domain/` | Types, units, temporal constants, assumption shapes |
 | Engine | `src/core/calculation/` | Harmonization, daily engine, monthly/annual roll-ups |
@@ -28,7 +28,7 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 
 ## Calculation flow (high level)
 
-1. User edits scenario; on run, the UI builds a wire payload and validates with **`safeParseScenarioInput`** (same schema as exports).
+1. User edits scenario; on run, the UI maps form state through **`buildScenarioPayload`** (display-unit conversion and series text as applicable), then validates with **`safeParseScenarioInput`** (same schema as exports).
 2. **`mergeProcessAssumptionsInput`** fills omitted process fields with flagged MVP defaults.
 3. **`calculateScenario`** runs: SEC resolution (and warnings) → CO₂/electricity **daily** series (365 points) → optional CAPEX → per-day rows → monthly and annual summaries.
 4. UI renders **`CalculationResult`** (KPIs, series, assumptions, opaque `warnings: string[]`). The **sticky top bar** runs validation + calculation, resets the form, switches locale, links to **`#scenario-outcome`**, and triggers exports (disabled until a result exists); after a successful run the page scrolls to the outcome section.

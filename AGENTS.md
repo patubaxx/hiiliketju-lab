@@ -30,6 +30,16 @@ Do not collapse these layers together.
 
 ---
 
+## Accepted input UX (WP1–WP3, current product)
+
+These are **documentation anchors** for behaviour already shipped; they do not relax calculation or wire contracts.
+
+- **Copy:** electricity is framed as **purchase / procurement price**; methane and hydrogen economics as **assumed sales prices**; profitability KPIs that depend on costs remain **derived** from **`calculateScenario`**. Wire field names were not renamed for wording.
+- **Display units:** the form may show **annual CO₂** as `kt/year` or `kg/year` and **constant** electricity purchase price as `EUR/MWh` or `c/kWh`. Convert in **`buildScenarioPayload`** (or shared domain helpers), not scattered in presentational components. **Canonical wire** stays `kt/year` / `EUR/MWh` for those fields; **time-series** and **exports** stay canonical.
+- **CSV import:** browser-only parsing into the existing bulk **`seriesText`** path for CO₂ and electricity time-series where the UI offers it; **no** new calculation modes and **no** new `ScenarioInput` shapes.
+
+---
+
 ## Non-Negotiable Rules
 
 1. **Do not put calculation logic into React components.**
@@ -135,7 +145,7 @@ These defaults must be implemented as clearly flagged assumptions, not hard-code
 
 * Keep domain types explicit and unit-aware.
 * Prefer descriptive names over short names.
-* Never hide unit transformations inside UI helpers.
+* Never hide unit transformations inside presentational UI helpers; map display units to wire in **`buildScenarioPayload`** (or domain conversion helpers it calls).
 * Separate user-facing units from internal canonical units.
 
 ### Calculation layer

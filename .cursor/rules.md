@@ -56,6 +56,12 @@ Supported modes:
 
 Any new code must respect these modes.
 
+### Form conveniences (current product, WP1–WP3)
+
+- **Copy** distinguishes electricity **purchase** price, methane/hydrogen **sales price** inputs, and **derived** profitability outputs; do not rename wire fields for wording.
+- **Optional display units** in the scenario form: annual CO₂ (`kt/year` | `kg/year`) and **constant** electricity purchase price (`EUR/MWh` | `c/kWh`) are converted in **`buildScenarioPayload`** so **`ScenarioInput`** and exports stay canonical. **Time-series** bulk entry does not add alternate display units in MVP.
+- **Browser CSV import** for CO₂ / electricity time-series fills the same bulk text path as manual entry; it is **not** a new `ScenarioInput` mode or server ingest contract.
+
 ---
 
 ## 4. Assumption transparency rule

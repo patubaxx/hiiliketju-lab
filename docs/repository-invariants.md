@@ -14,6 +14,14 @@
 
 ---
 
+## Terminology (UI / export copy)
+
+- **Electricity** is framed as **purchase / procurement price** where relevant (constant, series, and historical import paths).
+- **Methane and hydrogen economics** are framed as **assumed sales prices** (inputs), distinct from **derived** profitability indicators (e.g. break-even methane price) that come from the canonical **`CalculationResult`**.
+- **Wire / domain field names** were not renamed for this wording pass; copy and validation messages align with the above intent.
+
+---
+
 ## Export boundary
 
 1. Shipped downloads use **`POST /api/export/excel`** and **`POST /api/export/pdf`** with body **`{ "scenario": <wire> }`**.
@@ -58,7 +66,9 @@
 ## Known intentional limitations (MVP)
 
 - No auth, rate limiting, or export abuse protection beyond platform defaults.
-- No strict body-size policy beyond platform limits; very large pasted series may be impractical.
+- No strict body-size policy beyond platform limits; very large pasted or imported series may be impractical.
+- **CSV time-series import** is **browser-side only**; it does not add a server ingest mode or a new `ScenarioInput` shape—only fills **`seriesText`** for the existing daily/hourly bulk paths. Supported layouts and error cases are those implemented by **`parse-time-series-csv`** (not arbitrary spreadsheet dialects).
+- **Display-unit switching** applies only to **annual CO₂** and **constant electricity purchase price** in the form; **time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
 - ASCII **`filename=`** in `Content-Disposition` only (no RFC 5987 `filename*`).
 - Optional: extra HTTP route tests for every `parseExportScenarioPostBody` error code (parser is already unit-tested).
 
@@ -72,4 +82,4 @@
 
 ## Consolidation note
 
-This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference (April 2026 documentation pass).
+This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference. The April 2026 pass also records accepted **WP1–WP3** behaviour (terminology, optional display units before canonical payload, CSV → `seriesText`) without changing calculation or wire contracts.

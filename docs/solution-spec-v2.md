@@ -154,10 +154,15 @@ The following are locked for MVP:
 - CH₄ annual business unit = `t/year`
 - CH₄ price unit = `EUR/t_CH4`
 - electricity unit = `MWh`
-- electricity price unit = `EUR/MWh`
+- electricity purchase price unit = `EUR/MWh` (canonical wire; constant mode may be entered as `c/kWh` in the UI and converted)
 - target profitability formula = `markup_on_cost`
 - hourly CO₂ to daily aggregation = `sum`
 - hourly electricity price to daily aggregation = `arithmetic_mean`
+
+**UI conveniences (do not change wire or engine contracts):**
+
+- Optional **display units** in the scenario form: annual CO₂ as **`kt/year` or `kg/year`**; **constant** electricity **purchase** price as **`EUR/MWh` or `c/kWh`**. Values are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** remains canonical (**`kt/year`**, **`EUR/MWh`** for those fields). Time-series bulk entry does **not** gain alternate display units in MVP.
+- **Browser CSV import** for CO₂ and electricity **time-series** fills the same bulk text / builder path as paste; it is not a separate calculation mode or input contract.
 
 ---
 
@@ -198,11 +203,11 @@ User can define:
 - annual CO₂ amount
 - utilization rate
 - CO₂ availability mode
-- temporal input data or seasonal parameters
-- electricity price mode
-- electricity price values or price series
-- methane price
-- hydrogen price
+- temporal input data or seasonal parameters (including optional browser **CSV import** into the same bulk series path as manual entry, where the UI exposes time-series modes)
+- electricity **purchase** price mode
+- electricity **purchase** price values or price series
+- methane **assumed sales** price
+- hydrogen **assumed sales** price
 - other OPEX
 - optional CAPEX inputs
 - advanced assumptions
@@ -338,12 +343,12 @@ If `includeCapex = false`, then:
 ## 9. Units and Measurement Conventions
 
 ### 9.1 User-facing default units
-- CO₂: `kt/year`
+- CO₂: `kt/year` (default); the form may also **display** annual CO₂ as `kg/year` before conversion to canonical wire
 - H₂: `kg`
 - CH₄: `t/year`
 - methane price: `EUR/t_CH4`
 - electricity: `MWh`
-- electricity price: `EUR/MWh`
+- electricity price: `EUR/MWh` (default); the form may **display** **constant** purchase price as `c/kWh` before conversion to canonical wire
 - other OPEX: `EUR/year`
 - CAPEX: `EUR`
 
@@ -357,8 +362,8 @@ If `includeCapex = false`, then:
 ### 9.3 Unit principles
 - every input and output field must display units explicitly
 - internal units and user-facing units must be kept distinct where needed
-- exports must use the same business-facing units as the UI unless explicitly justified otherwise
-- unit transformations must live in calculation/domain helpers, not in UI components
+- **exports and the canonical wire `ScenarioInput` use canonical business units** (`kt/year`, `EUR/MWh`, etc.); optional alternate **form display** units for annual CO₂ and constant electricity are converted **before** validation and do not change export column semantics
+- unit transformations must live in calculation/domain helpers and the **payload builder** (`buildScenarioPayload`), not ad hoc in presentational UI components
 
 ---
 
@@ -397,7 +402,7 @@ The calculation engine returns one canonical calculation result containing:
 - calculation is deterministic
 - the same input always produces the same output
 - output contains everything needed by UI and exports
-- calculation consumes canonical resolved temporal series rather than raw UI-specific source formats
+- calculation consumes canonical resolved temporal series rather than raw UI-specific source formats (bulk paste or CSV-imported text is normalized into the same series builder / validation path before **`ScenarioInput`** is accepted)
 
 ---
 

@@ -103,6 +103,11 @@ Example note:
 - electricity: `MWh`
 - electricity price: `EUR/MWh`
 
+### UI display vs canonical wire (scenario form)
+
+- Optional **display** units for **annual CO₂** (`kg/year` ↔ `kt/year`) and **constant electricity purchase price** (`c/kWh` ↔ `EUR/MWh`) are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** matches this spec. **Time-series** bulk entry does not add alternate display units in MVP.
+- **Browser CSV import** for CO₂ and electricity time-series produces the same bulk **`seriesText`** (and downstream parsing) as manual paste; it does **not** introduce new `co2AvailabilityMode` / `electricityPriceMode` values or parallel ingest contracts.
+
 ### Internal canonical units
 - CO₂ timestep value: `kg/day`
 - H₂ timestep value: `kg/day`
@@ -135,6 +140,8 @@ Example note:
 | methanationCapexEur | Methanation CAPEX | EUR | conditional | user |
 | capexLifetimeYears | CAPEX lifetime | years | conditional | user/customer |
 
+Parameters in this table describe the **validated wire** `ScenarioInput`. UI-only display alternatives for **annual CO₂** and **constant electricity purchase price** are normalized to these units before validation.
+
 ### 6.2 CO₂ temporal input contract
 
 `co2AvailabilityMode` must be one of:
@@ -144,6 +151,8 @@ Example note:
 - `time_series_hourly`
 
 ### 6.3 Electricity temporal input contract
+
+Timestep electricity prices are **purchase** prices in **EUR/MWh** after harmonization to daily engine resolution.
 
 `electricityPriceMode` must be one of:
 - `constant`
