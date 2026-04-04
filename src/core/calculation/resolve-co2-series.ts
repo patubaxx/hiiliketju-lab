@@ -14,12 +14,19 @@ import {
 } from "@/core/domain/temporal";
 import { annualCo2KtPerYearToKgPerYear } from "@/core/domain/units";
 
+/**
+ * Series length guard. Keep behavior aligned with the duplicate in `resolve-electricity-price-series.ts`
+ * so CO₂ and electricity validation stay consistent for maintainers.
+ */
 function assertDailySeriesLength(name: string, values: readonly number[], expected: number): void {
   if (values.length !== expected) {
     throw new RangeError(`${name} must have length ${expected}, got ${values.length}`);
   }
 }
 
+/**
+ * Non-negativity / finiteness guard. Mirrored in `resolve-electricity-price-series.ts` — change both if rules evolve.
+ */
 function assertNonNegativeFinite(name: string, values: readonly number[]): void {
   for (let i = 0; i < values.length; i++) {
     const v = values[i]!;
@@ -29,6 +36,10 @@ function assertNonNegativeFinite(name: string, values: readonly number[]): void 
   }
 }
 
+/**
+ * Hourly CO₂ mass (kg per hour, length 8760) → daily kg/day by summing each calendar day’s 24 hours.
+ * Sum preserves total annual CO₂ mass when moving from hourly availability to the daily-first engine.
+ */
 function aggregateHourlyCo2ToDailyKg(hourlyKg: readonly number[]): number[] {
   const daily: number[] = [];
   for (let d = 0; d < SCENARIO_PERIOD_DAYS; d++) {
@@ -43,12 +54,14 @@ function aggregateHourlyCo2ToDailyKg(hourlyKg: readonly number[]): number[] {
 }
 
 /**
- * Resolve CO₂ availability to canonical `kg/day` for each MVP day (365 rows).
+ * Resolve CO₂ availability to canonical kg/day for each MVP day (always 365 rows; see `SCENARIO_PERIOD_DAYS`).
+ * Annual kt/year on `co2` is converted to kg/year, then distributed or read per mode below.
  */
 export function resolveCo2Series(co2: Co2Input): readonly ResolvedDailyCo2Point[] {
   const annualCo2Kg = annualCo2KtPerYearToKgPerYear(co2.annualAmountKtPerYear);
 
   switch (co2.availability.mode) {
+    /** No extra series: uniform kg/day = annual kg / 365. */
     case CO2_MODE_FLAT_ANNUAL: {
       const perDay = annualCo2Kg / SCENARIO_PERIOD_DAYS;
       const out: ResolvedDailyCo2Point[] = [];
@@ -64,12 +77,14 @@ export function resolveCo2Series(co2: Co2Input): readonly ResolvedDailyCo2Point[
       }
       return out;
     }
+    /** Twelve relative weights → monthly masses → uniform kg/day within each month (non-leap calendar). */
     case CO2_MODE_SEASONAL_DAILY: {
       return buildSeasonalDailyCo2ProfileKg({
         annualCo2Kg,
         monthlyRelativeWeights: co2.availability.monthlyRelativeWeights,
       });
     }
+    /** Input: `dailyAvailableCo2Kg` length 365 (kg/day). No harmonization beyond validation. */
     case CO2_MODE_TIME_SERIES_DAILY: {
       const series = co2.availability.dailyAvailableCo2Kg;
       assertDailySeriesLength("dailyAvailableCo2Kg", series, SCENARIO_PERIOD_DAYS);
@@ -87,6 +102,10 @@ export function resolveCo2Series(co2: Co2Input): readonly ResolvedDailyCo2Point[
       }
       return out;
     }
+    /**
+     * Input: `hourlyAvailableCo2Kg` length 8760 (kg CO₂ per hour). Harmonization: sum each day’s 24 hours → kg/day
+     * (conserves mass into the daily engine).
+     */
     case CO2_MODE_TIME_SERIES_HOURLY: {
       const hourly = co2.availability.hourlyAvailableCo2Kg;
       assertDailySeriesLength("hourlyAvailableCo2Kg", hourly, SCENARIO_HOURLY_SLOTS);

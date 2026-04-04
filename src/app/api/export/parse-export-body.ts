@@ -1,3 +1,8 @@
+/**
+ * Export POST bodies are `{ "scenario": <wire> }`. This parser validates with the same Zod schema as the UI,
+ * merges default process assumptions, and returns a `ScenarioInput` suitable for `calculateScenario`.
+ * Extra JSON keys (e.g. a spoofed calculation result) are ignored — the server always recomputes.
+ */
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 
@@ -11,10 +16,7 @@ export type ParseExportScenarioBodyResult =
   | { readonly ok: true; readonly input: ScenarioInput }
   | { readonly ok: false; readonly status: number; readonly payload: ExportErrorPayload };
 
-/**
- * Parses POST JSON `{ "scenario": <ScenarioInput wire shape> }` for server-side exports.
- * Validates with the same Zod schema as the interactive form; does not trust client-sent numbers without validation.
- */
+/** Parses POST JSON for `/api/export/excel` and `/api/export/pdf` (see file-level contract). */
 export function parseExportScenarioPostBody(rawText: string): ParseExportScenarioBodyResult {
   let json: unknown;
   try {

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Read-only presentation of `CalculationResult`: KPIs, tables, charts, assumptions, warnings.
+ * Download buttons POST the wire scenario for server-side `calculateScenario` + export; they do not send client KPIs as truth.
+ */
 import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 

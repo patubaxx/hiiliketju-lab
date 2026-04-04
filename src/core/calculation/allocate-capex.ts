@@ -1,3 +1,6 @@
+/**
+ * Optional CAPEX: simple lifetime straight-line allocation to EUR/year then EUR/day (no discounting, no annuity).
+ */
 import type { EconomicsInput } from "@/core/domain/scenario";
 import { SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 

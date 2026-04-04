@@ -1,3 +1,8 @@
+/**
+ * MVP calendar and timestep constants: fixed 365-day non-leap window, 8760 hourly slots, helpers for labels and series scaffolding.
+ * `dateLabel` values use a reference calendar year for deterministic exports and UI (not a leap-year model).
+ */
+
 /** Harmonized / resolved CO₂ mass available per day (internal canonical unit: kg/day). */
 export type ResolvedDailyCo2Point = {
   readonly dayIndex: number;

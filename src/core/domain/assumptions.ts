@@ -1,6 +1,6 @@
 /**
- * Assumption transparency (AGENTS.md, .cursor/rules.md).
- * Reusable for process inputs, economics flags, exports, and UI.
+ * Assumption transparency: every literature-based or non-customer value must be traceable via metadata.
+ * Shared by process inputs, exports, and UI (see repository `AGENTS.md` for the full policy).
  */
 
 export type AssumptionSource =

@@ -1,6 +1,6 @@
 /**
- * Unit vocabulary for public contracts and documentation.
- * Conversions live in the calculation layer (Agent 2); this file names units only.
+ * Named unit types for public contracts and documentation. Most values are plain numbers at runtime; these types
+ * document intent. `annualCo2KtPerYearToKgPerYear` is the small kt/year → kg/year conversion used when resolving CO₂.
  */
 
 /** User-facing annual CO₂ availability (locked MVP: kt/year). */
@@ -69,7 +69,7 @@ export type HydrogenMassKg = {
   readonly value: number;
 };
 
-/** Convert kt/year to kg/year (1 kt = 1_000_000 kg). Pure helper for Agent 1 / 2 boundaries. */
+/** Convert kt/year to kg/year (1 kt = 1_000_000 kg). Used when harmonizing annual CO₂ into daily kg. */
 export function annualCo2KtPerYearToKgPerYear(ktPerYear: number): number {
   return ktPerYear * 1_000_000;
 }

@@ -1,3 +1,7 @@
+/**
+ * Structural guards before mapping `CalculationResult` into workbook/PDF layouts. Complements business validation
+ * in Zod and the calculation engine; fails fast if series lengths or warning types are wrong.
+ */
 import type { CalculationResult } from "@/core/domain/result";
 import { SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 

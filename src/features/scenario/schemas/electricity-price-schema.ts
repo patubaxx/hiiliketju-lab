@@ -1,3 +1,6 @@
+/**
+ * Electricity price branch validation: constant, daily 365, hourly 8760, or imported daily/hourly (`resolution` selects length).
+ */
 import * as z from "zod";
 
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";

@@ -1,3 +1,6 @@
+/**
+ * POST validated `scenario` → `buildExcelExportResponse` (server `calculateScenario` + Excel bytes). See `parse-export-body.ts`.
+ */
 import { NextResponse } from "next/server";
 
 import { parseExportScenarioPostBody } from "../parse-export-body";

@@ -88,7 +88,10 @@ export type ElectricityPriceInput =
   | {
       readonly mode: typeof ELECTRICITY_MODE_HISTORICAL_IMPORTED;
       readonly resolution: "daily" | "hourly";
-      /** Daily: length 365. Hourly: length 8760. Imported series before/after normalization is an Agent 2 concern. */
+      /**
+       * Daily: length 365. Hourly: length 8760. Values are EUR/MWh in MVP window order; any gap-filling or
+       * alignment of raw market data must happen before this wire shape is produced.
+       */
       readonly pricesEurPerMwh: readonly number[];
     };
 

@@ -3,10 +3,7 @@ import type { ResolvedDailyCo2Point, ResolvedDailyElectricityPricePoint } from "
 
 export type { ResolvedDailyCo2Point, ResolvedDailyElectricityPricePoint } from "./temporal";
 
-/**
- * Per-day calculation row (canonical units in field names).
- * Formula population is Agent 2; shape is harmonization/calculation-ready.
- */
+/** Per-day calculation row produced by the daily engine (canonical units in field names). */
 export type DailyResult = {
   readonly dayIndex: number;
   readonly dateLabel: string;
@@ -67,8 +64,8 @@ export type ScenarioSummary = {
 };
 
 /**
- * Canonical calculation output for UI, Excel, and PDF (Agent 2 fills series and summaries).
- * Resolved daily inputs are the harmonized series consumed by the daily engine.
+ * Canonical calculation output: single source of truth for UI, Excel, and PDF. Populated only by `calculateScenario`
+ * and its helpers. `resolvedDailyCo2` / `resolvedDailyElectricityPrice` are the harmonized inputs fed to the daily engine.
  */
 export type CalculationResult = {
   readonly input: ScenarioInput;

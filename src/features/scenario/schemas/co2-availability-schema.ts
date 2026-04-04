@@ -1,3 +1,6 @@
+/**
+ * CO₂ availability branch validation: mode discriminant plus 12-tuple weights or fixed-length daily/hourly series.
+ */
 import * as z from "zod";
 
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";

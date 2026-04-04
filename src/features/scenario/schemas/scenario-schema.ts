@@ -1,3 +1,7 @@
+/**
+ * Authoritative Zod schema for `ScenarioInput` wire JSON: same contract for the interactive form and `/api/export/*`.
+ * `parseScenarioInput` / `safeParseScenarioInput` return typed data; `mergeProcessAssumptionsInput` fills omitted process fields.
+ */
 import * as z from "zod";
 
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";

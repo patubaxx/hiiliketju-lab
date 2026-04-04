@@ -1,7 +1,6 @@
 /**
- * CO₂ temporal availability validation (mode-based contract).
- * Implementation lives in `co2-availability-schema.ts`; this barrel keeps the
- * scenario feature folder aligned with the WP3 layout.
+ * Re-exports CO₂ availability Zod schemas from `co2-availability-schema.ts` for convenient imports elsewhere
+ * in the scenario feature.
  */
 export {
   co2AvailabilityInputSchema,

@@ -1,3 +1,6 @@
+/**
+ * PDF rendering from canonical `CalculationResult` → `PdfReportModel` → React-PDF. Used on the server for `/api/export/pdf`.
+ */
 import { pdf } from "@react-pdf/renderer";
 
 import type { CalculationResult } from "@/core/domain/result";

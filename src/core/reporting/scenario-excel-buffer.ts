@@ -1,3 +1,7 @@
+/**
+ * Excel bytes from an existing `CalculationResult`. Callers must pass output of `calculateScenario` (e.g. export routes);
+ * this file does not parse wire JSON or trust client KPIs.
+ */
 import type { CalculationResult } from "@/core/domain/result";
 
 import { assertCalculationResultExportable } from "./assert-calculation-result-exportable";

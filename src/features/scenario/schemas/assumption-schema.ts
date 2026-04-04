@@ -1,3 +1,6 @@
+/**
+ * Zod building blocks for `AssumptionValue<number>`: source, status, optional note, wrapped numeric value.
+ */
 import * as z from "zod";
 
 export const assumptionSourceSchema = z.enum([

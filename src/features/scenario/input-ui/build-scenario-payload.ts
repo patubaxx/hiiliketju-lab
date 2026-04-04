@@ -1,3 +1,7 @@
+/**
+ * Maps interactive form state to the JSON shape expected by `scenarioInputSchema`. Series fields stay as user text here;
+ * parsing issues are returned for field-level UX. Zod on submit remains authoritative for run/export.
+ */
 import type { AssumptionMeta } from "@/core/domain/assumptions";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 

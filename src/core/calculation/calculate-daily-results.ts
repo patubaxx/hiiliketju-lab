@@ -1,3 +1,8 @@
+/**
+ * Daily-first engine: one `DailyResult` per MVP day from already-harmonized CO₂ and electricity series.
+ * Exported per-day helpers are pure unit transformations; they are the single place for these stoichiometric
+ * and cost formulas (UI and exports must not duplicate them).
+ */
 import type { DailyResult } from "@/core/domain/result";
 import type { EconomicsInput } from "@/core/domain/scenario";
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
@@ -98,9 +103,12 @@ export function calculateDailyResults(params: DailyCalculationParams): readonly 
 
   const h2Factor = process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.value;
   const ch4Factor = process.stoichiometricMethaneYieldFactorKgCh4PerKgCo2.value;
-  // plantAvailabilityPct and processEfficiencyPct are carried on `process` with full assumption metadata for
-  // UI/export traceability. They are not yet applied as multipliers in these daily formulas (MVP neutral 100%
-  // defaults); a future iteration may incorporate them without changing the harmonization contract.
+  /*
+   * `plantAvailabilityPct` and `processEfficiencyPct` remain on `process` with full `AssumptionValue` metadata so
+   * the UI and exports can show source/status/notes. They are intentionally not multiplied into the daily mass
+   * or energy balance in the current MVP (defaults are neutral 100%). Changing that requires an explicit product
+   * decision and must stay consistent with harmonization and reporting, not a silent local tweak.
+   */
 
   const out: DailyResult[] = [];
   for (let d = 0; d < SCENARIO_PERIOD_DAYS; d++) {

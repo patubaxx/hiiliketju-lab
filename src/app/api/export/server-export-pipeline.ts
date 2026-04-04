@@ -1,3 +1,8 @@
+/**
+ * Shipped export HTTP handlers build bytes only after server-side validation and a full `calculateScenario` run.
+ * Request bodies carry a wire `scenario` object, never a trusted precomputed `CalculationResult`. Reporting
+ * mappers consume the canonical result from this pipeline only.
+ */
 import { NextResponse } from "next/server";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";

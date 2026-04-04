@@ -1,3 +1,7 @@
+/**
+ * Roll-ups from canonical `DailyResult[]`: monthly buckets by calendar month, annual KPIs for summaries and exports.
+ * All totals are simple sums over daily rows unless noted on `ScenarioSummary` (e.g. ratio/price fields use nulls).
+ */
 import type { DailyResult, MonthlySummary, ScenarioSummary } from "@/core/domain/result";
 import {
   MONTH_START_DAY_INDEX,
@@ -74,7 +78,12 @@ function sumDailyResults(dailyResults: readonly DailyResult[]): ReturnType<typeo
 }
 
 /**
- * Annual KPIs from daily rows (spec F-013–F-018).
+ * Annual KPIs from daily rows: sums mass and energy, then derives business metrics.
+ *
+ * Null semantics (avoid misleading infinities or undefined ratios):
+ * - `co2RecyclingRatePct`: null when no CO₂ was available (utilized/available undefined).
+ * - `breakEvenMethanePriceEurPerTon`, profitability methane prices: null when no methane was produced (EUR/t would diverge).
+ * `deltaVsHydrogenSaleEur` is always a number (can be negative) from summed daily revenues.
  */
 export function aggregateAnnualFromDaily(dailyResults: readonly DailyResult[]): ScenarioSummary {
   const t = sumDailyResults(dailyResults);

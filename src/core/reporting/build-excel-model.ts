@@ -1,9 +1,8 @@
 import { PROCESS_ASSUMPTION_EXPORT_ORDER, type ScenarioExcelExportModel } from "./build-export-model";
 
 /**
- * Excel workbook source model for WP7 slice 1.
- * Currently identical to `ScenarioExcelExportModel`; keep this module if Excel-specific
- * reshaping (column sets, split tables) diverges from other export targets later.
+ * Excel-specific typing and structural invariants on top of `ScenarioExcelExportModel`.
+ * Currently identical to that model; this module is the hook if Excel layout later diverges from PDF.
  */
 export type ExcelWorkbookSourceModel = ScenarioExcelExportModel;
 

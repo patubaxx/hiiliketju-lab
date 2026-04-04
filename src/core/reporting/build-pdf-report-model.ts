@@ -1,3 +1,6 @@
+/**
+ * PDF view model: reuses `buildScenarioExcelExportModel` for tabular content; adds downsampled chart series from the same result.
+ */
 import type { CalculationResult } from "@/core/domain/result";
 
 import { buildScenarioExcelExportModel, type ScenarioExcelExportModel } from "./build-export-model";

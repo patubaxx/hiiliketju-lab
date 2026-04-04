@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Scenario shell: form state → validation → canonical `calculateScenario` → results presentation.
+ * Run pipeline: `buildScenarioPayload` (parses text/series for UX feedback) → `safeParseScenarioInput` (authoritative Zod)
+ * → `mergeProcessAssumptionsInput` (literature defaults for omitted process fields) → `calculateScenario`.
+ * Do not recompute KPIs or time series here; render from `CalculationResult` only.
+ */
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -198,6 +204,7 @@ export function ScenarioInputApp() {
   return (
     <>
       <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-12 pb-28 sm:px-6 md:pb-14 xl:space-y-12 xl:px-10 xl:pb-16">
+      {/* --- Page header + hero --- */}
       <header className="mb-2">
         <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/42 ring-offset-0 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
@@ -248,6 +255,7 @@ export function ScenarioInputApp() {
         </div>
       </header>
 
+      {/* --- Validation summary (payload parse + Zod) --- */}
       {hasErrors ? (
         <div
           className="rounded-xl border border-destructive/35 bg-destructive/[0.04] px-5 py-4 text-destructive"
@@ -278,9 +286,11 @@ export function ScenarioInputApp() {
         </div>
       ) : null}
 
+      {/* --- Main layout: setup form (left) + desktop action aside --- */}
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_15.5rem] xl:items-start xl:gap-10">
         <div className="min-w-0 space-y-8">
           <ShellSetupRegion title={t("app.shell.setupTitle")} lead={t("app.shell.setupLead")}>
+      {/* --- Scenario identity + assumptions meta --- */}
       <Section title={t("scenarioForm.title")} description={t("scenarioForm.description")}>
         <FieldHint>{t("scenarioForm.periodNote")}</FieldHint>
         <div>
@@ -338,6 +348,7 @@ export function ScenarioInputApp() {
         </div>
       </Section>
 
+      {/* --- CO₂: mode + seasonal weights or time series --- */}
       <Section title={t("sections.co2")} description={t("sections.co2Intro")}>
         <div>
           <FieldLabel htmlFor="co2mode">{t("co2.mode")}</FieldLabel>
@@ -444,6 +455,7 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
+      {/* --- Electricity price: mode + series / historical resolution --- */}
       <Section title={t("sections.electricity")} description={t("sections.electricityIntro")}>
         <div>
           <FieldLabel htmlFor="elmode">{t("electricity.mode")}</FieldLabel>
@@ -627,6 +639,7 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
+      {/* --- Economics + optional CAPEX --- */}
       <Section title={t("sections.economics")} description={t("sections.economicsIntro")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -735,6 +748,7 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
+      {/* --- Advanced process assumptions (values + metadata; some not applied in daily engine — see calculation layer) --- */}
       <Section
         title={t("sections.advanced")}
         description={t("sections.advancedIntro")}
@@ -892,9 +906,10 @@ export function ScenarioInputApp() {
             <Button type="button" variant="outline" onClick={onReset}>
               {t("scenarioForm.reset")}
             </Button>
-          </div>
         </div>
+      </div>
 
+        {/* --- Desktop sticky: run / reset --- */}
         <aside
           className="mt-8 hidden xl:mt-0 xl:block"
           aria-labelledby="scenario-shell-actions-heading"
@@ -924,6 +939,7 @@ export function ScenarioInputApp() {
         </aside>
       </div>
 
+      {/* --- Outcome: `ResultsPanel` from canonical result only --- */}
       <div
         className="scroll-mt-8 pt-10 xl:scroll-mt-10 xl:pt-14"
         id="scenario-outcome"
@@ -948,6 +964,7 @@ export function ScenarioInputApp() {
       </div>
       </div>
 
+      {/* --- Mobile: fixed run / reset --- */}
       <div
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md supports-[backdrop-filter]:bg-background/75 md:hidden"
         role="toolbar"

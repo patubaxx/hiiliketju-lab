@@ -12,6 +12,12 @@ import {
   ELECTRICITY_MODE_HOURLY_SERIES,
 } from "@/core/domain/scenario";
 
+/*
+ * Tabular / snapshot view models for Excel (and aligned PDF sections). Inputs are a fresh `CalculationResult`
+ * from `calculateScenario` on the server (or the same in the browser for preview). This module only maps, labels,
+ * and stringifies: it does not re-harmonize time series, re-aggregate KPIs, or trust any client-supplied totals.
+ */
+
 /** Stable export order and English labels (workbook headers; not UI i18n). */
 export const PROCESS_ASSUMPTION_EXPORT_ORDER: readonly (keyof ProcessAssumptionsInput)[] = [
   "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",

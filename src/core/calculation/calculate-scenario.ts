@@ -1,3 +1,16 @@
+/**
+ * MVP calculation orchestration entry: one validated `ScenarioInput` in, one `CalculationResult` out.
+ *
+ * Pipeline order:
+ * 1. Resolve electrolyzer SEC (MWh/kg_H2 authoritative; may append kWh/MWh consistency warnings).
+ * 2. Optionally append a single literature-based process-defaults warning (assumption transparency).
+ * 3. Harmonize CO₂ and electricity to daily series (365 rows each).
+ * 4. Allocate optional CAPEX to a flat daily EUR amount.
+ * 5. Run the daily row engine, then monthly and annual aggregations.
+ *
+ * Warnings are non-fatal strings only; they must not change numeric outputs. UI and exports surface the same
+ * `warnings` array from this result (exports recompute on the server and must not trust client-sent outputs).
+ */
 import { allocateCapex } from "@/core/calculation/allocate-capex";
 import { aggregateAnnualFromDaily, aggregateMonthlyFromDaily } from "@/core/calculation/aggregate-results";
 import { calculateDailyResults } from "@/core/calculation/calculate-daily-results";
@@ -36,9 +49,7 @@ export function literatureEstimatedProcessWarning(process: ProcessAssumptionsInp
   return candidates.some(isLiteratureEstimated) ? WARNING_LITERATURE_ESTIMATED_PROCESS_DEFAULTS : undefined;
 }
 
-/**
- * End-to-end MVP scenario calculation: harmonize inputs, daily engine, aggregations.
- */
+/** End-to-end MVP scenario calculation (see file-level doc for pipeline and warning sources). */
 export function calculateScenario(input: ScenarioInput): CalculationResult {
   const warnings: string[] = [];
 

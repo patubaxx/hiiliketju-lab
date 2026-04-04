@@ -1,3 +1,6 @@
+/**
+ * POST validated `scenario` → `buildPdfExportResponse` (server `calculateScenario` + PDF bytes). See `parse-export-body.ts`.
+ */
 import { NextResponse } from "next/server";
 
 import { parseExportScenarioPostBody } from "../parse-export-body";
