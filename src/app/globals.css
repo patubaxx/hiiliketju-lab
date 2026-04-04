@@ -67,9 +67,9 @@
   /* #067668 — outer shell grounding / broad framing; inner hierarchy stays consultancy. */
   --structural: #067668;
   --structural-muted: color-mix(in srgb, #067668 78%, #ffffff 22%);
-  /* Layered surfaces (light): shell vs card must not collapse to the same white. */
+  /* Layered surfaces (light): outer shells are clean white; inset + header strip separate inner cards. */
   --surface-hero: oklch(1 0 0);
-  --surface-shell: oklch(0.975 0.014 200);
+  --surface-shell: oklch(1 0 0);
   --surface-inset: oklch(0.99 0.006 95);
   --surface-results: oklch(0.978 0.018 198);
   --background: oklch(0.991 0.005 98);
