@@ -9,7 +9,7 @@ const CHART_W = 230;
 const CHART_H = 106;
 
 const PDF_PROCESS_TRANSPARENCY_NOTE =
-  "Plant availability and process efficiency are stored with assumption metadata for traceability. The current MVP daily engine does not multiply daily outputs by these factors (defaults are neutral 100%).";
+  "Plant availability and process efficiency are stored with assumption metadata for traceability. The current MVP daily calculation does not multiply daily outputs by these factors (defaults are neutral 100%).";
 
 const PDF_DAILY_APPENDIX_NOTE =
   "Full daily results (365 rows per metric) and the complete input snapshot are available in the Excel export for this scenario.";

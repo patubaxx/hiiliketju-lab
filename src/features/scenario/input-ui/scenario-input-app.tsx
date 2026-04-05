@@ -51,6 +51,7 @@ import {
 } from "@/features/scenario/input-ui/form-state";
 import { parseFiniteNumber } from "@/features/scenario/input-ui/parse-number-series";
 import { SeriesCsvImportControl } from "@/features/scenario/input-ui/series-csv-import-control";
+import { translateZodIssueMessage } from "@/features/scenario/input-ui/translate-zod-issue-message";
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { useLocale } from "@/i18n/locale-context";
@@ -117,8 +118,14 @@ function mergeMaps(a: Map<string, string[]>, b: Map<string, string[]>): Map<stri
   return out;
 }
 
-function getErrors(map: Map<string, string[]>, path: string): string | undefined {
-  return map.get(path)?.join(" ");
+function getErrors(
+  map: Map<string, string[]>,
+  path: string,
+  t: (id: string, vars?: Record<string, string>) => string,
+): string | undefined {
+  const arr = map.get(path);
+  if (!arr?.length) return undefined;
+  return arr.map((m) => translateZodIssueMessage(m, t)).join(" ");
 }
 
 function SeasonalDailyCo2Fields({
@@ -156,7 +163,7 @@ function SeasonalDailyCo2Fields({
                 );
               }}
             />
-            <FieldError message={getErrors(errors, `co2.availability.monthlyRelativeWeights.${i}`)} />
+            <FieldError message={getErrors(errors, `co2.availability.monthlyRelativeWeights.${i}`, t)} />
           </div>
         ))}
       </div>
@@ -284,7 +291,9 @@ export function ScenarioInputApp() {
               const friendly = friendlyLabelForValidationPath(path, t);
               return (
                 <li key={path} className="border-t border-destructive/15 pt-4 first:border-t-0 first:pt-0">
-                  <p className="text-sm font-medium leading-snug text-destructive">{msgs.join(" · ")}</p>
+                  <p className="text-sm font-medium leading-snug text-destructive">
+                    {msgs.map((m) => translateZodIssueMessage(m, t)).join(" · ")}
+                  </p>
                   {friendly ? (
                     <p className="mt-1.5 text-xs leading-relaxed text-destructive/85">{friendly}</p>
                   ) : null}
@@ -317,7 +326,7 @@ export function ScenarioInputApp() {
             value={form.scenarioName}
             onChange={(e) => setForm((s) => ({ ...s, scenarioName: e.target.value }))}
           />
-          <FieldError message={getErrors(errors, "scenarioName")} />
+          <FieldError message={getErrors(errors, "scenarioName", t)} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -356,7 +365,7 @@ export function ScenarioInputApp() {
               </select>
             </div>
             <FieldHint>{t("co2.annualAmountHint")}</FieldHint>
-            <FieldError message={getErrors(errors, "co2.annualAmountKtPerYear")} />
+            <FieldError message={getErrors(errors, "co2.annualAmountKtPerYear", t)} />
           </div>
           <div>
             <FieldLabel htmlFor="util">{t("co2.utilization")}</FieldLabel>
@@ -367,7 +376,7 @@ export function ScenarioInputApp() {
               value={form.utilizationRatePct}
               onChange={(e) => setForm((s) => ({ ...s, utilizationRatePct: e.target.value }))}
             />
-            <FieldError message={getErrors(errors, "co2.utilizationRatePct")} />
+            <FieldError message={getErrors(errors, "co2.utilizationRatePct", t)} />
           </div>
         </div>
         <div>
@@ -378,7 +387,7 @@ export function ScenarioInputApp() {
             value={form.assumptionsVersion}
             onChange={(e) => setForm((s) => ({ ...s, assumptionsVersion: e.target.value }))}
           />
-          <FieldError message={getErrors(errors, "assumptionsMeta.assumptionsVersion")} />
+          <FieldError message={getErrors(errors, "assumptionsMeta.assumptionsVersion", t)} />
         </div>
         <div>
           <FieldLabel htmlFor="assumptionsNotes">{t("scenarioForm.assumptionsNotes")}</FieldLabel>
@@ -509,6 +518,7 @@ export function ScenarioInputApp() {
                   form.co2.mode === "time_series_daily"
                     ? "co2.availability.dailyAvailableCo2Kg"
                     : "co2.availability.hourlyAvailableCo2Kg",
+                  t,
                 )}
               />
             </div>
@@ -592,7 +602,7 @@ export function ScenarioInputApp() {
               </select>
             </div>
             <FieldHint>{t("electricity.constantPriceHint")}</FieldHint>
-            <FieldError message={getErrors(errors, "electricity.priceEurPerMwh")} />
+            <FieldError message={getErrors(errors, "electricity.priceEurPerMwh", t)} />
           </div>
         ) : null}
 
@@ -774,6 +784,7 @@ export function ScenarioInputApp() {
                     : form.electricity.mode === "hourly_series"
                       ? "electricity.hourlyPricesEurPerMwh"
                       : "electricity.pricesEurPerMwh",
+                  t,
                 )}
               />
             </div>
@@ -786,6 +797,7 @@ export function ScenarioInputApp() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <FieldLabel htmlFor="pch4">{t("economics.methanePrice")}</FieldLabel>
+            <FieldHint>{t("economics.methanePriceHint")}</FieldHint>
             <input
               id="pch4"
               className={inputClassName}
@@ -795,10 +807,11 @@ export function ScenarioInputApp() {
                 setForm((s) => ({ ...s, economics: { ...s.economics, methanePriceEurPerTch4: e.target.value } }))
               }
             />
-            <FieldError message={getErrors(errors, "economics.methanePriceEurPerTch4")} />
+            <FieldError message={getErrors(errors, "economics.methanePriceEurPerTch4", t)} />
           </div>
           <div>
             <FieldLabel htmlFor="ph2">{t("economics.hydrogenPrice")}</FieldLabel>
+            <FieldHint>{t("economics.hydrogenPriceHint")}</FieldHint>
             <input
               id="ph2"
               className={inputClassName}
@@ -808,7 +821,7 @@ export function ScenarioInputApp() {
                 setForm((s) => ({ ...s, economics: { ...s.economics, hydrogenPriceEurPerKg: e.target.value } }))
               }
             />
-            <FieldError message={getErrors(errors, "economics.hydrogenPriceEurPerKg")} />
+            <FieldError message={getErrors(errors, "economics.hydrogenPriceEurPerKg", t)} />
           </div>
         </div>
         <div>
@@ -822,19 +835,22 @@ export function ScenarioInputApp() {
               setForm((s) => ({ ...s, economics: { ...s.economics, otherOpexEurPerYear: e.target.value } }))
             }
           />
-          <FieldError message={getErrors(errors, "economics.otherOpexEurPerYear")} />
+          <FieldError message={getErrors(errors, "economics.otherOpexEurPerYear", t)} />
         </div>
-        <div className="flex items-center gap-2">
-          <input
-            id="capexInc"
-            type="checkbox"
-            className="size-4 rounded border-input"
-            checked={form.economics.includeCapex}
-            onChange={(e) =>
-              setForm((s) => ({ ...s, economics: { ...s.economics, includeCapex: e.target.checked } }))
-            }
-          />
-          <FieldLabel htmlFor="capexInc">{t("economics.includeCapex")}</FieldLabel>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <input
+              id="capexInc"
+              type="checkbox"
+              className="size-4 rounded border-input"
+              checked={form.economics.includeCapex}
+              onChange={(e) =>
+                setForm((s) => ({ ...s, economics: { ...s.economics, includeCapex: e.target.checked } }))
+              }
+            />
+            <FieldLabel htmlFor="capexInc">{t("economics.includeCapex")}</FieldLabel>
+          </div>
+          <FieldHint>{t("economics.includeCapexHint")}</FieldHint>
         </div>
         {form.economics.includeCapex ? (
           <div className="grid gap-4 sm:grid-cols-2 border-t border-border pt-4">
@@ -852,7 +868,7 @@ export function ScenarioInputApp() {
                   }))
                 }
               />
-              <FieldError message={getErrors(errors, "economics.electrolyzerCapexEur")} />
+              <FieldError message={getErrors(errors, "economics.electrolyzerCapexEur", t)} />
             </div>
             <div>
               <FieldLabel htmlFor="capexMe">{t("economics.methanationCapex")}</FieldLabel>
@@ -868,7 +884,7 @@ export function ScenarioInputApp() {
                   }))
                 }
               />
-              <FieldError message={getErrors(errors, "economics.methanationCapexEur")} />
+              <FieldError message={getErrors(errors, "economics.methanationCapexEur", t)} />
             </div>
             <div className="sm:col-span-2">
               <FieldLabel htmlFor="capexLife">{t("economics.capexLifetime")}</FieldLabel>
@@ -884,7 +900,7 @@ export function ScenarioInputApp() {
                   }))
                 }
               />
-              <FieldError message={getErrors(errors, "economics.capexLifetimeYears")} />
+              <FieldError message={getErrors(errors, "economics.capexLifetimeYears", t)} />
             </div>
           </div>
         ) : null}
@@ -961,7 +977,7 @@ export function ScenarioInputApp() {
                           }))
                         }
                       />
-                      <FieldError message={getErrors(errors, `process.${key}.value`)} />
+                      <FieldError message={getErrors(errors, `process.${key}.value`, t)} />
                     </div>
                     <div>
                       <FieldLabel htmlFor={`src-${key}`}>{t("advanced.assumptionSource")}</FieldLabel>

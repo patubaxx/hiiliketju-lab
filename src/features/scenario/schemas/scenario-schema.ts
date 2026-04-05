@@ -24,53 +24,51 @@ const processAssumptionsPartialSchema = z
 
 export const scenarioInputSchema = z
   .object({
-    scenarioName: z.string().trim().min(1, "Scenario name is required"),
-    periodDays: z.literal(SCENARIO_PERIOD_DAYS, {
-      error: `Calculation period must be exactly ${SCENARIO_PERIOD_DAYS} days in MVP`,
-    }),
+    scenarioName: z.string().trim().min(1, "validation.zod.scenarioNameRequired"),
+    periodDays: z.literal(SCENARIO_PERIOD_DAYS, "validation.zod.periodDaysMvp"),
     co2: z.object({
       annualAmountKtPerYear: z
-        .number("Annual CO₂ must be a number")
-        .finite("Annual CO₂ must be a finite number")
-        .min(0, "Annual CO₂ amount cannot be negative"),
+        .number("validation.zod.annualCo2MustBeNumber")
+        .finite("validation.zod.annualCo2MustBeFinite")
+        .min(0, "validation.zod.annualCo2NonNegative"),
       utilizationRatePct: z
-        .number("Utilization rate must be a number")
-        .finite("Utilization rate must be a finite number")
-        .min(0, "Utilization rate must be between 0 and 100")
-        .max(100, "Utilization rate must be between 0 and 100"),
+        .number("validation.zod.utilizationMustBeNumber")
+        .finite("validation.zod.utilizationMustBeFinite")
+        .min(0, "validation.zod.utilizationOutOfRange")
+        .max(100, "validation.zod.utilizationOutOfRange"),
       availability: co2AvailabilityInputSchema,
     }),
     electricity: electricityPriceInputSchema,
     economics: z
       .object({
         methanePriceEurPerTch4: z
-          .number("Methane sales price assumption must be a number")
-          .finite("Methane sales price assumption must be a finite number")
-          .min(0, "Methane sales price assumption (EUR/t_CH4) cannot be negative"),
+          .number("validation.zod.methaneAssumedPriceMustBeNumber")
+          .finite("validation.zod.methaneAssumedPriceMustBeFinite")
+          .min(0, "validation.zod.methaneAssumedPriceNonNegative"),
         hydrogenPriceEurPerKg: z
-          .number("Hydrogen sales price assumption must be a number")
-          .finite("Hydrogen sales price assumption must be a finite number")
-          .min(0, "Hydrogen sales price assumption (EUR/kg_H2) cannot be negative"),
+          .number("validation.zod.hydrogenAssumedPriceMustBeNumber")
+          .finite("validation.zod.hydrogenAssumedPriceMustBeFinite")
+          .min(0, "validation.zod.hydrogenAssumedPriceNonNegative"),
         otherOpexEurPerYear: z
-          .number("Other OPEX must be a number")
-          .finite("Other OPEX must be a finite number")
-          .min(0, "Other OPEX cannot be negative")
+          .number("validation.zod.otherOpexMustBeNumber")
+          .finite("validation.zod.otherOpexMustBeFinite")
+          .min(0, "validation.zod.otherOpexNonNegative")
           .default(0),
         includeCapex: z.boolean(),
         electrolyzerCapexEur: z
-          .number("Electrolyzer CAPEX must be a number")
-          .finite("Electrolyzer CAPEX must be a finite number")
-          .min(0, "Electrolyzer CAPEX cannot be negative")
+          .number("validation.zod.electrolyzerCapexMustBeNumber")
+          .finite("validation.zod.electrolyzerCapexMustBeFinite")
+          .min(0, "validation.zod.electrolyzerCapexNonNegative")
           .optional(),
         methanationCapexEur: z
-          .number("Methanation CAPEX must be a number")
-          .finite("Methanation CAPEX must be a finite number")
-          .min(0, "Methanation CAPEX cannot be negative")
+          .number("validation.zod.methanationCapexMustBeNumber")
+          .finite("validation.zod.methanationCapexMustBeFinite")
+          .min(0, "validation.zod.methanationCapexNonNegative")
           .optional(),
         capexLifetimeYears: z
-          .number("CAPEX lifetime must be a number")
-          .finite("CAPEX lifetime must be a finite number")
-          .positive("CAPEX lifetime must be greater than zero")
+          .number("validation.zod.capexLifetimeMustBeNumber")
+          .finite("validation.zod.capexLifetimeMustBeFinite")
+          .positive("validation.zod.capexLifetimePositive")
           .optional(),
       })
       .superRefine((data, ctx) => {
@@ -78,28 +76,28 @@ export const scenarioInputSchema = z
         if (data.electrolyzerCapexEur === undefined) {
           ctx.addIssue({
             code: "custom",
-            message: "electrolyzerCapexEur is required when includeCapex is true",
+            message: "validation.zod.capexElectrolyzerRequiredWhenIncluded",
             path: ["electrolyzerCapexEur"],
           });
         }
         if (data.methanationCapexEur === undefined) {
           ctx.addIssue({
             code: "custom",
-            message: "methanationCapexEur is required when includeCapex is true",
+            message: "validation.zod.capexMethanationRequiredWhenIncluded",
             path: ["methanationCapexEur"],
           });
         }
         if (data.capexLifetimeYears === undefined) {
           ctx.addIssue({
             code: "custom",
-            message: "capexLifetimeYears is required when includeCapex is true",
+            message: "validation.zod.capexLifetimeRequiredWhenIncluded",
             path: ["capexLifetimeYears"],
           });
         }
       }),
     process: processAssumptionsPartialSchema.default({}),
     assumptionsMeta: z.object({
-      assumptionsVersion: z.string().trim().min(1, "Assumptions version is required"),
+      assumptionsVersion: z.string().trim().min(1, "validation.zod.assumptionsVersionRequired"),
       notes: z.string().optional(),
     }),
   })

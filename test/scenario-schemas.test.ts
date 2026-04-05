@@ -65,9 +65,11 @@ describe("monthlyRelativeWeights12Schema", () => {
     const result = monthlyRelativeWeights12Schema.safeParse(zeros);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((i: { message: string }) => i.message.includes("zero"))).toBe(
-        true,
-      );
+      expect(
+        result.error.issues.some((i: { message: string }) =>
+          i.message.includes("validation.zod.seasonalWeightsNotAllZero"),
+        ),
+      ).toBe(true);
     }
   });
 });

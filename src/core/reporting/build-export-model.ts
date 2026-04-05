@@ -119,7 +119,7 @@ function serializeScenarioInputSnapshot(input: ScenarioInput): readonly InputSna
   pushKv(rows, "scenarioName", input.scenarioName);
   pushKv(rows, "periodDays", String(input.periodDays));
 
-  pushSection(rows, "Scenario assumptions meta");
+  pushSection(rows, "Assumptions metadata");
   pushKv(rows, "assumptionsVersion", input.assumptionsMeta.assumptionsVersion);
   pushKv(rows, "notes", input.assumptionsMeta.notes ?? "");
 
@@ -212,19 +212,19 @@ function buildAnnualMetricRows(summary: ScenarioSummary): readonly AnnualMetricE
     },
     {
       metricKey: "breakEvenMethanePriceEurPerTon",
-      label: "Break-even methane price",
+      label: "Break-even methane sales price (derived)",
       value: summary.breakEvenMethanePriceEurPerTon,
       unit: "EUR/t CH₄",
     },
     {
       metricKey: "methanePriceAt10PctProfitabilityEurPerTon",
-      label: "Methane price at 10% profitability",
+      label: "Derived methane sales price at 10% profitability",
       value: summary.methanePriceAt10PctProfitabilityEurPerTon,
       unit: "EUR/t CH₄",
     },
     {
       metricKey: "methanePriceAt30PctProfitabilityEurPerTon",
-      label: "Methane price at 30% profitability",
+      label: "Derived methane sales price at 30% profitability",
       value: summary.methanePriceAt30PctProfitabilityEurPerTon,
       unit: "EUR/t CH₄",
     },
@@ -314,9 +314,9 @@ export function buildScenarioExcelExportModel(result: CalculationResult): Scenar
     annualMetrics: buildAnnualMetricRows(result.annualSummary),
     monthlyRows: buildMonthlyRows(result.monthlySummary),
     comparison: [
-      { label: "Methane path revenue (annual)", valueEur: result.annualSummary.annualMethaneRevenueEur },
-      { label: "Hydrogen sales alternative (annual)", valueEur: result.annualSummary.hydrogenSalesAlternativeRevenueEur },
-      { label: "Delta (methane minus H₂ alternative)", valueEur: result.annualSummary.deltaVsHydrogenSaleEur },
+      { label: "Annual revenue — methane path", valueEur: result.annualSummary.annualMethaneRevenueEur },
+      { label: "Annual revenue — hydrogen sales alternative", valueEur: result.annualSummary.hydrogenSalesAlternativeRevenueEur },
+      { label: "Difference (methane minus hydrogen alternative)", valueEur: result.annualSummary.deltaVsHydrogenSaleEur },
     ],
     warnings: [...result.warnings],
   };

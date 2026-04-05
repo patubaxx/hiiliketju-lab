@@ -6,26 +6,22 @@ import * as z from "zod";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 
 const nonNegativeFinite = z
-  .number("Must be a number")
-  .finite("Must be a finite number")
-  .min(0, "Cannot be negative");
+  .number("validation.zod.mustBeNumber")
+  .finite("validation.zod.mustBeFiniteNumber")
+  .min(0, "validation.zod.cannotBeNegative");
 
 /** EUR/MWh series may include negative spot / market prices; constant mode stays non-negative. */
-const finiteSeriesElement = z.number("Must be a number").finite("Must be a finite number");
+const finiteSeriesElement = z
+  .number("validation.zod.mustBeNumber")
+  .finite("validation.zod.mustBeFiniteNumber");
 
 const dailyPriceSeriesSchema = z
   .array(finiteSeriesElement)
-  .length(
-    SCENARIO_PERIOD_DAYS,
-    `dailyPricesEurPerMwh must have exactly ${SCENARIO_PERIOD_DAYS} values`,
-  );
+  .length(SCENARIO_PERIOD_DAYS, "validation.zod.electricityDailySeriesLength");
 
 const hourlyPriceSeriesSchema = z
   .array(finiteSeriesElement)
-  .length(
-    SCENARIO_HOURLY_SLOTS,
-    `hourlyPricesEurPerMwh must have exactly ${SCENARIO_HOURLY_SLOTS} values`,
-  );
+  .length(SCENARIO_HOURLY_SLOTS, "validation.zod.electricityHourlySeriesLength");
 
 /**
  * Union (not `discriminatedUnion`) because `historical_market_data_imported` also

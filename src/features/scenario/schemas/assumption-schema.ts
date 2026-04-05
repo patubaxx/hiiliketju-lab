@@ -26,8 +26,8 @@ export const assumptionMetaSchema = z.object({
 
 export const assumptionValueNumberSchema = z.object({
   value: z
-    .number("Value must be a number")
-    .finite("Value must be a finite number"),
+    .number("validation.zod.assumptionValueMustBeNumber")
+    .finite("validation.zod.assumptionValueMustBeFinite"),
   assumptionMeta: assumptionMetaSchema,
 });
 

@@ -565,8 +565,6 @@ PDF is built from a dedicated report model containing:
 
 The first version should use a neutral visual style that is easy to brand later.
 
-HTML-to-PDF technology is used.
-
 ---
 
 ## 15. Testing Strategy
