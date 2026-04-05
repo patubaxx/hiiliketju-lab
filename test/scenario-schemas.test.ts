@@ -152,6 +152,49 @@ describe("electricityPriceInputSchema", () => {
       expect(parsed.resolution).toBe("daily");
     }
   });
+
+  it("accepts daily_series with negative EUR/MWh (spot-style prices)", () => {
+    const daily = [...ones365];
+    daily[3] = -50.25;
+    const parsed = electricityPriceInputSchema.parse({
+      mode: "daily_series",
+      dailyPricesEurPerMwh: daily,
+    });
+    expect(parsed.mode).toBe("daily_series");
+    if (parsed.mode === "daily_series") {
+      expect(parsed.dailyPricesEurPerMwh[3]).toBe(-50.25);
+    }
+  });
+
+  it("accepts hourly_series with negative EUR/MWh", () => {
+    const hourly = Array.from({ length: 8760 }, (_, i) => (i === 42 ? -0.01 : 0));
+    const parsed = electricityPriceInputSchema.parse({
+      mode: "hourly_series",
+      hourlyPricesEurPerMwh: hourly,
+    });
+    expect(parsed.mode).toBe("hourly_series");
+    if (parsed.mode === "hourly_series") {
+      expect(parsed.hourlyPricesEurPerMwh[42]).toBe(-0.01);
+    }
+  });
+
+  it("accepts historical_market_data_imported hourly resolution with negative prices", () => {
+    const hourly = Array.from({ length: 8760 }, () => -2);
+    const parsed = electricityPriceInputSchema.parse({
+      mode: "historical_market_data_imported",
+      resolution: "hourly",
+      pricesEurPerMwh: hourly,
+    });
+    expect(parsed.mode).toBe("historical_market_data_imported");
+  });
+
+  it("rejects constant mode with negative price", () => {
+    const result = electricityPriceInputSchema.safeParse({
+      mode: "constant",
+      priceEurPerMwh: -1,
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("scenarioInputSchema", () => {
@@ -256,6 +299,28 @@ describe("scenarioInputSchema", () => {
       }),
     );
     expect(result.success).toBe(false);
+  });
+
+  it("accepts full scenario with electricity daily_series containing negative prices", () => {
+    const daily = [...ones365];
+    daily[0] = -10;
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          electricity: { mode: "daily_series", dailyPricesEurPerMwh: daily },
+        }),
+      ).success,
+    ).toBe(true);
+  });
+
+  it("rejects constant electricity with negative price on full scenario", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          electricity: { mode: "constant", priceEurPerMwh: -0.01 },
+        }),
+      ).success,
+    ).toBe(false);
   });
 
   it("rejects negative methane price", () => {

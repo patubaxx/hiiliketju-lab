@@ -126,7 +126,7 @@ export const en = {
     seriesDailyLabel: "Daily purchase prices (EUR/MWh × 365)",
     seriesHourlyLabel: "Hourly purchase prices (EUR/MWh × 8760)",
     seriesHelp:
-      "Enter the required count of non-negative numbers, separated by commas, semicolons, or line breaks.",
+      "Enter the required count of numbers (EUR/MWh), separated by commas, semicolons, or line breaks. Negative values are allowed (e.g. market spot prices).",
     historicalResolution: "Imported series resolution",
     resolution_daily: "Daily (365 values)",
     resolution_hourly: "Hourly (8760 values)",

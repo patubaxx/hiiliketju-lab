@@ -125,7 +125,7 @@ export const sv = {
     seriesDailyLabel: "Dagliga inköpspriser (EUR/MWh × 365)",
     seriesHourlyLabel: "Timvisa inköpspriser (EUR/MWh × 8760)",
     seriesHelp:
-      "Ange det krävda antalet icke-negativa tal separerade med komma, semikolon eller radbrytning.",
+      "Ange det krävda antalet tal (EUR/MWh) separerade med komma, semikolon eller radbrytning. Negativa värden tillåts (t.ex. spotpriser).",
     historicalResolution: "Upplösning för importerad serie",
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",

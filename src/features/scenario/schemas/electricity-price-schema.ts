@@ -10,15 +10,18 @@ const nonNegativeFinite = z
   .finite("Must be a finite number")
   .min(0, "Cannot be negative");
 
+/** EUR/MWh series may include negative spot / market prices; constant mode stays non-negative. */
+const finiteSeriesElement = z.number("Must be a number").finite("Must be a finite number");
+
 const dailyPriceSeriesSchema = z
-  .array(nonNegativeFinite)
+  .array(finiteSeriesElement)
   .length(
     SCENARIO_PERIOD_DAYS,
     `dailyPricesEurPerMwh must have exactly ${SCENARIO_PERIOD_DAYS} values`,
   );
 
 const hourlyPriceSeriesSchema = z
-  .array(nonNegativeFinite)
+  .array(finiteSeriesElement)
   .length(
     SCENARIO_HOURLY_SLOTS,
     `hourlyPricesEurPerMwh must have exactly ${SCENARIO_HOURLY_SLOTS} values`,

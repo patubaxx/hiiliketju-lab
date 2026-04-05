@@ -125,7 +125,7 @@ export const fi = {
     seriesDailyLabel: "Päivittäiset hankintahinnat (EUR/MWh × 365)",
     seriesHourlyLabel: "Tuntikohtaiset hankintahinnat (EUR/MWh × 8760)",
     seriesHelp:
-      "Syötä vaadittu määrä ei-negatiivisia lukuja pilkuilla, puolipisteillä tai rivinvaihdoilla eroteltuna.",
+      "Syötä vaadittu määrä lukuja (EUR/MWh) pilkuilla, puolipisteillä tai rivinvaihdoilla eroteltuna. Negatiiviset arvot sallitaan (esim. spot-hinnat).",
     historicalResolution: "Tuodun sarjan resoluutio",
     resolution_daily: "Päivittäinen (365 arvoa)",
     resolution_hourly: "Tuntikohtainen (8760 arvoa)",

@@ -21,14 +21,12 @@ function assertDailySeriesLength(name: string, values: readonly number[], expect
   }
 }
 
-/**
- * Non-negativity / finiteness guard. Mirrored in `resolve-co2-series.ts` — change both if rules evolve.
- */
-function assertNonNegativeFinite(name: string, values: readonly number[]): void {
+/** Finiteness only; EUR/MWh series may be negative (e.g. spot prices). */
+function assertFiniteSeries(name: string, values: readonly number[]): void {
   for (let i = 0; i < values.length; i++) {
     const v = values[i]!;
-    if (!Number.isFinite(v) || v < 0) {
-      throw new RangeError(`${name}[${i}] must be finite and non-negative`);
+    if (!Number.isFinite(v)) {
+      throw new RangeError(`${name}[${i}] must be finite`);
     }
   }
 }
@@ -84,7 +82,7 @@ export function resolveElectricityPriceSeries(
     case ELECTRICITY_MODE_DAILY_SERIES: {
       const series = electricity.dailyPricesEurPerMwh;
       assertDailySeriesLength("dailyPricesEurPerMwh", series, SCENARIO_PERIOD_DAYS);
-      assertNonNegativeFinite("dailyPricesEurPerMwh", series);
+      assertFiniteSeries("dailyPricesEurPerMwh", series);
       return mapDailyPrices(series);
     }
     /**
@@ -94,7 +92,7 @@ export function resolveElectricityPriceSeries(
     case ELECTRICITY_MODE_HOURLY_SERIES: {
       const hourly = electricity.hourlyPricesEurPerMwh;
       assertDailySeriesLength("hourlyPricesEurPerMwh", hourly, SCENARIO_HOURLY_SLOTS);
-      assertNonNegativeFinite("hourlyPricesEurPerMwh", hourly);
+      assertFiniteSeries("hourlyPricesEurPerMwh", hourly);
       return mapDailyPrices(aggregateHourlyPricesToDailyMean(hourly));
     }
     /**
@@ -106,12 +104,12 @@ export function resolveElectricityPriceSeries(
       if (electricity.resolution === "daily") {
         const series = electricity.pricesEurPerMwh;
         assertDailySeriesLength("historical prices (daily)", series, SCENARIO_PERIOD_DAYS);
-        assertNonNegativeFinite("historical prices (daily)", series);
+        assertFiniteSeries("historical prices (daily)", series);
         return mapDailyPrices(series);
       }
       const hourly = electricity.pricesEurPerMwh;
       assertDailySeriesLength("historical prices (hourly)", hourly, SCENARIO_HOURLY_SLOTS);
-      assertNonNegativeFinite("historical prices (hourly)", hourly);
+      assertFiniteSeries("historical prices (hourly)", hourly);
       return mapDailyPrices(aggregateHourlyPricesToDailyMean(hourly));
     }
     default: {

@@ -216,6 +216,24 @@ describe("resolveElectricityPriceSeries", () => {
       }),
     ).toThrow(RangeError);
   });
+
+  it("daily_series allows negative EUR/MWh values", () => {
+    const dailyPricesEurPerMwh = Array.from({ length: 365 }, (_, d) => (d === 200 ? -33.3 : 10));
+    const s = resolveElectricityPriceSeries({ mode: "daily_series", dailyPricesEurPerMwh });
+    expect(s[200]!.electricityPriceEurPerMWh).toBe(-33.3);
+  });
+
+  it("hourly_series allows negative hourly prices", () => {
+    const hourly = Array.from({ length: 8760 }, (_, i) => (i < 12 ? -24 : 0));
+    const s = resolveElectricityPriceSeries({ mode: "hourly_series", hourlyPricesEurPerMwh: hourly });
+    expect(s[0]!.electricityPriceEurPerMWh).toBeCloseTo(-12, 10);
+  });
+
+  it("throws when constant electricity price is negative", () => {
+    expect(() =>
+      resolveElectricityPriceSeries({ mode: "constant", priceEurPerMwh: -1 }),
+    ).toThrow(RangeError);
+  });
 });
 
 describe("allocateCapex", () => {

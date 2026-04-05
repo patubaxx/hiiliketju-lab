@@ -7,6 +7,7 @@ import {
   parseNumericCell,
   parseTimeSeriesCsv,
 } from "@/features/scenario/input-ui/parse-time-series-csv";
+import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 
 describe("parseNumericCell", () => {
   it("accepts dot decimals and integers", () => {
@@ -35,6 +36,22 @@ describe("parseTimeSeriesCsv", () => {
     expect(r.values).toEqual([1, 2, 3]);
     expect(r.seriesText).toBe("1\n2\n3");
     expect(parseNumberSeries(r.seriesText)).toEqual({ ok: true, values: [1, 2, 3] });
+  });
+
+  it("accepts negative prices in single-column CSV", () => {
+    const csv = "-10\n0\n-0.25";
+    const r = parseTimeSeriesCsv(csv, { resolution: "daily", expectedCount: 3 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.values).toEqual([-10, 0, -0.25]);
+  });
+
+  it("accepts negative prices in two-column daily CSV", () => {
+    const csv = "2023-01-01,-5.5\n2023-01-02,0";
+    const r = parseTimeSeriesCsv(csv, { resolution: "daily", expectedCount: 2 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.values).toEqual([-5.5, 0]);
   });
 
   it("strips BOM", () => {
@@ -165,5 +182,40 @@ describe("parseTimeSeriesCsv", () => {
     expect(avail.dailyAvailableCo2Kg[0]).toBe(0);
     expect(avail.dailyAvailableCo2Kg[1]).toBe(1);
     expect(avail.dailyAvailableCo2Kg.length).toBe(365);
+  });
+
+  it("CSV import of negative electricity prices validates through buildScenarioPayload and scenario schema", () => {
+    const csv = Array.from({ length: 365 }, (_, i) => String(i === 10 ? -7.5 : 20)).join("\n");
+    const r = parseTimeSeriesCsv(csv, { resolution: "daily", expectedCount: 365 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const state = {
+      ...createInitialFormState(),
+      electricity: { mode: "daily_series" as const, seriesText: r.seriesText },
+    };
+    const built = buildScenarioPayload(state);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    const z = safeParseScenarioInput(built.payload as Record<string, unknown>);
+    expect(z.success).toBe(true);
+    if (z.success) {
+      expect(z.data.electricity.mode).toBe("daily_series");
+      if (z.data.electricity.mode === "daily_series") {
+        expect(z.data.electricity.dailyPricesEurPerMwh[10]).toBe(-7.5);
+      }
+    }
+  });
+
+  it("manual electricity hourly series text with negatives validates through buildScenarioPayload and scenario schema", () => {
+    const seriesText = Array.from({ length: 8760 }, (_, i) => String(i % 100 === 0 ? -1 : 5)).join("\n");
+    const state = {
+      ...createInitialFormState(),
+      electricity: { mode: "hourly_series" as const, seriesText },
+    };
+    const built = buildScenarioPayload(state);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    const z = safeParseScenarioInput(built.payload as Record<string, unknown>);
+    expect(z.success).toBe(true);
   });
 });
