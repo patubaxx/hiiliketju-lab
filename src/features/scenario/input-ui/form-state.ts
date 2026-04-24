@@ -158,8 +158,8 @@ export function createInitialFormState(): ScenarioFormState {
     co2: { mode: "flat_annual" },
     electricity: { mode: "constant", priceEurPerMwh: "80", priceDisplayUnit: "eur_per_mwh" },
     economics: {
-      methanePriceEurPerTch4: "120",
-      hydrogenPriceEurPerKg: "6",
+      methanePriceEurPerTch4: "1200",
+      hydrogenPriceEurPerKg: "4",
       otherOpexEurPerYear: "0",
       includeCapex: false,
       electrolyzerCapexEur: "",

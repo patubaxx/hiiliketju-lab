@@ -915,7 +915,11 @@ export function ScenarioInputApp() {
             return (
               <div
                 key={key}
-                className="space-y-3 rounded-lg border border-border/75 bg-surface-inset p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] ring-1 ring-black/[0.03] dark:shadow-none dark:ring-white/[0.04]"
+                className={`rounded-xl border px-4 py-4 shadow-sm ${
+                  !row.override && activeMeta.assumptionSource === "literature_based"
+                    ? "border-amber-500/40 bg-amber-500/[0.06]"
+                    : "border-border bg-muted/30"
+                }`}
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <input
@@ -946,40 +950,42 @@ export function ScenarioInputApp() {
                     }
                   />
                   <FieldLabel htmlFor={`ov-${key}`}>{t(labelId)}</FieldLabel>
+                  {!row.override ? (
+                    <span className="rounded-md border border-amber-600/35 bg-amber-500/12 px-2 py-0.5 text-xs font-medium text-amber-950 dark:text-amber-100">
+                      {t("results.assumptions.literatureBadge")}
+                    </span>
+                  ) : (
+                    <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5 text-xs font-medium text-foreground/70">
+                      {t("advanced.usingCustomValue")}
+                    </span>
+                  )}
                   {inactive ? (
                     <span className="text-[0.65rem] uppercase tracking-wide text-amber-700 dark:text-amber-300">
                       (MVP)
                     </span>
                   ) : null}
                 </div>
-                <div className="rounded-md border border-border/65 bg-card/80 px-3 py-2 text-sm">
-                  <p className="font-medium text-foreground">
-                    {row.override
-                      ? t("advanced.usingCustomValue")
-                      : t("advanced.usingLiteratureDefault")}
-                  </p>
-                  <p className="mt-1 font-mono text-base font-semibold tabular-nums text-foreground">
-                    {activeValueText}{" "}
-                    <span className="font-sans text-xs font-medium text-muted-foreground">{t(unitId)}</span>
-                  </p>
-                  <dl className="mt-2 space-y-1.5 text-xs text-muted-foreground">
-                    <div className="flex flex-wrap gap-x-2">
-                      <dt className="font-medium text-foreground/85">{t("advanced.assumptionSource")}</dt>
-                      <dd>{t(`assumptionSource.${activeMeta.assumptionSource}`)}</dd>
+                <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
+                  {activeValueText}{" "}
+                  <span className="font-sans text-xs font-medium text-muted-foreground">{t(unitId)}</span>
+                </p>
+                <dl className="mt-4 space-y-2 text-xs leading-relaxed text-muted-foreground">
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                    <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.source")}</dt>
+                    <dd>{t(`assumptionSource.${activeMeta.assumptionSource}`)}</dd>
+                  </div>
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                    <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.status")}</dt>
+                    <dd>{t(`assumptionStatus.${activeMeta.assumptionStatus}`)}</dd>
+                  </div>
+                  {activeMeta.assumptionNote ? (
+                    <div>
+                      <dt className="font-medium text-foreground/85">{t("results.assumptions.note")}</dt>
+                      <dd className="mt-0.5 text-[0.8125rem] leading-snug text-foreground/90">{activeMeta.assumptionNote}</dd>
                     </div>
-                    <div className="flex flex-wrap gap-x-2">
-                      <dt className="font-medium text-foreground/85">{t("advanced.assumptionStatus")}</dt>
-                      <dd>{t(`assumptionStatus.${activeMeta.assumptionStatus}`)}</dd>
-                    </div>
-                    {activeMeta.assumptionNote ? (
-                      <div>
-                        <dt className="font-medium text-foreground/85">{t("advanced.assumptionNote")}</dt>
-                        <dd className="mt-0.5 text-foreground/90">{activeMeta.assumptionNote}</dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                </div>
-                <details className="text-xs">
+                  ) : null}
+                </dl>
+                <details className="mt-3 border-t border-border/60 pt-3 text-xs">
                   <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                     {t("advanced.internalKey")}
                   </summary>
@@ -988,7 +994,7 @@ export function ScenarioInputApp() {
                   </p>
                 </details>
                 {row.override ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-3 border-t border-border/60 pt-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <FieldLabel htmlFor={`val-${key}`}>{t("advanced.value")}</FieldLabel>
                       <input

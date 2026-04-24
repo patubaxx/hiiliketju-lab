@@ -28,6 +28,28 @@ function baseScenarioRaw() {
   };
 }
 
+describe("pre-WP18 – commercial defaults", () => {
+  it("initial form state uses 1200 EUR/t CH4 as methane default", () => {
+    const state = createInitialFormState();
+    expect(state.economics.methanePriceEurPerTch4).toBe("1200");
+  });
+
+  it("initial form state uses 4 EUR/kg H2 as hydrogen default", () => {
+    const state = createInitialFormState();
+    expect(state.economics.hydrogenPriceEurPerKg).toBe("4");
+  });
+
+  it("buildScenarioPayload with initial state produces valid payload with new defaults", () => {
+    const state = createInitialFormState();
+    const built = buildScenarioPayload(state);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    const econ = (built.payload as { economics: { methanePriceEurPerTch4: number; hydrogenPriceEurPerKg: number } }).economics;
+    expect(econ.methanePriceEurPerTch4).toBe(1200);
+    expect(econ.hydrogenPriceEurPerKg).toBe(4);
+  });
+});
+
 describe("WP17 – advanced assumptions payload/provenance", () => {
   it("keeps untouched process fields omitted so canonical merge provides defaults", () => {
     const state = createInitialFormState();
