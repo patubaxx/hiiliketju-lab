@@ -74,7 +74,7 @@
 ## Default electricity data pipeline (WP16)
 
 - **Source:** `sources/electricity_prices.csv` — porssisahko.net quarter-hourly Finnish spot prices, `snt/kWh` with VAT.
-- **Script:** `scripts/generate-electricity-defaults-2025-fi.js` — deterministic Node.js transform; run to regenerate the artifact.
+- **Script:** `scripts/generate-electricity-defaults-2025-fi.mjs` — deterministic Node.js transform; run to regenerate the artifact.
 - **Artifact:** `src/data/electricity-defaults-2025-fi.ts` — checked-in, app-consumable module; **do not edit manually**.
 - **Unit conversion:** `snt/kWh × 10 = EUR/MWh` (exact; 1 snt/kWh = 0.01 EUR/kWh = 10 EUR/MWh).
 - **Hourly defaults (8 760 values):** arithmetic mean of 4 consecutive quarter-hourly values per clock hour, sequential within each calendar date. DST: spring-forward day 2025-03-30 yields 23 hourly values; fall-back day 2025-10-26 yields 25 hourly values (total = 8 760).

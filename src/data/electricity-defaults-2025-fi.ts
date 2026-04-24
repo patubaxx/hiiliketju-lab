@@ -1,5 +1,5 @@
 // AUTO-GENERATED — do not edit manually.
-// Regenerate: node scripts/generate-electricity-defaults-2025-fi.js
+// Regenerate: node scripts/generate-electricity-defaults-2025-fi.mjs
 // Generated: 2026-04-24
 //
 // Source   : sources/electricity_prices.csv (porssisahko.net)
