@@ -48,6 +48,8 @@ import {
   createInitialFormState,
   defaultCo2Branch,
   defaultElectricityBranch,
+  isHydrogenPriceAtFactoryDefault,
+  isMethanePriceAtFactoryDefault,
 } from "@/features/scenario/input-ui/form-state";
 import {
   isBundledFinland2025DefaultImportedSeries,
@@ -877,6 +879,11 @@ export function ScenarioInputApp() {
                 setForm((s) => ({ ...s, economics: { ...s.economics, methanePriceEurPerTch4: e.target.value } }))
               }
             />
+            {isMethanePriceAtFactoryDefault(form.economics.methanePriceEurPerTch4) ? (
+              <FieldHint>
+                <span data-testid="economics-methane-default-verify-hint">{t("economics.methanePriceDefaultVerifyHint")}</span>
+              </FieldHint>
+            ) : null}
             <FieldError message={getErrors(errors, "economics.methanePriceEurPerTch4", t)} />
           </div>
           <div>
@@ -891,6 +898,11 @@ export function ScenarioInputApp() {
                 setForm((s) => ({ ...s, economics: { ...s.economics, hydrogenPriceEurPerKg: e.target.value } }))
               }
             />
+            {isHydrogenPriceAtFactoryDefault(form.economics.hydrogenPriceEurPerKg) ? (
+              <FieldHint>
+                <span data-testid="economics-hydrogen-default-verify-hint">{t("economics.hydrogenPriceDefaultVerifyHint")}</span>
+              </FieldHint>
+            ) : null}
             <FieldError message={getErrors(errors, "economics.hydrogenPriceEurPerKg", t)} />
           </div>
         </div>

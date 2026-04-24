@@ -7,7 +7,7 @@ export const fi = {
     hero: {
       headline: "Teknis-taloudelliset skenaariot biologisen CO₂:n ja vedyn arvoketjuille",
       lead:
-        "Vertaa kahta biologisen CO₂:n arvoketjuvaihtoehtoa: synteettistä metaania (CO₂ + H₂ → CH₄, polku A) ja vetyä, joka myydään suoraan ja CO₂ vapautetaan (polku B). Aseta CO₂:n saatavuus ja sähkön hankintahinnat 365 päivän vuodelle ja katso tuotantomäärät, sähkönkulutus, kustannukset, tulot sekä johdetut kannattavuushinnat molemmille poluille — halutessasi CAPEX mukana — suoraan selaimessa.",
+        "Vertaa kahta biogeenisen CO₂:n arvoketjuvaihtoehtoa: synteettistä metaania (CO₂ + H₂ → CH₄, polku A) ja vetyä, joka myydään suoraan ja CO₂ vapautetaan (polku B). Aseta CO₂:n saatavuus ja sähkön hankintahinnat 365 päivän vuodelle ja katso tuotantomäärät, sähkönkulutus, kustannukset, tulot sekä johdetut kannattavuushinnat molemmille poluille — halutessasi CAPEX mukana — suoraan selaimessa.",
       bullet1: "Metaanipolku (polku A: CO₂ + H₂ → CH₄) ja vedynmyyntivaihtoehto (polku B) samassa ajossa",
       bullet2: "365 päivän vuosimalli — CO₂ ja sähkö tasaisena, kausiluonteisena tai päivittäisenä/tuntikohtaisena aikasarjana",
       bullet3: "Johdettu kriittinen metaanihinta ja kannattavuuskynnykset — tuotanto-, energia-, kustannus- ja tuloKPI:iden rinnalla",
@@ -157,6 +157,10 @@ export const fi = {
       "Käytetään metaanipolun tuloissa. Ei ole sama asia kuin tulososion tasapaino- tai kannattavuushinnat.",
     hydrogenPrice: "Vedyn oletettu myyntihinta (EUR/kg H₂)",
     hydrogenPriceHint: "Käytetään vedyn myynnin vaihtoehtoisissa tuloissa.",
+    methanePriceDefaultVerifyHint:
+      "Tämä on tuotteen oletushinta—tarkista hankkeellesi sopiva metaanin markkinahinta ennen kuin tuloksia tai vientiä käytetään päätöksentekoon.",
+    hydrogenPriceDefaultVerifyHint:
+      "Tämä on tuotteen oletushinta—tarkista hankkeellesi sopiva vedyn markkinahinta ennen kuin tuloksia tai vientiä käytetään päätöksentekoon.",
     otherOpex: "Muut käyttökulut (EUR/v)",
     includeCapex: "Laske investointi mukaan kustannuksiin",
     includeCapexHint:

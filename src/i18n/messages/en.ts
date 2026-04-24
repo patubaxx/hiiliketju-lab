@@ -158,6 +158,10 @@ export const en = {
       "Used for methane-path revenue. This is not the same as derived break-even or profitability prices in the results.",
     hydrogenPrice: "Assumed hydrogen sales price (EUR/kg H₂)",
     hydrogenPriceHint: "Used for the hydrogen-sales alternative revenue.",
+    methanePriceDefaultVerifyHint:
+      "This is the product default—verify a market-appropriate methane price for your project before treating results or exports as decision-ready.",
+    hydrogenPriceDefaultVerifyHint:
+      "This is the product default—verify a market-appropriate hydrogen price for your project before treating results or exports as decision-ready.",
     otherOpex: "Other operating costs (EUR/year)",
     includeCapex: "Include CAPEX in the cost stack",
     includeCapexHint:

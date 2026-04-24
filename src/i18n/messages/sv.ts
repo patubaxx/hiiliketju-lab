@@ -157,6 +157,10 @@ export const sv = {
       "Används för intäkter på metanvägen. Det är inte samma som de härledda break-even- eller lönsamhetspriserna i resultatet.",
     hydrogenPrice: "Antaget försäljningspris för vätgas (EUR/kg H₂)",
     hydrogenPriceHint: "Används för intäkter i väteförsäljningsalternativet.",
+    methanePriceDefaultVerifyHint:
+      "Detta är produktens standardvärde—kontrollera ett marknadsanpassat metanpris för ditt projekt innan resultat eller export betraktas som beslutsunderlag.",
+    hydrogenPriceDefaultVerifyHint:
+      "Detta är produktens standardvärde—kontrollera ett marknadsanpassat vätepris för ditt projekt innan resultat eller export betraktas som beslutsunderlag.",
     otherOpex: "Övriga driftkostnader (EUR/år)",
     includeCapex: "Ta med CAPEX i kostnadsbilden",
     includeCapexHint:
