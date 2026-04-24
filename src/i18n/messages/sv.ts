@@ -7,16 +7,27 @@ export const sv = {
     hero: {
       headline: "Teknik-ekonomiska scenarier för biogent CO₂ och väte i värdekedjor",
       lead:
-        "Jämför syntetisk metan (CO₂ + H₂ → CH₄) med att sälja väte och släppa CO₂. Ange hur mycket CO₂ som finns och hur inköpspriset för el varierar under året, och se metanproduktion, energi, kostnader, intäkter samt härledda break-even- och lönsamhetsindikatorer—valfritt med CAPEX—direkt i webbläsaren.",
-      bullet1: "Metanvägen och väteförsäljningsalternativet i samma vy",
-      bullet2: "CO₂ och el som enkla totaler eller dag- / timserier, förenade till en daglig modell",
-      bullet3: "Resultat: produktion, energi, kostnader, intäkter och härledda lönsamhetsmått",
-      bullet4: "Antaganden syns hela vägen så att vy och export hänger ihop",
+        "Jämför två värdekedjevägar för biogent CO₂: syntetisk metanproduktion (CO₂ + H₂ → CH₄, väg A) och direkt väteförsäljning med CO₂-frisläppning (väg B). Ange CO₂-tillgång och inköpspriser för el för ett 365-dagarsår och se produktionsvolymer, elanvändning, kostnader, intäkter och härledda lönsamhetspriser för båda vägarna — valfritt med CAPEX — beräknade i webbläsaren.",
+      bullet1: "Metanvägen (väg A: CO₂ + H₂ → CH₄) och väteförsäljningsalternativet (väg B) jämförs i en körning",
+      bullet2: "365-dagars årsmodell — CO₂ och el som jämna totaler, säsongsprofiler eller fullständiga dags- / tidsserier",
+      bullet3: "Härlett break-even-metanpris och lönsamhetströsklar — bredvid produktion, energi, kostnader och intäktsnyckeltal",
+      bullet4: "Alla antaganden synliga med källa, status och notering — Excel- och PDF-exporter inkluderar samma metadata",
+      beforeYouRun: {
+        title: "Innan du startar",
+        item1:
+          "Importerade elpriser använder Finlands spotmarknadspriser för 2025 inklusive konsumentmoms (25,5 %) — ersätt med ditt faktiska inköpspris för industriella scenarier.",
+        item2:
+          "Metan- och vätgaspriser startar från formulärets standardvärden (1 200 EUR/t CH₄; 4 EUR/kg H₂) — kontrollera att de stämmer med ditt projekt innan du läser resultaten.",
+        item3:
+          "Stökiometriska processantaganden är litteraturbaserade uppskattningar — åsidosätt i avsnittet Avancerade antaganden om du har projektspecifika värden.",
+        item4:
+          "Anläggningstillgänglighet och processeffektivitet registreras med antagandemetadata men används ännu inte av beräkningsmotorn — båda är för tillfället neutral 100 %.",
+      },
     },
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
-        "Fyll i värden för den fasta 365-dagarsperioden. I fältet överst kör du beräkningen, återställer formuläret, byter språk, exporterar och kan gå direkt till resultatet nedan.",
+        "Arbeta uppifrån och ned: CO₂-tillgång → inköpspris för el → ekonomi → avancerade antaganden (vid behov). Använd fältet överst för att köra beräkningen, återställa, byta språk, exportera eller gå direkt till resultaten.",
       actionsCardTitle: "Beräkning",
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",

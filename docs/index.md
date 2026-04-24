@@ -14,6 +14,7 @@ Start with the root **[`README.md`](../README.md)** for setup, architecture summ
 | Document | Content |
 |----------|---------|
 | [`repository-invariants.md`](repository-invariants.md) | Canonical result, export API contract, mapper rules, warnings, checklists, known non-goals (includes current visible-vs-internal UX boundaries: annual CO₂ fixed to `kt/year`, constant electricity display-unit switching only, CSV ingest, retained hidden wire modes) |
+| [`release-memo-mvp.md`](release-memo-mvp.md) | MVP release/handoff memo: what the tool now does, user-visible capabilities, important caveats, assumptions to verify, and next-phase roadmap |
 
 ## Implementation policy (automation-friendly)
 

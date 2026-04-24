@@ -276,6 +276,30 @@ export function ScenarioInputApp() {
                 </ul>
               </div>
             </div>
+            {/* --- Before interpreting results: key caveats to check before reading results --- */}
+            <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-5 py-4 sm:max-w-[46rem] sm:px-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-100">
+                {t("app.hero.beforeYouRun.title")}
+              </p>
+              <ul className="mt-3 space-y-2 text-sm leading-snug text-muted-foreground">
+                <li className="flex gap-3">
+                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                  <span>{t("app.hero.beforeYouRun.item1")}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                  <span>{t("app.hero.beforeYouRun.item2")}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                  <span>{t("app.hero.beforeYouRun.item3")}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                  <span>{t("app.hero.beforeYouRun.item4")}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -7,16 +7,27 @@ export const fi = {
     hero: {
       headline: "Teknis-taloudelliset skenaariot biologisen CO₂:n ja vedyn arvoketjuille",
       lead:
-        "Vertaa synteettistä metaania (CO₂ + H₂ → CH₄) tilanteeseen, jossa myyt vetyä ja CO₂ pääsee vapaaksi. Kerro, miten paljon CO₂:ta on tarjolla ja miten sähkön hankintahinta vaihtelee vuoden aikana, ja katso metaanintuotanto, energia, kustannukset, tulot sekä laskennasta johdetut kriittiset ja tavoitekannattavuusluvut—halutessasi CAPEX mukana—suoraan selaimessa.",
-      bullet1: "Metaanipolku ja vedynmyyntivaihtoehto samassa näkymässä",
-      bullet2: "CO₂ ja sähkö joko yhteenvetona tai päivä- tai tuntitasolla, yhdenmukaistettuna päivittäiseen malliin",
-      bullet3: "Tulokset: tuotanto, energia, kustannukset, tulot ja johdetut kannattavuusluvut",
-      bullet4: "Oletukset näkyvät läpi, jotta näyttö ja vienti pysyvät linjassa",
+        "Vertaa kahta biologisen CO₂:n arvoketjuvaihtoehtoa: synteettistä metaania (CO₂ + H₂ → CH₄, polku A) ja vetyä, joka myydään suoraan ja CO₂ vapautetaan (polku B). Aseta CO₂:n saatavuus ja sähkön hankintahinnat 365 päivän vuodelle ja katso tuotantomäärät, sähkönkulutus, kustannukset, tulot sekä johdetut kannattavuushinnat molemmille poluille — halutessasi CAPEX mukana — suoraan selaimessa.",
+      bullet1: "Metaanipolku (polku A: CO₂ + H₂ → CH₄) ja vedynmyyntivaihtoehto (polku B) samassa ajossa",
+      bullet2: "365 päivän vuosimalli — CO₂ ja sähkö tasaisena, kausiluonteisena tai päivittäisenä/tuntikohtaisena aikasarjana",
+      bullet3: "Johdettu kriittinen metaanihinta ja kannattavuuskynnykset — tuotanto-, energia-, kustannus- ja tuloKPI:iden rinnalla",
+      bullet4: "Kaikki oletukset näkyvissä lähde-, tila- ja huomiotietoineen — Excel- ja PDF-viennit sisältävät samat metatiedot",
+      beforeYouRun: {
+        title: "Ennen kuin aloitat",
+        item1:
+          "Tuodut sähkön oletushinnat perustuvat vuoden 2025 suomalaisiin pörssisähkön hintoihin ja sisältävät kuluttajan ALV:n (25,5 %) — korvaa teollisuusskenaarioissa omalla hankintahinnalla.",
+        item2:
+          "Metaanin ja vedyn hinnat alkavat lomakkeen oletuksista (1 200 EUR/t CH₄; 4 EUR/kg H₂) — varmista ennen tulosten lukemista, että ne vastaavat projektiasi.",
+        item3:
+          "Stoikiometriset prosessioletukset ovat kirjallisuuspohjaisia arvioita — korvaa ne Edistyneet oletukset -osiossa, jos sinulla on projektikohtaisia arvoja.",
+        item4:
+          "Laitoksen käytettävyys ja prosessin hyötysuhde kirjataan oletusmetatietoineen, mutta laskentamoottori ei vielä käytä niitä — oletusarvo on neutraali 100 %.",
+      },
     },
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:
-        "Täytä kentät kiinteälle 365 päivän jaksolle. Yläpalkista käynnistät laskennan, nollaat lomakkeen, vaihdat kieltä, viennit ja voit hypätä suoraan tuloksiin.",
+        "Etene ylhäältä alas: CO₂:n saatavuus → sähkön hankintahinta → talousparametrit → edistyneet oletukset (tarvittaessa). Yläpalkin kautta voit käynnistää laskennan, nollata, vaihtaa kieltä, viedä tulokset tai siirtyä suoraan tuloksiin.",
       actionsCardTitle: "Laskenta",
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",

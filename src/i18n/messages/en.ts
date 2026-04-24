@@ -7,16 +7,27 @@ export const en = {
     hero: {
       headline: "Techno-economic scenarios for biogenic CO₂ and hydrogen value chains",
       lead:
-        "Compare synthetic methane (CO₂ + H₂ → CH₄) with selling hydrogen and releasing CO₂. Set how much CO₂ is available and how electricity purchase prices vary through the year, then see methane output, energy use, costs, revenue, and derived break-even and profitability indicators—with optional CAPEX—in your browser.",
-      bullet1: "Methane pathway and hydrogen-sales alternative in one place",
-      bullet2: "CO₂ and electricity as simple totals or daily / hourly series, aligned to a daily model",
-      bullet3: "Results cover production, energy, costs, revenue, and derived profitability metrics",
-      bullet4: "Assumptions stay visible so exports match what you see on screen",
+        "Compare two paths for biogenic CO₂: synthetic methane production (CO₂ + H₂ → CH₄, Path A) and direct hydrogen sales with CO₂ release (Path B). Set CO₂ availability and electricity purchase prices for a 365-day year, then see production volumes, electricity use, costs, revenue, and derived break-even and profitability prices for both paths—with optional CAPEX—computed in your browser.",
+      bullet1: "Methane pathway (Path A: CO₂ + H₂ → CH₄) and hydrogen-sales alternative (Path B) compared in a single run",
+      bullet2: "365-day annual model — CO₂ and electricity as flat totals, seasonal profiles, or full daily / hourly time series",
+      bullet3: "Derived break-even methane price and profitability thresholds — alongside production, energy, cost, and revenue KPIs",
+      bullet4: "All assumptions visible with source, status, and note — Excel and PDF exports include the same metadata",
+      beforeYouRun: {
+        title: "Before you start",
+        item1:
+          "Imported electricity defaults use 2025 Finnish spot-market prices including consumer VAT (25.5 %) — replace with your actual procurement price for industrial scenarios.",
+        item2:
+          "Methane and hydrogen prices start from form defaults (1 200 EUR/t CH₄; 4 EUR/kg H₂) — verify these match your project before reading results.",
+        item3:
+          "Stoichiometric process defaults are literature-based estimates — use the Advanced section to override with project-specific values if available.",
+        item4:
+          "Plant availability and process efficiency are recorded with assumption metadata but not yet applied by the engine — both currently default to a neutral 100 %.",
+      },
     },
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "Enter inputs for the fixed 365-day period. Use the bar at the top to run the calculation, reset the form, change language, export, or jump to results below.",
+        "Work top to bottom: CO₂ availability → electricity purchase price → economics → advanced assumptions (if needed). Use the bar at the top to run, reset, change language, export, or jump to results.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
