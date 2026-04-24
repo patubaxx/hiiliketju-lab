@@ -23,6 +23,9 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 | Reporting | `src/core/reporting/` | Export models, workbook/PDF builders |
 | Tests | `test/` | Vitest unit/integration tests |
 | Human specs | `docs/` | Solution spec, calculation spec, index, invariants |
+| Source data | `sources/` | Raw input data (e.g. `electricity_prices.csv` — quarter-hourly Finnish spot prices from porssisahko.net) |
+| Data pipeline scripts | `scripts/` | Deterministic transform scripts that produce checked-in artifacts in `src/data/` |
+| Generated data artifacts | `src/data/` | App-consumable data modules generated from `sources/` (e.g. `electricity-defaults-2025-fi.ts`) — do not edit manually |
 | Agent rules | `AGENTS.md` (root) | Non-negotiable rules for humans and automation |
 | Cursor policy | `.cursor/rules.md` | Cursor-specific copy of core policy |
 

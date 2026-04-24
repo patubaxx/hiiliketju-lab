@@ -63,12 +63,25 @@
 
 ---
 
+## Default electricity data pipeline (WP16)
+
+- **Source:** `sources/electricity_prices.csv` — porssisahko.net quarter-hourly Finnish spot prices, `snt/kWh` with VAT.
+- **Script:** `scripts/generate-electricity-defaults-2025-fi.js` — deterministic Node.js transform; run to regenerate the artifact.
+- **Artifact:** `src/data/electricity-defaults-2025-fi.ts` — checked-in, app-consumable module; **do not edit manually**.
+- **Unit conversion:** `snt/kWh × 10 = EUR/MWh` (exact; 1 snt/kWh = 0.01 EUR/kWh = 10 EUR/MWh).
+- **Hourly defaults (8 760 values):** arithmetic mean of 4 consecutive quarter-hourly values per clock hour, sequential within each calendar date. DST: spring-forward day 2025-03-30 yields 23 hourly values; fall-back day 2025-10-26 yields 25 hourly values (total = 8 760).
+- **Daily defaults (365 values):** arithmetic mean of all hourly values per calendar date (23, 24, or 25 values depending on DST).
+- **App integration:** `historical_market_data_imported` mode initialises and resolution-switches with the corresponding 2025 default dataset. Users can paste or import their own series to override.
+
+---
+
 ## Known intentional limitations (MVP)
 
 - No auth, rate limiting, or export abuse protection beyond platform defaults.
 - No strict body-size policy beyond platform limits; very large pasted or imported series may be impractical.
 - **CSV time-series import** is **browser-side only**; it does not add a server ingest mode or a new `ScenarioInput` shape—only fills **`seriesText`** for the existing daily/hourly bulk paths. Supported layouts and error cases are those implemented by **`parse-time-series-csv`** (not arbitrary spreadsheet dialects).
 - **Display-unit switching** applies only to **constant electricity purchase price** in the form (`EUR/MWh` ↔ `c/kWh`); **annual CO₂** is fixed to `kt/year` (no unit selector visible). **Time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
+- **Default electricity data** includes Finnish VAT (25.5 % in 2025) because the source (porssisahko.net) provides consumer-facing prices. Industrial procurement prices are typically ex-VAT; users should override with their actual contract price.
 - ASCII **`filename=`** in `Content-Disposition` only (no RFC 5987 `filename*`).
 - Optional: extra HTTP route tests for every `parseExportScenarioPostBody` error code (parser is already unit-tested).
 

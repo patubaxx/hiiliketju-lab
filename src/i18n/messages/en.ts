@@ -128,7 +128,7 @@ export const en = {
     resolution_daily: "Daily (365 values)",
     resolution_hourly: "Hourly (8760 values)",
     historicalHelp:
-      "Paste normalized EUR/MWh purchase prices in MVP order, or use Import CSV for the same shapes as manual entry. Further data cleaning is outside this screen.",
+      "Pre-loaded with 2025 Finnish spot-market prices (porssisahko.net, VAT included, EUR/MWh). Switch resolution to load the hourly or daily defaults. Paste or import your own EUR/MWh series to override.",
     fillOnes365: "Fill with 365 × 50",
     fillOnes8760: "Fill with 8760 × 50",
   },

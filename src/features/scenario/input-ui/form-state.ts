@@ -4,8 +4,13 @@ import type {
   ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
+import {
+  FINLAND_2025_DAILY_EUR_PER_MWH,
+  FINLAND_2025_HOURLY_EUR_PER_MWH,
+} from "@/data/electricity-defaults-2025-fi";
 
 export type { AnnualCo2InputDisplayUnit, ElectricityPriceInputDisplayUnit };
+export { FINLAND_2025_DAILY_EUR_PER_MWH, FINLAND_2025_HOURLY_EUR_PER_MWH };
 
 export type Co2AvailabilityModeForm =
   | "flat_annual"
@@ -163,7 +168,7 @@ export function defaultElectricityBranch(mode: ElectricityModeForm): Electricity
       return {
         mode: "historical_market_data_imported",
         resolution: "daily",
-        seriesText: Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n"),
+        seriesText: FINLAND_2025_DAILY_EUR_PER_MWH.join("\n"),
       };
     default: {
       const _e: never = mode;

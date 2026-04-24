@@ -127,7 +127,7 @@ export const sv = {
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",
     historicalHelp:
-      "Klistra in normaliserade EUR/MWh inköpspriser i MVP-ordning, eller använd CSV-import med samma format som manuell inmatning. Vidare datarensning ligger utanför denna vy.",
+      "Förladdat med 2025 års finska elbörspriser (porssisahko.net, inkl. moms, EUR/MWh). Byt upplösning för att ladda tim- eller dagsvis standarddata. Klistra in eller importera din egen EUR/MWh-serie för att åsidosätta.",
     fillOnes365: "Fyll med 365 × 50",
     fillOnes8760: "Fyll med 8760 × 50",
   },

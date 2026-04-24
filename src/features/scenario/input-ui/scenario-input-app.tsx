@@ -37,6 +37,8 @@ import {
 } from "@/features/scenario/input-ui/form-primitives";
 import { friendlyLabelForValidationPath } from "@/features/scenario/input-ui/validation-field-label";
 import {
+  FINLAND_2025_DAILY_EUR_PER_MWH,
+  FINLAND_2025_HOURLY_EUR_PER_MWH,
   PROCESS_FIELD_ORDER,
   type Co2AvailabilityModeForm,
   type Co2FormBranch,
@@ -593,8 +595,8 @@ export function ScenarioInputApp() {
                     const resolution = e.target.value as "daily" | "hourly";
                     const seriesText =
                       resolution === "daily"
-                        ? Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n")
-                        : Array.from({ length: SCENARIO_HOURLY_SLOTS }, () => "50").join("\n");
+                        ? FINLAND_2025_DAILY_EUR_PER_MWH.join("\n")
+                        : FINLAND_2025_HOURLY_EUR_PER_MWH.join("\n");
                     setForm((s) =>
                       s.electricity.mode === "historical_market_data_imported"
                         ? {

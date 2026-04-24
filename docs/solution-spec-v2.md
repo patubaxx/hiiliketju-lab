@@ -50,6 +50,7 @@ The MVP must produce, at minimum:
   - `hourly_series`
   - `historical_market_data_imported`
   - **Visible UI selector:** only `constant` and `historical_market_data_imported` are offered; `daily_series` and `hourly_series` remain as internal contracts.
+  - **`historical_market_data_imported` defaults:** pre-loaded with deterministic 2025 Finnish spot-market prices derived from `sources/electricity_prices.csv` (porssisahko.net, VAT included). Daily defaults = arithmetic mean of 24 hourly prices per calendar date; both resolutions available. Users may override by pasting or importing their own EUR/MWh series.
 - hourly input harmonization into daily internal resolution
 - stoichiometric methane path calculation
 - hydrogen alternative path comparison

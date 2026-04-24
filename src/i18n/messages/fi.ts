@@ -127,7 +127,7 @@ export const fi = {
     resolution_daily: "Päivittäinen (365 arvoa)",
     resolution_hourly: "Tuntikohtainen (8760 arvoa)",
     historicalHelp:
-      "Liitä normalisoidut EUR/MWh hankintahinnat MVP-järjestyksessä tai käytä CSV-tuontia samoilla muodoilla kuin manuaalisessa syötteessä. Laajempi puhdistus on tämän näkymän ulkopuolella.",
+      "Ladattu valmiiksi vuoden 2025 suomalaisilla pörssisähkön hinnoilla (porssisahko.net, sisältää ALV:n, EUR/MWh). Vaihda resoluutiota ladataksesi tunti- tai päiväkohtaiset oletukset. Liitä tai tuo oma EUR/MWh-sarjasi korvaamaan oletukset.",
     fillOnes365: "Täytä 365 × 50",
     fillOnes8760: "Täytä 8760 × 50",
   },
