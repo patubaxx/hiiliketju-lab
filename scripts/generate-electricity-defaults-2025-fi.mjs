@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * scripts/generate-electricity-defaults-2025-fi.js
+ * scripts/generate-electricity-defaults-2025-fi.mjs
  *
  * Generates deterministic 2025 Finnish electricity price defaults from the
  * repository-local source CSV. Run once to regenerate the checked-in artifact:
  *
- *   node scripts/generate-electricity-defaults-2025-fi.js
+ *   node scripts/generate-electricity-defaults-2025-fi.mjs
  *
  * Source:  sources/electricity_prices.csv  (porssisahko.net quarter-hourly data)
  * Output:  src/data/electricity-defaults-2025-fi.ts
@@ -27,10 +27,11 @@
  *           (23 values for the spring-forward day, 25 for the fall-back day).
  */
 
-"use strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const fs = require("fs");
-const path = require("path");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SOURCE_CSV = path.resolve(__dirname, "../sources/electricity_prices.csv");
 const OUTPUT_TS = path.resolve(__dirname, "../src/data/electricity-defaults-2025-fi.ts");
@@ -176,7 +177,7 @@ for (let d = 0; d < 365; d++) {
 }
 
 const output = `// AUTO-GENERATED — do not edit manually.
-// Regenerate: node scripts/generate-electricity-defaults-2025-fi.js
+// Regenerate: node scripts/generate-electricity-defaults-2025-fi.mjs
 // Generated: ${now}
 //
 // Source   : sources/electricity_prices.csv (porssisahko.net)

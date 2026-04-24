@@ -9,6 +9,7 @@ import {
   FINLAND_2025_DAILY_EUR_PER_MWH,
   FINLAND_2025_HOURLY_EUR_PER_MWH,
 } from "@/data/electricity-defaults-2025-fi";
+import { parseFiniteNumber } from "@/features/scenario/input-ui/parse-number-series";
 
 export type { AnnualCo2InputDisplayUnit, ElectricityPriceInputDisplayUnit };
 export { FINLAND_2025_DAILY_EUR_PER_MWH, FINLAND_2025_HOURLY_EUR_PER_MWH };
@@ -74,6 +75,22 @@ export type ScenarioFormState = {
   };
   process: Record<ProcessSchemaKey, ProcessFieldFormState>;
 };
+
+/** Factory default assumed sales prices (EUR per unit); setup form initializes to these until edited. */
+export const FACTORY_DEFAULT_METHANE_SALES_PRICE_EUR_PER_T_CH4 = 1200;
+export const FACTORY_DEFAULT_HYDROGEN_SALES_PRICE_EUR_PER_KG_H2 = 4;
+
+/** True when the field still parses to the factory default (same rule as `buildScenarioPayload` number parse). */
+export function isMethanePriceAtFactoryDefault(raw: string): boolean {
+  const n = parseFiniteNumber(raw);
+  return n === FACTORY_DEFAULT_METHANE_SALES_PRICE_EUR_PER_T_CH4;
+}
+
+/** True when the field still parses to the factory default (same rule as `buildScenarioPayload` number parse). */
+export function isHydrogenPriceAtFactoryDefault(raw: string): boolean {
+  const n = parseFiniteNumber(raw);
+  return n === FACTORY_DEFAULT_HYDROGEN_SALES_PRICE_EUR_PER_KG_H2;
+}
 
 const DEFAULT_PROCESS_ASSUMPTIONS = defaultProcessAssumptionsInput();
 
@@ -158,8 +175,8 @@ export function createInitialFormState(): ScenarioFormState {
     co2: { mode: "flat_annual" },
     electricity: { mode: "constant", priceEurPerMwh: "80", priceDisplayUnit: "eur_per_mwh" },
     economics: {
-      methanePriceEurPerTch4: "1200",
-      hydrogenPriceEurPerKg: "4",
+      methanePriceEurPerTch4: String(FACTORY_DEFAULT_METHANE_SALES_PRICE_EUR_PER_T_CH4),
+      hydrogenPriceEurPerKg: String(FACTORY_DEFAULT_HYDROGEN_SALES_PRICE_EUR_PER_KG_H2),
       otherOpexEurPerYear: "0",
       includeCapex: false,
       electrolyzerCapexEur: "",
