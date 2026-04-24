@@ -105,7 +105,7 @@ Example note:
 
 ### UI display vs canonical wire (scenario form)
 
-- Optional **display** units for **annual CO₂** (`kg/year` ↔ `kt/year`) and **constant electricity purchase price** (`c/kWh` ↔ `EUR/MWh`) are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** matches this spec. **Time-series** bulk entry does not add alternate display units in MVP.
+- **Annual CO₂** is fixed to **`kt/year`** in the visible scenario form (no unit selector). Internal domain helpers for `kg/year` conversion remain in code but are not exposed in the UI. **Constant electricity purchase price** display units (`c/kWh` ↔ `EUR/MWh`) are user-selectable and converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** matches this spec. **Time-series** bulk entry does not add alternate display units in MVP.
 - **Browser CSV import** for CO₂ and electricity time-series produces the same bulk **`seriesText`** (and downstream parsing) as manual paste; it does **not** introduce new `co2AvailabilityMode` / `electricityPriceMode` values or parallel ingest contracts.
 
 ### Internal canonical units

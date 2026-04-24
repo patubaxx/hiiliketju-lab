@@ -35,7 +35,6 @@ export const en = {
   },
   units: {
     co2KtPerYear: "kt/year",
-    co2KgPerYear: "kg/year",
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
@@ -75,7 +74,7 @@ export const en = {
   sections: {
     co2: "Carbon dioxide availability",
     co2Intro:
-      "How much CO₂ you have per year, how much of it you use, and how it varies over the year. If you use a time series, day-by-day amounts come from that series; the annual total is still required for the form but is not used to rescale the series. You may enter the annual total as kt/year or kg/year; storage uses kt/year.",
+      "How much CO₂ you have per year, how much of it you use, and how it varies over the year. If you use a time series, day-by-day amounts come from that series; the annual total is still required for the form but is not used to rescale the series. The annual total is in kt/year.",
     electricity: "Electricity purchase price",
     electricityIntro:
       "How electricity purchase (procurement) prices are entered for the year. Hourly values are averaged to calendar days. For a flat price you can use EUR/MWh or c/kWh; series always use EUR/MWh.",
@@ -89,9 +88,7 @@ export const en = {
   },
   co2: {
     annualAmount: "Annual CO₂",
-    annualAmountUnitAria: "Unit for annual CO₂ amount",
-    annualAmountHint:
-      "Choose kt/year or kg/year for entry only; the engine and exports use kt/year. Switching unit converts the number to the same physical total.",
+    annualAmountHint: "Enter the annual CO₂ total in kt/year.",
     annualKt: "Annual CO₂ (kt/year)",
     utilization: "Utilization rate (%)",
     mode: "Temporal profile",

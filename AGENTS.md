@@ -35,7 +35,7 @@ Do not collapse these layers together.
 These are **documentation anchors** for behaviour already shipped; they do not relax calculation or wire contracts.
 
 - **Copy:** electricity is framed as **purchase / procurement price**; methane and hydrogen economics as **assumed sales prices**; profitability KPIs that depend on costs remain **derived** from **`calculateScenario`**. Wire field names were not renamed for wording.
-- **Display units:** the form may show **annual CO₂** as `kt/year` or `kg/year` and **constant** electricity purchase price as `EUR/MWh` or `c/kWh`. Convert in **`buildScenarioPayload`** (or shared domain helpers), not scattered in presentational components. **Canonical wire** stays `kt/year` / `EUR/MWh` for those fields; **time-series** and **exports** stay canonical.
+- **Display units:** the form shows **annual CO₂** as `kt/year` (fixed, no unit selector) and **constant** electricity purchase price as `EUR/MWh` or `c/kWh` (user-selectable). Convert in **`buildScenarioPayload`** (or shared domain helpers), not scattered in presentational components. **Canonical wire** stays `kt/year` / `EUR/MWh` for those fields; **time-series** and **exports** stay canonical. (Internal conversion helpers for `kg/year` remain in domain code to preserve future flexibility; they are not exposed in the visible UI.)
 - **CSV import:** browser-only parsing into the existing bulk **`seriesText`** path for CO₂ and electricity time-series where the UI offers it; **no** new calculation modes and **no** new `ScenarioInput` shapes.
 
 ---
@@ -104,12 +104,14 @@ These are locked unless the user explicitly changes them:
   * `seasonal_daily`
   * `time_series_daily`
   * `time_series_hourly`
-* supported electricity price modes:
+* supported electricity price modes (internal contracts — all four remain valid for schema, engine, and exports):
 
   * `constant`
   * `daily_series`
   * `hourly_series`
   * `historical_market_data_imported`
+
+  **Visible UI selector (WP15+):** only `constant` and `historical_market_data_imported` are selectable in the scenario form. `daily_series` and `hourly_series` remain supported internally.
 * hourly CO₂ to daily aggregation = `sum`
 * hourly electricity price to daily aggregation = `arithmetic_mean`
 * CAPEX is optional

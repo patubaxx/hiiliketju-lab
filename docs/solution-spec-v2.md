@@ -44,11 +44,12 @@ The MVP must produce, at minimum:
   - `seasonal_daily`
   - `time_series_daily`
   - `time_series_hourly`
-- support for electricity price input modes:
+- support for electricity price input modes (all four remain supported in schema, engine, and exports):
   - `constant`
   - `daily_series`
   - `hourly_series`
   - `historical_market_data_imported`
+  - **Visible UI selector:** only `constant` and `historical_market_data_imported` are offered; `daily_series` and `hourly_series` remain as internal contracts.
 - hourly input harmonization into daily internal resolution
 - stoichiometric methane path calculation
 - hydrogen alternative path comparison
@@ -161,7 +162,7 @@ The following are locked for MVP:
 
 **UI conveniences (do not change wire or engine contracts):**
 
-- Optional **display units** in the scenario form: annual CO₂ as **`kt/year` or `kg/year`**; **constant** electricity **purchase** price as **`EUR/MWh` or `c/kWh`**. Values are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** remains canonical (**`kt/year`**, **`EUR/MWh`** for those fields). Time-series bulk entry does **not** gain alternate display units in MVP.
+- **Annual CO₂** is shown fixed as **`kt/year`** in the scenario form (no unit selector; internal `kg/year` conversion helpers remain in domain code for future use). **Constant** electricity **purchase** price may be entered as **`EUR/MWh` or `c/kWh`**; values are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** remains canonical (**`kt/year`**, **`EUR/MWh`** for those fields). Time-series bulk entry does **not** gain alternate display units in MVP.
 - **Browser CSV import** for CO₂ and electricity **time-series** fills the same bulk text / builder path as paste; it is not a separate calculation mode or input contract.
 
 ---

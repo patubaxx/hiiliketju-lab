@@ -35,7 +35,6 @@ export const sv = {
   },
   units: {
     co2KtPerYear: "kt/år",
-    co2KgPerYear: "kg/år",
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
@@ -74,7 +73,7 @@ export const sv = {
   sections: {
     co2: "Koldioxidtillgång",
     co2Intro:
-      "Hur mycket CO₂ du har per år, hur stor del du använder och hur fördelningen ser ut över året. Med tidsserie kommer dygnsvärden från serien; årstotalen krävs ändå i formuläret men används inte för att skala om serien. Årstotalen kan anges i kt/år eller kg/år; lagring sker i kt/år.",
+      "Hur mycket CO₂ du har per år, hur stor del du använder och hur fördelningen ser ut över året. Med tidsserie kommer dygnsvärden från serien; årstotalen krävs ändå i formuläret men används inte för att skala om serien. Årstotalen anges i kt/år.",
     electricity: "Inköpspris för el",
     electricityIntro:
       "Hur inköpspriset för el anges för hela året. Timvärden görs om till dygnsmedel för kalenderdagar. För ett jämnt pris kan du ange EUR/MWh eller c/kWh; serier använder alltid EUR/MWh.",
@@ -88,9 +87,7 @@ export const sv = {
   },
   co2: {
     annualAmount: "Årlig CO₂",
-    annualAmountUnitAria: "Enhet för årlig CO₂-mängd",
-    annualAmountHint:
-      "Välj kt/år eller kg/år endast för inmatning; motorn och exporten använder kt/år. Byte av enhet omvandlar talet till samma fysiska total.",
+    annualAmountHint: "Ange den årliga CO₂-totalen i kt/år.",
     annualKt: "Årlig CO₂ (kt/år)",
     utilization: "Utnyttjandegrad (%)",
     mode: "Tidsprofil",

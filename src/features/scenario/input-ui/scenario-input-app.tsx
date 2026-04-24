@@ -15,11 +15,8 @@ import { calculateScenario } from "@/core/calculation/calculate-scenario";
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
 import {
-  annualCo2InputToKtPerYear,
-  annualCo2KtPerYearToInputDisplay,
   electricityPriceEurPerMwhToInputDisplay,
   electricityPriceInputToEurPerMwh,
-  type AnnualCo2InputDisplayUnit,
   type ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
@@ -339,30 +336,7 @@ export function ScenarioInputApp() {
                 value={form.annualAmountKtPerYear}
                 onChange={(e) => setForm((s) => ({ ...s, annualAmountKtPerYear: e.target.value }))}
               />
-              <select
-                className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
-                value={form.annualCo2DisplayUnit}
-                aria-label={t("co2.annualAmountUnitAria")}
-                onChange={(e) => {
-                  const next = e.target.value as AnnualCo2InputDisplayUnit;
-                  setForm((s) => {
-                    const v = parseFiniteNumber(s.annualAmountKtPerYear);
-                    if (v === undefined) {
-                      return { ...s, annualCo2DisplayUnit: next };
-                    }
-                    const kt = annualCo2InputToKtPerYear(v, s.annualCo2DisplayUnit);
-                    const newDisplay = annualCo2KtPerYearToInputDisplay(kt, next);
-                    return {
-                      ...s,
-                      annualCo2DisplayUnit: next,
-                      annualAmountKtPerYear: String(newDisplay),
-                    };
-                  });
-                }}
-              >
-                <option value="kt_per_year">{t("units.co2KtPerYear")}</option>
-                <option value="kg_per_year">{t("units.co2KgPerYear")}</option>
-              </select>
+              <span className="shrink-0 text-sm text-muted-foreground">{t("units.co2KtPerYear")}</span>
             </div>
             <FieldHint>{t("co2.annualAmountHint")}</FieldHint>
             <FieldError message={getErrors(errors, "co2.annualAmountKtPerYear", t)} />
@@ -537,8 +511,6 @@ export function ScenarioInputApp() {
             onChange={(e) => setElectricityMode(e.target.value as ElectricityModeForm)}
           >
             <option value="constant">{t("electricity.mode_constant")}</option>
-            <option value="daily_series">{t("electricity.mode_daily_series")}</option>
-            <option value="hourly_series">{t("electricity.mode_hourly_series")}</option>
             <option value="historical_market_data_imported">
               {t("electricity.mode_historical_imported")}
             </option>
