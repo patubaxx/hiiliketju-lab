@@ -89,7 +89,7 @@
 - No strict body-size policy beyond platform limits; very large pasted or imported series may be impractical.
 - **CSV time-series import** is **browser-side only**; it does not add a server ingest mode or a new `ScenarioInput` shape—only fills **`seriesText`** for the existing daily/hourly bulk paths. Supported layouts and error cases are those implemented by **`parse-time-series-csv`** (not arbitrary spreadsheet dialects).
 - **Display-unit switching** applies only to **constant electricity purchase price** in the form (`EUR/MWh` ↔ `c/kWh`); **annual CO₂** is fixed to `kt/year` (no unit selector visible). **Time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
-- **Default electricity data** includes Finnish VAT (25.5 % in 2025) because the source (porssisahko.net) provides consumer-facing prices. Industrial procurement prices are typically ex-VAT; users should override with their actual contract price.
+- **Default electricity data** includes Finnish VAT (25.5 % in 2025) because the source (porssisahko.net) provides consumer-facing prices. Industrial procurement prices are typically ex-VAT; users should override with their actual contract price. The scenario form surfaces a **visible** contextual note (not tooltip-only) on the imported market-data path alongside inline summary stats for the active series.
 - ASCII **`filename=`** in `Content-Disposition` only (no RFC 5987 `filename*`).
 - Optional: extra HTTP route tests for every `parseExportScenarioPostBody` error code (parser is already unit-tested).
 
