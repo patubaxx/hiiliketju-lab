@@ -16,7 +16,7 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 | Area | Path | Role |
 |------|------|------|
 | App shell & API routes | `src/app/` | Pages, `layout`, **`api/export/excel`**, **`api/export/pdf`** |
-| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, sticky action bar (`scenario-app-navbar.tsx`), charts/tables; optional **display units** (annual CO₂ kt/year or kg/year; constant electricity EUR/MWh or c/kWh) convert in **`buildScenarioPayload`** to canonical wire; browser **CSV import** for time-series fills the same bulk `seriesText` path as paste (see [`docs/repository-invariants.md`](docs/repository-invariants.md)) |
+| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, sticky action bar (`scenario-app-navbar.tsx`), charts/tables; optional **display units** (annual CO₂ kt/year; constant electricity EUR/MWh or c/kWh) convert in **`buildScenarioPayload`** to canonical wire; browser **CSV import** for time-series fills the same bulk `seriesText` path as paste (see [`docs/repository-invariants.md`](docs/repository-invariants.md)) |
 | Wire validation | `src/features/scenario/schemas/` | Zod schemas aligned with `ScenarioInput` |
 | Domain | `src/core/domain/` | Types, units, temporal constants, assumption shapes |
 | Engine | `src/core/calculation/` | Harmonization, daily engine, monthly/annual roll-ups |
