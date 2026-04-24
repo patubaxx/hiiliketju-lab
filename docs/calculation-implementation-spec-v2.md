@@ -105,8 +105,9 @@ Example note:
 
 ### UI display vs canonical wire (scenario form)
 
-- Optional **display** units for **annual CO₂** (`kg/year` ↔ `kt/year`) and **constant electricity purchase price** (`c/kWh` ↔ `EUR/MWh`) are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** matches this spec. **Time-series** bulk entry does not add alternate display units in MVP.
+- **Annual CO₂** is fixed to **`kt/year`** in the visible scenario form (no unit selector). Internal domain helpers for `kg/year` conversion remain in code but are not exposed in the UI. **Constant electricity purchase price** display units (`c/kWh` ↔ `EUR/MWh`) are user-selectable and converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** matches this spec. **Time-series** bulk entry does not add alternate display units in MVP.
 - **Browser CSV import** for CO₂ and electricity time-series produces the same bulk **`seriesText`** (and downstream parsing) as manual paste; it does **not** introduce new `co2AvailabilityMode` / `electricityPriceMode` values or parallel ingest contracts.
+- **Default electricity data unit pipeline (`historical_market_data_imported`):** raw source `sources/electricity_prices.csv` is in `snt/kWh` (Finnish euro-cents per kWh, VAT included). The deterministic transform script `scripts/generate-electricity-defaults-2025-fi.js` applies the conversion **`snt/kWh × 10 = EUR/MWh`** (exact: 1 snt/kWh = 0.01 EUR/kWh = 10 EUR/MWh) and writes the checked-in artifact `src/data/electricity-defaults-2025-fi.ts`. The app consumes the artifact directly — no runtime CSV parsing. Daily defaults are the **arithmetic mean of 24 hourly values** (or 23/25 on DST transition days).
 
 ### Internal canonical units
 - CO₂ timestep value: `kg/day`
@@ -132,7 +133,7 @@ Example note:
 | scenarioName | Scenario label | - | yes | user |
 | annualCO2KtPerYear | Annual CO₂ amount | kt/year | yes | user |
 | utilizationRatePct | CO₂ utilization rate | % | yes | user |
-| methanePriceEurPerTon | Methane sales price | EUR/t_CH4 | yes | user/customer |
+| methanePriceEurPerTch4 | Methane sales price | EUR/t_CH4 | yes | user/customer |
 | hydrogenPriceEurPerKg | Hydrogen sales price | EUR/kg_H2 | yes | user/customer |
 | otherOpexEurPerYear | Other annual OPEX | EUR/year | no | user |
 | includeCapex | Whether CAPEX is included | boolean | yes | user |
@@ -160,6 +161,8 @@ Timestep electricity prices are **purchase** prices in **EUR/MWh** after harmoni
 - `hourly_series`
 - `historical_market_data_imported`
 
+The visible scenario UI offers only `constant` and `historical_market_data_imported`. `daily_series` and `hourly_series` remain retained internal wire / schema / engine / export capabilities.
+
 ### 6.4 Calculation settings
 
 | Parameter | Description | Allowed values |
@@ -183,16 +186,20 @@ Timestep electricity prices are **purchase** prices in **EUR/MWh** after harmoni
 | plantAvailabilityPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 | processEfficiencyPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 
+In the setup UI, these defaults are shown as active values with metadata before any override is entered; payload mapping keeps untouched fields omitted so `mergeProcessAssumptionsInput` remains the canonical default source.
+
 ### 7.2 Inputs that remain customer/business inputs
 
 | Parameter | Unit | assumptionSource | assumptionStatus |
 |---|---|---|---|
-| methanePriceEurPerTon | EUR/t_CH4 | customer_provided | confirmed or pending_customer_confirmation |
+| methanePriceEurPerTch4 | EUR/t_CH4 | customer_provided | confirmed or pending_customer_confirmation |
 | hydrogenPriceEurPerKg | EUR/kg_H2 | customer_provided | confirmed or pending_customer_confirmation |
 | otherOpexEurPerYear | EUR/year | customer_provided | confirmed or pending_customer_confirmation |
 | electrolyzerCapexEur | EUR | customer_provided | confirmed or pending_customer_confirmation |
 | methanationCapexEur | EUR | customer_provided | confirmed or pending_customer_confirmation |
 | capexLifetimeYears | year | customer_provided | confirmed or pending_customer_confirmation |
+
+Current setup UI defaults for these editable commercial inputs are `1200 EUR/t_CH4` for methane and `4 EUR/kg_H2` for hydrogen. They are scenario defaults, not product-locked calculation assumptions.
 
 ---
 
@@ -298,7 +305,7 @@ Else:
 `totalCostEur_day = variableCostEur_day + allocatedCapexCostEur_day`
 
 ### F-011 Methane revenue
-`methaneRevenueEur_day = (methaneProducedKg_day / 1000) * methanePriceEurPerTon`
+`methaneRevenueEur_day = (methaneProducedKg_day / 1000) * methanePriceEurPerTch4`
 
 ### F-012 Hydrogen alternative revenue
 `hydrogenAlternativeRevenueEur_day = hydrogenNeededKg_day * hydrogenPriceEurPerKg`

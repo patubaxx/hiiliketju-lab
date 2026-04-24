@@ -35,7 +35,6 @@ export const fi = {
   },
   units: {
     co2KtPerYear: "kt/v",
-    co2KgPerYear: "kg/v",
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
@@ -74,7 +73,7 @@ export const fi = {
   sections: {
     co2: "Hiilidioksidin saatavuus",
     co2Intro:
-      "Vuosittainen CO₂-saatavuus, kuinka suuren osan siitä käytät ja miten jakautuminen menee vuoden yli. Jos käytät aikasarjaa, päiväkohtaiset määrät tulevat siitä; vuosiluku on silti pakollinen, mutta sitä ei käytetä sarjan skaalaamiseen. Vuosimäärän voit antaa kt/v tai kg/v; tallennus on kt/v.",
+      "Vuosittainen CO₂-saatavuus, kuinka suuren osan siitä käytät ja miten jakautuminen menee vuoden yli. Jos käytät aikasarjaa, päiväkohtaiset määrät tulevat siitä; vuosiluku on silti pakollinen, mutta sitä ei käytetä sarjan skaalaamiseen. Vuosimäärä annetaan yksikössä kt/v.",
     electricity: "Sähkön hankintahinta",
     electricityIntro:
       "Miten sähkön hankintahinta annetaan koko vuodelle. Tuntiarvot muunnetaan kalenteripäivän keskiarvoiksi. Tasaisessa hinnassa voit käyttää EUR/MWh tai c/kWh; sarjat ovat aina EUR/MWh.",
@@ -88,9 +87,7 @@ export const fi = {
   },
   co2: {
     annualAmount: "Vuotuinen CO₂",
-    annualAmountUnitAria: "Vuotuisen CO₂-määrän yksikkö",
-    annualAmountHint:
-      "Valitse kt/v tai kg/v vain syöttöä varten; moottori ja viennit käyttävät kt/v. Yksikön vaihto muuntaa luvun samaan fysikaaliseen määrään.",
+    annualAmountHint: "Syötä vuotuinen CO₂-kokonaismäärä yksikössä kt/v.",
     annualKt: "Vuotuinen CO₂ (kt/v)",
     utilization: "Hyötysuhde (%)",
     mode: "Ajallinen profiili",
@@ -130,7 +127,7 @@ export const fi = {
     resolution_daily: "Päivittäinen (365 arvoa)",
     resolution_hourly: "Tuntikohtainen (8760 arvoa)",
     historicalHelp:
-      "Liitä normalisoidut EUR/MWh hankintahinnat MVP-järjestyksessä tai käytä CSV-tuontia samoilla muodoilla kuin manuaalisessa syötteessä. Laajempi puhdistus on tämän näkymän ulkopuolella.",
+      "Ladattu valmiiksi vuoden 2025 suomalaisilla pörssisähkön hinnoilla (porssisahko.net, sisältää ALV:n, EUR/MWh). Vaihda resoluutiota ladataksesi tunti- tai päiväkohtaiset oletukset. Liitä tai tuo oma EUR/MWh-sarjasi korvaamaan oletukset.",
     fillOnes365: "Täytä 365 × 50",
     fillOnes8760: "Täytä 8760 × 50",
   },
@@ -153,6 +150,8 @@ export const fi = {
     inactiveFactorsTitle: "Ei vielä päivittäisissä kaavoissa",
     inactiveFactorsBody:
       "Laitoksen käytettävyys ja prosessin hyötysuhde kulkevat metatietoineen läpinäkyvyyden vuoksi, mutta nykyinen MVP-päivämoottori ei kerro näillä arvoilla (oletukset ovat neutraalit 100 %).",
+    usingLiteratureDefault: "Käytössä kirjallisuuspohjainen oletusarvo",
+    usingCustomValue: "Käytössä oma arvo",
     override: "Korvaa oletus",
     value: "Arvo",
     assumptionSource: "Oletuksen lähde",
@@ -164,6 +163,11 @@ export const fi = {
     field_secMwh: "Elektrolyyserin SEC (MWh / kg H₂)",
     field_plantAvail: "Laitoksen käytettävyys (%)",
     field_processEff: "Prosessin hyötysuhde (%)",
+    unit_stoichH2: "kg H₂ / kg CO₂",
+    unit_stoichCh4: "kg CH₄ / kg CO₂",
+    unit_secKwh: "kWh / kg H₂",
+    unit_secMwh: "MWh / kg H₂",
+    unit_pct: "%",
   },
   assumptionSource: {
     customer_provided: "Asiakkaan toimittama",

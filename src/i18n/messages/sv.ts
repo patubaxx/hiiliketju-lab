@@ -35,7 +35,6 @@ export const sv = {
   },
   units: {
     co2KtPerYear: "kt/år",
-    co2KgPerYear: "kg/år",
     electricityEurPerMwh: "EUR/MWh",
     electricityCPerKwh: "c/kWh",
   },
@@ -74,7 +73,7 @@ export const sv = {
   sections: {
     co2: "Koldioxidtillgång",
     co2Intro:
-      "Hur mycket CO₂ du har per år, hur stor del du använder och hur fördelningen ser ut över året. Med tidsserie kommer dygnsvärden från serien; årstotalen krävs ändå i formuläret men används inte för att skala om serien. Årstotalen kan anges i kt/år eller kg/år; lagring sker i kt/år.",
+      "Hur mycket CO₂ du har per år, hur stor del du använder och hur fördelningen ser ut över året. Med tidsserie kommer dygnsvärden från serien; årstotalen krävs ändå i formuläret men används inte för att skala om serien. Årstotalen anges i kt/år.",
     electricity: "Inköpspris för el",
     electricityIntro:
       "Hur inköpspriset för el anges för hela året. Timvärden görs om till dygnsmedel för kalenderdagar. För ett jämnt pris kan du ange EUR/MWh eller c/kWh; serier använder alltid EUR/MWh.",
@@ -88,9 +87,7 @@ export const sv = {
   },
   co2: {
     annualAmount: "Årlig CO₂",
-    annualAmountUnitAria: "Enhet för årlig CO₂-mängd",
-    annualAmountHint:
-      "Välj kt/år eller kg/år endast för inmatning; motorn och exporten använder kt/år. Byte av enhet omvandlar talet till samma fysiska total.",
+    annualAmountHint: "Ange den årliga CO₂-totalen i kt/år.",
     annualKt: "Årlig CO₂ (kt/år)",
     utilization: "Utnyttjandegrad (%)",
     mode: "Tidsprofil",
@@ -130,7 +127,7 @@ export const sv = {
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",
     historicalHelp:
-      "Klistra in normaliserade EUR/MWh inköpspriser i MVP-ordning, eller använd CSV-import med samma format som manuell inmatning. Vidare datarensning ligger utanför denna vy.",
+      "Förladdat med 2025 års finska elbörspriser (porssisahko.net, inkl. moms, EUR/MWh). Byt upplösning för att ladda tim- eller dagsvis standarddata. Klistra in eller importera din egen EUR/MWh-serie för att åsidosätta.",
     fillOnes365: "Fyll med 365 × 50",
     fillOnes8760: "Fyll med 8760 × 50",
   },
@@ -153,6 +150,8 @@ export const sv = {
     inactiveFactorsTitle: "Används ännu inte i dagliga formler",
     inactiveFactorsBody:
       "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
+    usingLiteratureDefault: "Använder litteraturbaserat standardvärde",
+    usingCustomValue: "Använder eget värde",
     override: "Åsidosätt standard",
     value: "Värde",
     assumptionSource: "Antagandekälla",
@@ -164,6 +163,11 @@ export const sv = {
     field_secMwh: "Elektrolysör SEC (MWh / kg H₂)",
     field_plantAvail: "Anläggningstillgänglighet (%)",
     field_processEff: "Processeffektivitet (%)",
+    unit_stoichH2: "kg H₂ / kg CO₂",
+    unit_stoichCh4: "kg CH₄ / kg CO₂",
+    unit_secKwh: "kWh / kg H₂",
+    unit_secMwh: "MWh / kg H₂",
+    unit_pct: "%",
   },
   assumptionSource: {
     customer_provided: "Kundlevererad",

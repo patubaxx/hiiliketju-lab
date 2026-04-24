@@ -9,7 +9,7 @@
 ## Canonical calculation flow
 
 1. **`calculateScenario(validated ScenarioInput) → CalculationResult`** is the **only** numerical source of truth for KPIs, daily/monthly series, and summaries shown in the UI.
-2. The interactive UI validates with **`safeParseScenarioInput`**, applies **`mergeProcessAssumptionsInput`**, then calls **`calculateScenario`** (`src/features/scenario/input-ui/scenario-input-app.tsx`). **`buildScenarioPayload`** maps form state to the wire shape first; optional display units for **annual CO₂** (kg/year vs kt/year) and **constant electricity purchase price** (c/kWh vs EUR/MWh) are converted there to canonical **kt/year** and **EUR/MWh**. **CSV import** for CO₂ and electricity **time-series** modes is browser-only: it parses a file into the same **`seriesText`** bulk field as manual entry, then the existing payload + Zod path applies. **Primary actions** (run, reset, locale, jump to `#scenario-outcome`, Excel/PDF export) live in the **sticky navbar** (`scenario-app-navbar.tsx`); export controls are **disabled** when no result exists. A successful run **scrolls** to the outcome region; this is UX only and does not alter engine or export pipelines.
+2. The interactive UI validates with **`safeParseScenarioInput`**, applies **`mergeProcessAssumptionsInput`**, then calls **`calculateScenario`** (`src/features/scenario/input-ui/scenario-input-app.tsx`). **`buildScenarioPayload`** maps form state to the wire shape first; the display unit for **annual CO₂** is fixed as `kt/year` in the visible UI (no unit selector; internal `kg/year` conversion helpers remain in domain code); **constant electricity purchase price** may be entered as `c/kWh` or `EUR/MWh` and is converted to canonical **EUR/MWh**. The visible electricity selector offers only **`constant`** and **`historical_market_data_imported`**; internal wire support for **`daily_series`** and **`hourly_series`** remains valid in schema, domain, engine, and exports. Advanced process assumptions display active canonical defaults (value + unit + assumption metadata) before any overrides; user overrides are explicit and untouched fields remain omitted so defaults stay canonical in merge logic. The setup form currently initializes methane and hydrogen assumed sales prices to **`1200 EUR/t_CH4`** and **`4 EUR/kg_H2`**. **CSV import** for CO₂ and electricity **time-series** modes is browser-only: it parses a file into the same **`seriesText`** bulk field as manual entry, then the existing payload + Zod path applies. **Primary actions** (run, reset, locale, jump to `#scenario-outcome`, Excel/PDF export) live in the **sticky navbar** (`scenario-app-navbar.tsx`); export controls are **disabled** when no result exists. A successful run **scrolls** to the outcome region; this is UX only and does not alter engine or export pipelines.
 3. **Internal engine is daily-first** (365 days). Hourly CO₂ is harmonized with **sum** per day; hourly electricity **purchase** price (EUR/MWh) with **arithmetic mean** per day (see domain constants and `resolve-co2-series` / `resolve-electricity-price-series`).
 
 ---
@@ -19,6 +19,14 @@
 - **Electricity** is framed as **purchase / procurement price** where relevant (constant, series, and historical import paths).
 - **Methane and hydrogen economics** are framed as **assumed sales prices** (inputs), distinct from **derived** profitability indicators (e.g. break-even methane price) that come from the canonical **`CalculationResult`**.
 - **Wire / domain field names** were not renamed for this wording pass; copy and validation messages align with the above intent.
+
+---
+
+## Visible product behavior vs retained internal contracts
+
+- **Visible setup UI:** annual CO₂ is `kt/year` only; electricity mode selection offers only `constant` and `historical_market_data_imported`.
+- **Retained internal contracts:** schema / domain / engine / export paths still support `daily_series` and `hourly_series`; domain conversion helpers for annual CO₂ `kg/year` remain internal only.
+- **Export authority:** exports still accept validated `scenario` input and recompute with fresh `calculateScenario`; they do not trust client-posted result objects.
 
 ---
 
@@ -63,12 +71,25 @@
 
 ---
 
+## Default electricity data pipeline (WP16)
+
+- **Source:** `sources/electricity_prices.csv` — porssisahko.net quarter-hourly Finnish spot prices, `snt/kWh` with VAT.
+- **Script:** `scripts/generate-electricity-defaults-2025-fi.js` — deterministic Node.js transform; run to regenerate the artifact.
+- **Artifact:** `src/data/electricity-defaults-2025-fi.ts` — checked-in, app-consumable module; **do not edit manually**.
+- **Unit conversion:** `snt/kWh × 10 = EUR/MWh` (exact; 1 snt/kWh = 0.01 EUR/kWh = 10 EUR/MWh).
+- **Hourly defaults (8 760 values):** arithmetic mean of 4 consecutive quarter-hourly values per clock hour, sequential within each calendar date. DST: spring-forward day 2025-03-30 yields 23 hourly values; fall-back day 2025-10-26 yields 25 hourly values (total = 8 760).
+- **Daily defaults (365 values):** derived from the hourly defaults by arithmetic mean per calendar date (23, 24, or 25 values depending on DST).
+- **App integration:** `historical_market_data_imported` mode initialises and resolution-switches with the corresponding 2025 default dataset. Users can paste or import their own series to override.
+
+---
+
 ## Known intentional limitations (MVP)
 
 - No auth, rate limiting, or export abuse protection beyond platform defaults.
 - No strict body-size policy beyond platform limits; very large pasted or imported series may be impractical.
 - **CSV time-series import** is **browser-side only**; it does not add a server ingest mode or a new `ScenarioInput` shape—only fills **`seriesText`** for the existing daily/hourly bulk paths. Supported layouts and error cases are those implemented by **`parse-time-series-csv`** (not arbitrary spreadsheet dialects).
-- **Display-unit switching** applies only to **annual CO₂** and **constant electricity purchase price** in the form; **time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
+- **Display-unit switching** applies only to **constant electricity purchase price** in the form (`EUR/MWh` ↔ `c/kWh`); **annual CO₂** is fixed to `kt/year` (no unit selector visible). **Time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
+- **Default electricity data** includes Finnish VAT (25.5 % in 2025) because the source (porssisahko.net) provides consumer-facing prices. Industrial procurement prices are typically ex-VAT; users should override with their actual contract price.
 - ASCII **`filename=`** in `Content-Disposition` only (no RFC 5987 `filename*`).
 - Optional: extra HTTP route tests for every `parseExportScenarioPostBody` error code (parser is already unit-tested).
 
@@ -82,4 +103,4 @@
 
 ## Consolidation note
 
-This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference. The April 2026 pass also records accepted **WP1–WP3** behaviour (terminology, optional display units before canonical payload, CSV → `seriesText`) without changing calculation or wire contracts.
+This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference. The April 2026 pass also records accepted current-state behaviour without changing calculation or wire contracts: annual CO₂ stays visibly fixed to `kt/year`, constant electricity keeps the only visible display-unit switch, CSV still feeds `seriesText`, and hidden internal wire modes remain supported.

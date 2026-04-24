@@ -12,14 +12,12 @@ import { ScenarioAppNavbar } from "./scenario-app-navbar";
 
 import { Button } from "@/components/ui/button";
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
+import { defaultProcessAssumptionsInput } from "@/core/domain/assumptions";
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
 import {
-  annualCo2InputToKtPerYear,
-  annualCo2KtPerYearToInputDisplay,
   electricityPriceEurPerMwhToInputDisplay,
   electricityPriceInputToEurPerMwh,
-  type AnnualCo2InputDisplayUnit,
   type ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
@@ -40,6 +38,8 @@ import {
 } from "@/features/scenario/input-ui/form-primitives";
 import { friendlyLabelForValidationPath } from "@/features/scenario/input-ui/validation-field-label";
 import {
+  FINLAND_2025_DAILY_EUR_PER_MWH,
+  FINLAND_2025_HOURLY_EUR_PER_MWH,
   PROCESS_FIELD_ORDER,
   type Co2AvailabilityModeForm,
   type Co2FormBranch,
@@ -176,6 +176,7 @@ export function ScenarioInputApp() {
   const [form, setForm] = React.useState<ScenarioFormState>(() => createInitialFormState());
   const [errors, setErrors] = React.useState<Map<string, string[]>>(new Map());
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+  const defaultProcess = React.useMemo(() => defaultProcessAssumptionsInput(), []);
   const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
   const scrollToOutcomeAfterRunRef = React.useRef(false);
 
@@ -339,30 +340,7 @@ export function ScenarioInputApp() {
                 value={form.annualAmountKtPerYear}
                 onChange={(e) => setForm((s) => ({ ...s, annualAmountKtPerYear: e.target.value }))}
               />
-              <select
-                className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
-                value={form.annualCo2DisplayUnit}
-                aria-label={t("co2.annualAmountUnitAria")}
-                onChange={(e) => {
-                  const next = e.target.value as AnnualCo2InputDisplayUnit;
-                  setForm((s) => {
-                    const v = parseFiniteNumber(s.annualAmountKtPerYear);
-                    if (v === undefined) {
-                      return { ...s, annualCo2DisplayUnit: next };
-                    }
-                    const kt = annualCo2InputToKtPerYear(v, s.annualCo2DisplayUnit);
-                    const newDisplay = annualCo2KtPerYearToInputDisplay(kt, next);
-                    return {
-                      ...s,
-                      annualCo2DisplayUnit: next,
-                      annualAmountKtPerYear: String(newDisplay),
-                    };
-                  });
-                }}
-              >
-                <option value="kt_per_year">{t("units.co2KtPerYear")}</option>
-                <option value="kg_per_year">{t("units.co2KgPerYear")}</option>
-              </select>
+              <span className="shrink-0 text-sm text-muted-foreground">{t("units.co2KtPerYear")}</span>
             </div>
             <FieldHint>{t("co2.annualAmountHint")}</FieldHint>
             <FieldError message={getErrors(errors, "co2.annualAmountKtPerYear", t)} />
@@ -537,8 +515,6 @@ export function ScenarioInputApp() {
             onChange={(e) => setElectricityMode(e.target.value as ElectricityModeForm)}
           >
             <option value="constant">{t("electricity.mode_constant")}</option>
-            <option value="daily_series">{t("electricity.mode_daily_series")}</option>
-            <option value="hourly_series">{t("electricity.mode_hourly_series")}</option>
             <option value="historical_market_data_imported">
               {t("electricity.mode_historical_imported")}
             </option>
@@ -621,8 +597,8 @@ export function ScenarioInputApp() {
                     const resolution = e.target.value as "daily" | "hourly";
                     const seriesText =
                       resolution === "daily"
-                        ? Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n")
-                        : Array.from({ length: SCENARIO_HOURLY_SLOTS }, () => "50").join("\n");
+                        ? FINLAND_2025_DAILY_EUR_PER_MWH.join("\n")
+                        : FINLAND_2025_HOURLY_EUR_PER_MWH.join("\n");
                     setForm((s) =>
                       s.electricity.mode === "historical_market_data_imported"
                         ? {
@@ -918,14 +894,32 @@ export function ScenarioInputApp() {
         </div>
 
         <div className="space-y-6">
-          {PROCESS_FIELD_ORDER.map(({ key, labelId }) => {
+          {PROCESS_FIELD_ORDER.filter(({ showInAdvancedUi }) => showInAdvancedUi).map(
+            ({ key, labelId, unitId }) => {
             const row = form.process[key];
+            const canonicalDefault = defaultProcess[key];
+            const activeMeta = row.override
+              ? {
+                  assumptionSource: row.assumptionSource,
+                  assumptionStatus: row.assumptionStatus,
+                  assumptionNote: row.assumptionNote.trim(),
+                }
+              : {
+                  assumptionSource: canonicalDefault.assumptionMeta.assumptionSource,
+                  assumptionStatus: canonicalDefault.assumptionMeta.assumptionStatus,
+                  assumptionNote: canonicalDefault.assumptionMeta.assumptionNote ?? "",
+                };
+            const activeValueText = row.override ? (row.value.trim() || "—") : String(canonicalDefault.value);
             const inactive =
               key === "plantAvailabilityPct" || key === "processEfficiencyPct" ? true : false;
             return (
               <div
                 key={key}
-                className="space-y-3 rounded-lg border border-border/75 bg-surface-inset p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] ring-1 ring-black/[0.03] dark:shadow-none dark:ring-white/[0.04]"
+                className={`rounded-xl border px-4 py-4 shadow-sm ${
+                  !row.override && activeMeta.assumptionSource === "literature_based"
+                    ? "border-amber-500/40 bg-amber-500/[0.06]"
+                    : "border-border bg-muted/30"
+                }`}
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <input
@@ -938,19 +932,60 @@ export function ScenarioInputApp() {
                         ...s,
                         process: {
                           ...s.process,
-                          [key]: { ...s.process[key], override: e.target.checked },
+                          [key]: e.target.checked
+                            ? {
+                                ...s.process[key],
+                                override: true,
+                                value: s.process[key].value || String(defaultProcess[key].value),
+                                assumptionSource: "customer_provided",
+                                assumptionStatus: "confirmed",
+                                assumptionNote: "",
+                              }
+                            : {
+                                ...s.process[key],
+                                override: false,
+                              },
                         },
                       }))
                     }
                   />
                   <FieldLabel htmlFor={`ov-${key}`}>{t(labelId)}</FieldLabel>
+                  {!row.override ? (
+                    <span className="rounded-md border border-amber-600/35 bg-amber-500/12 px-2 py-0.5 text-xs font-medium text-amber-950 dark:text-amber-100">
+                      {t("results.assumptions.literatureBadge")}
+                    </span>
+                  ) : (
+                    <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5 text-xs font-medium text-foreground/70">
+                      {t("advanced.usingCustomValue")}
+                    </span>
+                  )}
                   {inactive ? (
                     <span className="text-[0.65rem] uppercase tracking-wide text-amber-700 dark:text-amber-300">
                       (MVP)
                     </span>
                   ) : null}
                 </div>
-                <details className="text-xs">
+                <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
+                  {activeValueText}{" "}
+                  <span className="font-sans text-xs font-medium text-muted-foreground">{t(unitId)}</span>
+                </p>
+                <dl className="mt-4 space-y-2 text-xs leading-relaxed text-muted-foreground">
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                    <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.source")}</dt>
+                    <dd>{t(`assumptionSource.${activeMeta.assumptionSource}`)}</dd>
+                  </div>
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                    <dt className="shrink-0 font-medium text-foreground/85">{t("results.assumptions.status")}</dt>
+                    <dd>{t(`assumptionStatus.${activeMeta.assumptionStatus}`)}</dd>
+                  </div>
+                  {activeMeta.assumptionNote ? (
+                    <div>
+                      <dt className="font-medium text-foreground/85">{t("results.assumptions.note")}</dt>
+                      <dd className="mt-0.5 text-[0.8125rem] leading-snug text-foreground/90">{activeMeta.assumptionNote}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+                <details className="mt-3 border-t border-border/60 pt-3 text-xs">
                   <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                     {t("advanced.internalKey")}
                   </summary>
@@ -959,7 +994,7 @@ export function ScenarioInputApp() {
                   </p>
                 </details>
                 {row.override ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-3 border-t border-border/60 pt-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <FieldLabel htmlFor={`val-${key}`}>{t("advanced.value")}</FieldLabel>
                       <input
