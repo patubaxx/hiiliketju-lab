@@ -139,7 +139,16 @@ export const en = {
     resolution_daily: "Daily (365 values)",
     resolution_hourly: "Hourly (8760 values)",
     historicalHelp:
-      "Pre-loaded with 2025 Finnish spot-market prices (porssisahko.net, VAT included, EUR/MWh). Switch resolution to load the hourly or daily defaults. Paste or import your own EUR/MWh series to override.",
+      "Pre-loaded with 2025 Finnish spot defaults from the porssisahko.net source (EUR/MWh). Switch resolution to load the hourly or daily series. Paste or import your own EUR/MWh series to override.",
+    importedVatNoticeTitle: "Price basis (imported data)",
+    importedVatNoticeBody:
+      "The bundled Finland 2025 default series includes Finnish consumer VAT (25.5 %). Industrial electricity procurement is often priced on different terms. Replace the defaults with your project-specific purchase price data when that applies to your case.",
+    importedStatsResolutionDaily: "Daily (365 values)",
+    importedStatsResolutionHourly: "Hourly (8,760 values)",
+    importedStatsSourceBundled: "Finland 2025 bundled default data",
+    importedStatsSourceUser: "Current series (edited, pasted, or imported)",
+    importedStatsValues: "Mean {{mean}} · min {{min}} · max {{max}} {{unit}}",
+    importedStatsInvalid: "Enter a full numeric series to see mean, min, and max.",
     fillOnes365: "Fill with 365 × 50",
     fillOnes8760: "Fill with 8760 × 50",
   },

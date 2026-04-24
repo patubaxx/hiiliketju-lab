@@ -138,7 +138,16 @@ export const sv = {
     resolution_daily: "Daglig (365 värden)",
     resolution_hourly: "Timvis (8760 värden)",
     historicalHelp:
-      "Förladdat med 2025 års finska elbörspriser (porssisahko.net, inkl. moms, EUR/MWh). Byt upplösning för att ladda tim- eller dagsvis standarddata. Klistra in eller importera din egen EUR/MWh-serie för att åsidosätta.",
+      "Förladdat med 2025 års finländska standardvärden från elbörsfältet (porssisahko.net, EUR/MWh). Byt upplösning för att ladda tim- eller dagsvist. Klistra in eller importera egen EUR/MWh-serie för att ersätta.",
+    importedVatNoticeTitle: "Prisunderlag (importerad data)",
+    importedVatNoticeBody:
+      "Finlands standardserie för 2025 innehåller finsk konsumentmoms (25,5 %). Industriell elinköp prissätts ofta med andra premisser. Ersätt standardvärdena med dina faktiska inköpspriser när det stämmer med ditt fall.",
+    importedStatsResolutionDaily: "Daglig (365 värden)",
+    importedStatsResolutionHourly: "Timvis (8 760 värden)",
+    importedStatsSourceBundled: "Finland 2025 inbundet standarddata",
+    importedStatsSourceUser: "Aktuell serie (redigerad, inklistrad eller importerad)",
+    importedStatsValues: "Medelvärde {{mean}} · min {{min}} · max {{max}} {{unit}}",
+    importedStatsInvalid: "Fyll en fullständig nummerserie för att se medel, min och max.",
     fillOnes365: "Fyll med 365 × 50",
     fillOnes8760: "Fyll med 8760 × 50",
   },

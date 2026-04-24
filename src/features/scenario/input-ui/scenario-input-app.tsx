@@ -49,13 +49,19 @@ import {
   defaultCo2Branch,
   defaultElectricityBranch,
 } from "@/features/scenario/input-ui/form-state";
+import {
+  isBundledFinland2025DefaultImportedSeries,
+  summarizeImportedElectricitySeriesText,
+} from "@/features/scenario/input-ui/imported-electricity-series";
 import { parseFiniteNumber } from "@/features/scenario/input-ui/parse-number-series";
 import { SeriesCsvImportControl } from "@/features/scenario/input-ui/series-csv-import-control";
 import { translateZodIssueMessage } from "@/features/scenario/input-ui/translate-zod-issue-message";
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
-import { useLocale } from "@/i18n/locale-context";
+import { formatResultNumber } from "@/features/scenario/results-ui/format-result-values";
 import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
+import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import type { Locale } from "@/i18n/messages";
+import { useLocale } from "@/i18n/locale-context";
 
 const ASSUMPTION_SOURCES: AssumptionSource[] = [
   "customer_provided",
@@ -126,6 +132,64 @@ function getErrors(
   const arr = map.get(path);
   if (!arr?.length) return undefined;
   return arr.map((m) => translateZodIssueMessage(m, t)).join(" ");
+}
+
+function ImportedElectricityMarketDataPanel({
+  resolution,
+  seriesText,
+  locale,
+  t,
+}: {
+  resolution: "daily" | "hourly";
+  seriesText: string;
+  locale: Locale;
+  t: (id: string, vars?: Record<string, string>) => string;
+}) {
+  const bundled = isBundledFinland2025DefaultImportedSeries(resolution, seriesText);
+  const summary = summarizeImportedElectricitySeriesText(seriesText);
+  const resolutionLabel =
+    resolution === "daily"
+      ? t("electricity.importedStatsResolutionDaily")
+      : t("electricity.importedStatsResolutionHourly");
+  const sourceLabel = bundled
+    ? t("electricity.importedStatsSourceBundled")
+    : t("electricity.importedStatsSourceUser");
+
+  return (
+    <div className="space-y-3">
+      <div
+        className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-muted-foreground"
+        data-testid="electricity-imported-vat-notice"
+      >
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-100">
+          {t("electricity.importedVatNoticeTitle")}
+        </p>
+        <p className="mt-2 leading-snug">{t("electricity.importedVatNoticeBody")}</p>
+      </div>
+      <div
+        className="rounded-lg border border-border/80 bg-muted/20 px-4 py-3 text-sm"
+        data-testid="electricity-imported-stats"
+      >
+        <p className="text-xs leading-snug text-muted-foreground">
+          <span className="font-medium text-foreground">{resolutionLabel}</span>
+          <span className="text-muted-foreground"> — </span>
+          <span>{sourceLabel}</span>
+        </p>
+        {summary.ok ? (
+          <p className="mt-1.5 text-xs leading-snug text-muted-foreground">
+            {t("electricity.importedStatsValues", {
+              mean: formatResultNumber(summary.stats.mean, locale, { maximumFractionDigits: 2 }),
+              min: formatResultNumber(summary.stats.min, locale, { maximumFractionDigits: 2 }),
+              max: formatResultNumber(summary.stats.max, locale, { maximumFractionDigits: 2 }),
+              unit: t("units.electricityEurPerMwh"),
+            })}
+          </p>
+        ) : (
+          <p className="mt-1.5 text-xs text-muted-foreground">{t("electricity.importedStatsInvalid")}</p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SeasonalDailyCo2Fields({
@@ -641,6 +705,12 @@ export function ScenarioInputApp() {
                   <option value="hourly">{t("electricity.resolution_hourly")}</option>
                 </select>
                 <FieldHint>{t("electricity.historicalHelp")}</FieldHint>
+                <ImportedElectricityMarketDataPanel
+                  resolution={form.electricity.resolution}
+                  seriesText={form.electricity.seriesText}
+                  locale={locale}
+                  t={t}
+                />
               </div>
             ) : null}
 
