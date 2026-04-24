@@ -151,6 +151,8 @@ export const en = {
     inactiveFactorsTitle: "Not yet applied in daily formulas",
     inactiveFactorsBody:
       "Plant availability and process efficiency are carried with assumption metadata for transparency, but the current MVP daily engine does not multiply outputs by these values (defaults are neutral 100%).",
+    usingLiteratureDefault: "Using literature-based default",
+    usingCustomValue: "Using custom value",
     override: "Override default",
     value: "Value",
     assumptionSource: "Assumption source",
@@ -162,6 +164,11 @@ export const en = {
     field_secMwh: "Electrolyzer SEC (MWh / kg H₂)",
     field_plantAvail: "Plant availability (%)",
     field_processEff: "Process efficiency (%)",
+    unit_stoichH2: "kg H₂ / kg CO₂",
+    unit_stoichCh4: "kg CH₄ / kg CO₂",
+    unit_secKwh: "kWh / kg H₂",
+    unit_secMwh: "MWh / kg H₂",
+    unit_pct: "%",
   },
   assumptionSource: {
     customer_provided: "Customer provided",

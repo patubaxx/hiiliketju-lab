@@ -150,6 +150,8 @@ export const sv = {
     inactiveFactorsTitle: "Används ännu inte i dagliga formler",
     inactiveFactorsBody:
       "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
+    usingLiteratureDefault: "Använder litteraturbaserat standardvärde",
+    usingCustomValue: "Använder eget värde",
     override: "Åsidosätt standard",
     value: "Värde",
     assumptionSource: "Antagandekälla",
@@ -161,6 +163,11 @@ export const sv = {
     field_secMwh: "Elektrolysör SEC (MWh / kg H₂)",
     field_plantAvail: "Anläggningstillgänglighet (%)",
     field_processEff: "Processeffektivitet (%)",
+    unit_stoichH2: "kg H₂ / kg CO₂",
+    unit_stoichCh4: "kg CH₄ / kg CO₂",
+    unit_secKwh: "kWh / kg H₂",
+    unit_secMwh: "MWh / kg H₂",
+    unit_pct: "%",
   },
   assumptionSource: {
     customer_provided: "Kundlevererad",

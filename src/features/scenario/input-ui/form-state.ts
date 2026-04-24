@@ -1,4 +1,5 @@
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
+import { defaultProcessAssumptionsInput } from "@/core/domain/assumptions";
 import type {
   AnnualCo2InputDisplayUnit,
   ElectricityPriceInputDisplayUnit,
@@ -74,13 +75,7 @@ export type ScenarioFormState = {
   process: Record<ProcessSchemaKey, ProcessFieldFormState>;
 };
 
-const defaultProcessField = (): ProcessFieldFormState => ({
-  override: false,
-  value: "",
-  assumptionSource: "customer_provided",
-  assumptionStatus: "confirmed",
-  assumptionNote: "",
-});
+const DEFAULT_PROCESS_ASSUMPTIONS = defaultProcessAssumptionsInput();
 
 export const PROCESS_FIELD_ORDER: readonly {
   key: ProcessSchemaKey;
@@ -91,19 +86,67 @@ export const PROCESS_FIELD_ORDER: readonly {
     | "advanced.field_secMwh"
     | "advanced.field_plantAvail"
     | "advanced.field_processEff";
+  unitId:
+    | "advanced.unit_stoichH2"
+    | "advanced.unit_stoichCh4"
+    | "advanced.unit_secKwh"
+    | "advanced.unit_secMwh"
+    | "advanced.unit_pct";
+  showInAdvancedUi: boolean;
 }[] = [
-  { key: "stoichiometricHydrogenDemandFactorKgH2PerKgCo2", labelId: "advanced.field_stoichH2" },
-  { key: "stoichiometricMethaneYieldFactorKgCh4PerKgCo2", labelId: "advanced.field_stoichCh4" },
-  { key: "electrolyzerSpecificEnergyConsumptionKwhPerKgH2", labelId: "advanced.field_secKwh" },
-  { key: "electrolyzerSpecificEnergyConsumptionMwhPerKgH2", labelId: "advanced.field_secMwh" },
-  { key: "plantAvailabilityPct", labelId: "advanced.field_plantAvail" },
-  { key: "processEfficiencyPct", labelId: "advanced.field_processEff" },
+  {
+    key: "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
+    labelId: "advanced.field_stoichH2",
+    unitId: "advanced.unit_stoichH2",
+    showInAdvancedUi: true,
+  },
+  {
+    key: "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
+    labelId: "advanced.field_stoichCh4",
+    unitId: "advanced.unit_stoichCh4",
+    showInAdvancedUi: true,
+  },
+  {
+    key: "electrolyzerSpecificEnergyConsumptionKwhPerKgH2",
+    labelId: "advanced.field_secKwh",
+    unitId: "advanced.unit_secKwh",
+    showInAdvancedUi: true,
+  },
+  {
+    key: "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
+    labelId: "advanced.field_secMwh",
+    unitId: "advanced.unit_secMwh",
+    showInAdvancedUi: false,
+  },
+  {
+    key: "plantAvailabilityPct",
+    labelId: "advanced.field_plantAvail",
+    unitId: "advanced.unit_pct",
+    showInAdvancedUi: true,
+  },
+  {
+    key: "processEfficiencyPct",
+    labelId: "advanced.field_processEff",
+    unitId: "advanced.unit_pct",
+    showInAdvancedUi: true,
+  },
 ];
+
+const defaultProcessField = (key: ProcessSchemaKey): ProcessFieldFormState => {
+  const canonical = DEFAULT_PROCESS_ASSUMPTIONS[key];
+  return {
+    override: false,
+    value: String(canonical.value),
+    assumptionSource: canonical.assumptionMeta.assumptionSource,
+    assumptionStatus: canonical.assumptionMeta.assumptionStatus,
+    assumptionNote: canonical.assumptionMeta.assumptionNote ?? "",
+  };
+};
 
 export function createInitialFormState(): ScenarioFormState {
   const process = {} as Record<ProcessSchemaKey, ProcessFieldFormState>;
   for (const { key } of PROCESS_FIELD_ORDER) {
-    process[key] = defaultProcessField();
+    process[key] = defaultProcessField(key);
   }
   return {
     scenarioName: "New scenario",

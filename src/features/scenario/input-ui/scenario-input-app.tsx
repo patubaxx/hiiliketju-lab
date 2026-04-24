@@ -12,6 +12,7 @@ import { ScenarioAppNavbar } from "./scenario-app-navbar";
 
 import { Button } from "@/components/ui/button";
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
+import { defaultProcessAssumptionsInput } from "@/core/domain/assumptions";
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
 import {
@@ -175,6 +176,7 @@ export function ScenarioInputApp() {
   const [form, setForm] = React.useState<ScenarioFormState>(() => createInitialFormState());
   const [errors, setErrors] = React.useState<Map<string, string[]>>(new Map());
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+  const defaultProcess = React.useMemo(() => defaultProcessAssumptionsInput(), []);
   const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
   const scrollToOutcomeAfterRunRef = React.useRef(false);
 
@@ -892,8 +894,22 @@ export function ScenarioInputApp() {
         </div>
 
         <div className="space-y-6">
-          {PROCESS_FIELD_ORDER.map(({ key, labelId }) => {
+          {PROCESS_FIELD_ORDER.filter(({ showInAdvancedUi }) => showInAdvancedUi).map(
+            ({ key, labelId, unitId }) => {
             const row = form.process[key];
+            const canonicalDefault = defaultProcess[key];
+            const activeMeta = row.override
+              ? {
+                  assumptionSource: row.assumptionSource,
+                  assumptionStatus: row.assumptionStatus,
+                  assumptionNote: row.assumptionNote.trim(),
+                }
+              : {
+                  assumptionSource: canonicalDefault.assumptionMeta.assumptionSource,
+                  assumptionStatus: canonicalDefault.assumptionMeta.assumptionStatus,
+                  assumptionNote: canonicalDefault.assumptionMeta.assumptionNote ?? "",
+                };
+            const activeValueText = row.override ? (row.value.trim() || "—") : String(canonicalDefault.value);
             const inactive =
               key === "plantAvailabilityPct" || key === "processEfficiencyPct" ? true : false;
             return (
@@ -912,7 +928,19 @@ export function ScenarioInputApp() {
                         ...s,
                         process: {
                           ...s.process,
-                          [key]: { ...s.process[key], override: e.target.checked },
+                          [key]: e.target.checked
+                            ? {
+                                ...s.process[key],
+                                override: true,
+                                value: s.process[key].value || String(defaultProcess[key].value),
+                                assumptionSource: "customer_provided",
+                                assumptionStatus: "confirmed",
+                                assumptionNote: "",
+                              }
+                            : {
+                                ...s.process[key],
+                                override: false,
+                              },
                         },
                       }))
                     }
@@ -923,6 +951,33 @@ export function ScenarioInputApp() {
                       (MVP)
                     </span>
                   ) : null}
+                </div>
+                <div className="rounded-md border border-border/65 bg-card/80 px-3 py-2 text-sm">
+                  <p className="font-medium text-foreground">
+                    {row.override
+                      ? t("advanced.usingCustomValue")
+                      : t("advanced.usingLiteratureDefault")}
+                  </p>
+                  <p className="mt-1 font-mono text-base font-semibold tabular-nums text-foreground">
+                    {activeValueText}{" "}
+                    <span className="font-sans text-xs font-medium text-muted-foreground">{t(unitId)}</span>
+                  </p>
+                  <dl className="mt-2 space-y-1.5 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap gap-x-2">
+                      <dt className="font-medium text-foreground/85">{t("advanced.assumptionSource")}</dt>
+                      <dd>{t(`assumptionSource.${activeMeta.assumptionSource}`)}</dd>
+                    </div>
+                    <div className="flex flex-wrap gap-x-2">
+                      <dt className="font-medium text-foreground/85">{t("advanced.assumptionStatus")}</dt>
+                      <dd>{t(`assumptionStatus.${activeMeta.assumptionStatus}`)}</dd>
+                    </div>
+                    {activeMeta.assumptionNote ? (
+                      <div>
+                        <dt className="font-medium text-foreground/85">{t("advanced.assumptionNote")}</dt>
+                        <dd className="mt-0.5 text-foreground/90">{activeMeta.assumptionNote}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
                 </div>
                 <details className="text-xs">
                   <summary className="cursor-pointer text-muted-foreground hover:text-foreground">

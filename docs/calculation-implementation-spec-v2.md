@@ -184,6 +184,8 @@ Timestep electricity prices are **purchase** prices in **EUR/MWh** after harmoni
 | plantAvailabilityPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 | processEfficiencyPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 
+In the setup UI, these defaults are shown as active values with metadata before any override is entered; payload mapping keeps untouched fields omitted so `mergeProcessAssumptionsInput` remains the canonical default source.
+
 ### 7.2 Inputs that remain customer/business inputs
 
 | Parameter | Unit | assumptionSource | assumptionStatus |

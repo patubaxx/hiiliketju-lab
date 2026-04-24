@@ -150,6 +150,8 @@ export const fi = {
     inactiveFactorsTitle: "Ei vielä päivittäisissä kaavoissa",
     inactiveFactorsBody:
       "Laitoksen käytettävyys ja prosessin hyötysuhde kulkevat metatietoineen läpinäkyvyyden vuoksi, mutta nykyinen MVP-päivämoottori ei kerro näillä arvoilla (oletukset ovat neutraalit 100 %).",
+    usingLiteratureDefault: "Käytössä kirjallisuuspohjainen oletusarvo",
+    usingCustomValue: "Käytössä oma arvo",
     override: "Korvaa oletus",
     value: "Arvo",
     assumptionSource: "Oletuksen lähde",
@@ -161,6 +163,11 @@ export const fi = {
     field_secMwh: "Elektrolyyserin SEC (MWh / kg H₂)",
     field_plantAvail: "Laitoksen käytettävyys (%)",
     field_processEff: "Prosessin hyötysuhde (%)",
+    unit_stoichH2: "kg H₂ / kg CO₂",
+    unit_stoichCh4: "kg CH₄ / kg CO₂",
+    unit_secKwh: "kWh / kg H₂",
+    unit_secMwh: "MWh / kg H₂",
+    unit_pct: "%",
   },
   assumptionSource: {
     customer_provided: "Asiakkaan toimittama",

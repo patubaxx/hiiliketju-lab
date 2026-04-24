@@ -3,6 +3,7 @@
  * parsing issues are returned for field-level UX. Zod on submit remains authoritative for run/export.
  */
 import type { AssumptionMeta } from "@/core/domain/assumptions";
+import { META_DERIVED_SEC_MWH } from "@/core/domain/assumptions";
 import {
   annualCo2InputToKtPerYear,
   electricityPriceInputToEurPerMwh,
@@ -278,6 +279,7 @@ function buildProcessPartial(
 ): Record<string, unknown> | undefined {
   const out: Record<string, unknown> = {};
   let bad = false;
+  let secKwhOverride: number | undefined;
 
   const addAssumption = (key: ProcessSchemaKey, meta: AssumptionMeta, value: number) => {
     out[key] = { value, assumptionMeta: meta };
@@ -287,7 +289,6 @@ function buildProcessPartial(
     "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
     "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
     "electrolyzerSpecificEnergyConsumptionKwhPerKgH2",
-    "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
     "plantAvailabilityPct",
     "processEfficiencyPct",
   ] as const) {
@@ -305,6 +306,31 @@ function buildProcessPartial(
       ...(row.assumptionNote.trim() ? { assumptionNote: row.assumptionNote.trim() } : {}),
     };
     addAssumption(key, meta, v);
+    if (key === "electrolyzerSpecificEnergyConsumptionKwhPerKgH2") {
+      secKwhOverride = v;
+    }
+  }
+
+  const secMwhRow = state.process.electrolyzerSpecificEnergyConsumptionMwhPerKgH2;
+  if (secMwhRow.override) {
+    const secMwh = parseFiniteNumber(secMwhRow.value);
+    if (secMwh === undefined) {
+      issues.push({ path: "process.electrolyzerSpecificEnergyConsumptionMwhPerKgH2.value", message: "invalid" });
+      bad = true;
+    } else {
+      const meta: AssumptionMeta = {
+        assumptionSource: secMwhRow.assumptionSource,
+        assumptionStatus: secMwhRow.assumptionStatus,
+        ...(secMwhRow.assumptionNote.trim() ? { assumptionNote: secMwhRow.assumptionNote.trim() } : {}),
+      };
+      addAssumption("electrolyzerSpecificEnergyConsumptionMwhPerKgH2", meta, secMwh);
+    }
+  } else if (secKwhOverride !== undefined) {
+    addAssumption(
+      "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
+      META_DERIVED_SEC_MWH,
+      secKwhOverride / 1000,
+    );
   }
 
   if (bad) return undefined;

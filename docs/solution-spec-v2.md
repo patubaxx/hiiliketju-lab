@@ -223,6 +223,7 @@ Advanced assumptions may include:
 - future extension fields
 
 All non-customer-provided values must display their source flag.
+The setup UI must show active literature-based defaults immediately (value, unit, source/status, optional note) and allow explicit user overrides per supported field.
 
 ### 7.3 Results view
 
