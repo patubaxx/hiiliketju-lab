@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 /**
  * WP15 — Product-surface simplification tests
  *
@@ -8,14 +9,18 @@
  * 4. `buildScenarioPayload` canonical output is correct with the fixed kt/year display unit.
  */
 import { describe, expect, it } from "vitest";
+import { createElement } from "react";
+import { render, screen } from "@testing-library/react";
 
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import {
   type ElectricityModeForm,
   createInitialFormState,
 } from "@/features/scenario/input-ui/form-state";
+import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-app";
 import { electricityPriceInputSchema } from "@/features/scenario/schemas/electricity-price-schema";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { LocaleProvider } from "@/i18n/locale-context";
 
 // ─── CO₂ unit simplification ────────────────────────────────────────────────
 
@@ -45,6 +50,15 @@ describe("WP15 – electricity mode visible defaults", () => {
   it("initial form state defaults electricity mode to constant (a visible mode)", () => {
     const state = createInitialFormState();
     expect(state.electricity.mode).toBe("constant");
+  });
+
+  it("visible electricity selector exposes only constant and imported historical modes", () => {
+    render(createElement(LocaleProvider, null, createElement(ScenarioInputApp)));
+
+    expect(screen.getByRole("option", { name: /Constant purchase price/i })).toBeTruthy();
+    expect(screen.getByRole("option", { name: /Imported market data/i })).toBeTruthy();
+    expect(screen.queryByRole("option", { name: /Daily series/i })).toBeNull();
+    expect(screen.queryByRole("option", { name: /Hourly series/i })).toBeNull();
   });
 });
 

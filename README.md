@@ -38,6 +38,10 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 
 Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ hourly → daily **sum**; electricity hourly → daily **arithmetic mean**).
 
+## Current product surface
+
+The visible scenario form keeps **annual CO₂** fixed to `kt/year`. The visible electricity selector offers only `constant` and `historical_market_data_imported`; retained internal support for `daily_series` and `hourly_series` still exists in schema, domain, engine, and export paths. Imported market defaults use deterministic repository-local Finland 2025 datasets, with hourly values from delivered source data and daily values derived from hourly arithmetic means. The setup UI initializes methane and hydrogen assumed sales prices to `1200 EUR/t_CH4` and `4 EUR/kg_H2`.
+
 ## Export flow (high level)
 
 1. From the scenario navbar, the client POSTs **`{ "scenario": <wire> }`** to **`/api/export/excel`** or **`/api/export/pdf`** (see `src/app/api/export/parse-export-body.ts`) using the canonical **`result.input`** from the latest successful run.

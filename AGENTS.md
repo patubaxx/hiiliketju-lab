@@ -36,6 +36,9 @@ These are **documentation anchors** for behaviour already shipped; they do not r
 
 - **Copy:** electricity is framed as **purchase / procurement price**; methane and hydrogen economics as **assumed sales prices**; profitability KPIs that depend on costs remain **derived** from **`calculateScenario`**. Wire field names were not renamed for wording.
 - **Display units:** the form shows **annual CO₂** as `kt/year` (fixed, no unit selector) and **constant** electricity purchase price as `EUR/MWh` or `c/kWh` (user-selectable). Convert in **`buildScenarioPayload`** (or shared domain helpers), not scattered in presentational components. **Canonical wire** stays `kt/year` / `EUR/MWh` for those fields; **time-series** and **exports** stay canonical. (Internal conversion helpers for `kg/year` remain in domain code to preserve future flexibility; they are not exposed in the visible UI.)
+- **Visible vs retained electricity modes:** the visible scenario form offers only **`constant`** and **`historical_market_data_imported`**. Internal schema / domain / engine / export support for **`daily_series`** and **`hourly_series`** remains intact.
+- **Imported market defaults:** `historical_market_data_imported` initializes from deterministic repository-local Finland 2025 data. Hourly defaults come from the delivered source material; daily defaults are derived from those hourly prices by arithmetic mean per calendar date.
+- **Current commercial setup defaults:** methane assumed sales price initializes to `1200 EUR/t_CH4`; hydrogen assumed sales price initializes to `4 EUR/kg_H2`.
 - **CSV import:** browser-only parsing into the existing bulk **`seriesText`** path for CO₂ and electricity time-series where the UI offers it; **no** new calculation modes and **no** new `ScenarioInput` shapes.
 
 ---

@@ -311,7 +311,7 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
               style={[styles.assumptionBlock, lit ? styles.assumptionLiterature : {}]}
               wrap={false}
             >
-              {lit ? <Text style={styles.assumptionBadge}>Literature-based default</Text> : null}
+              {lit ? <Text style={styles.assumptionBadge}>Literature-based</Text> : null}
               <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 2 }}>{a.fieldLabel}</Text>
               <Text style={styles.assumptionValue}>
                 {formatPdfNumber(a.value, 6)} {a.unit}

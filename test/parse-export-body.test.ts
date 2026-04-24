@@ -39,4 +39,21 @@ describe("parseExportScenarioPostBody", () => {
       expect(r.input.process.stoichiometricHydrogenDemandFactorKgH2PerKgCo2.value).toBeDefined();
     }
   });
+
+  it("ignores extra top-level payload objects and still trusts only scenario", () => {
+    const scenario = minimalExportScenarioWire();
+    const r = parseExportScenarioPostBody(
+      JSON.stringify({
+        scenario,
+        calculationResult: {
+          annualSummary: { annualTotalCostEur: 999999999 },
+        },
+      }),
+    );
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.input.scenarioName).toBe(scenario.scenarioName);
+      expect(r.input.economics.methanePriceEurPerTch4).toBe(scenario.economics.methanePriceEurPerTch4);
+    }
+  });
 });

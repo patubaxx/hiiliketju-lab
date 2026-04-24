@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
+import { mergeProcessAssumptionsInput } from "@/core/domain/scenario";
 import { buildScenarioExcelExportModel } from "@/core/reporting/build-export-model";
 import { buildScenarioPdfReportModel } from "@/core/reporting/build-pdf-report-model";
 import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
@@ -56,5 +57,32 @@ describe("PDF report model (WP7)", () => {
     const pdfModel = buildScenarioPdfReportModel(result, { chartMaxPoints: 10 });
     const last = pdfModel.charts.co2KgPerDay[pdfModel.charts.co2KgPerDay.length - 1]!;
     expect(last.dayIndex).toBe(364);
+  });
+
+  it("keeps overridden and untouched process-assumption provenance distinct in the PDF export path", () => {
+    const result = calculateScenario(
+      parseScenarioInput({
+        ...minimalScenarioRaw(),
+        process: mergeProcessAssumptionsInput({
+          stoichiometricHydrogenDemandFactorKgH2PerKgCo2: {
+            value: 0.2,
+            assumptionMeta: {
+              assumptionSource: "customer_provided",
+              assumptionStatus: "confirmed",
+            },
+          },
+        }),
+      }),
+    );
+    const pdfModel = buildScenarioPdfReportModel(result);
+    const overridden = pdfModel.excelModel.processAssumptions.find(
+      (row) => row.fieldKey === "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
+    );
+    const untouched = pdfModel.excelModel.processAssumptions.find(
+      (row) => row.fieldKey === "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
+    );
+
+    expect(overridden?.assumptionSource).toBe("customer_provided");
+    expect(untouched?.assumptionSource).toBe("literature_based");
   });
 });

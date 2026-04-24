@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import { createInitialFormState } from "@/features/scenario/input-ui/form-state";
 
-describe("buildScenarioPayload display units", () => {
-  it("converts annual CO₂ from kg/year to canonical kt/year on the wire", () => {
+describe("buildScenarioPayload retained conversion helpers", () => {
+  it("still converts annual CO₂ from internal kg/year helper input to canonical kt/year on the wire", () => {
     const state = {
       ...createInitialFormState(),
       annualAmountKtPerYear: "2500000",

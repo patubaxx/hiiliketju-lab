@@ -50,7 +50,7 @@ The MVP must produce, at minimum:
   - `hourly_series`
   - `historical_market_data_imported`
   - **Visible UI selector:** only `constant` and `historical_market_data_imported` are offered; `daily_series` and `hourly_series` remain as internal contracts.
-  - **`historical_market_data_imported` defaults:** pre-loaded with deterministic 2025 Finnish spot-market prices derived from `sources/electricity_prices.csv` (porssisahko.net, VAT included). Daily defaults = arithmetic mean of 24 hourly prices per calendar date; both resolutions available. Users may override by pasting or importing their own EUR/MWh series.
+  - **`historical_market_data_imported` defaults:** pre-loaded with deterministic repository-local 2025 Finnish spot-market prices derived from `sources/electricity_prices.csv` (porssisahko.net, VAT included). Hourly defaults come from the delivered source data; daily defaults are derived from those hourly prices by arithmetic mean per calendar date (23, 24, or 25 hourly values on DST transition days). Both resolutions are available. Users may override by pasting or importing their own EUR/MWh series.
 - hourly input harmonization into daily internal resolution
 - stoichiometric methane path calculation
 - hydrogen alternative path comparison
@@ -165,6 +165,7 @@ The following are locked for MVP:
 
 - **Annual CO₂** is shown fixed as **`kt/year`** in the scenario form (no unit selector; internal `kg/year` conversion helpers remain in domain code for future use). **Constant** electricity **purchase** price may be entered as **`EUR/MWh` or `c/kWh`**; values are converted in **`buildScenarioPayload`** so the validated **`ScenarioInput`** remains canonical (**`kt/year`**, **`EUR/MWh`** for those fields). Time-series bulk entry does **not** gain alternate display units in MVP.
 - **Browser CSV import** for CO₂ and electricity **time-series** fills the same bulk text / builder path as paste; it is not a separate calculation mode or input contract.
+- **Current setup defaults for commercial assumptions:** methane assumed sales price initializes to **`1200 EUR/t_CH4`** and hydrogen assumed sales price initializes to **`4 EUR/kg_H2`**. These are editable scenario defaults, not product-locked calculation outputs.
 
 ---
 
@@ -346,7 +347,7 @@ If `includeCapex = false`, then:
 ## 9. Units and Measurement Conventions
 
 ### 9.1 User-facing default units
-- CO₂: `kt/year` (default); the form may also **display** annual CO₂ as `kg/year` before conversion to canonical wire
+- CO₂: `kt/year` in the visible form; retained internal conversion helpers for `kg/year` do not change the current product UI
 - H₂: `kg`
 - CH₄: `t/year`
 - methane price: `EUR/t_CH4`
@@ -365,7 +366,7 @@ If `includeCapex = false`, then:
 ### 9.3 Unit principles
 - every input and output field must display units explicitly
 - internal units and user-facing units must be kept distinct where needed
-- **exports and the canonical wire `ScenarioInput` use canonical business units** (`kt/year`, `EUR/MWh`, etc.); optional alternate **form display** units for annual CO₂ and constant electricity are converted **before** validation and do not change export column semantics
+- **exports and the canonical wire `ScenarioInput` use canonical business units** (`kt/year`, `EUR/MWh`, etc.); annual CO₂ remains visibly `kt/year`, while the constant-electricity form may use `c/kWh` before conversion. Retained internal annual-CO₂ conversion helpers do not change export column semantics
 - unit transformations must live in calculation/domain helpers and the **payload builder** (`buildScenarioPayload`), not ad hoc in presentational UI components
 
 ---

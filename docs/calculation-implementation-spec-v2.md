@@ -133,7 +133,7 @@ Example note:
 | scenarioName | Scenario label | - | yes | user |
 | annualCO2KtPerYear | Annual CO₂ amount | kt/year | yes | user |
 | utilizationRatePct | CO₂ utilization rate | % | yes | user |
-| methanePriceEurPerTon | Methane sales price | EUR/t_CH4 | yes | user/customer |
+| methanePriceEurPerTch4 | Methane sales price | EUR/t_CH4 | yes | user/customer |
 | hydrogenPriceEurPerKg | Hydrogen sales price | EUR/kg_H2 | yes | user/customer |
 | otherOpexEurPerYear | Other annual OPEX | EUR/year | no | user |
 | includeCapex | Whether CAPEX is included | boolean | yes | user |
@@ -160,6 +160,8 @@ Timestep electricity prices are **purchase** prices in **EUR/MWh** after harmoni
 - `daily_series`
 - `hourly_series`
 - `historical_market_data_imported`
+
+The visible scenario UI offers only `constant` and `historical_market_data_imported`. `daily_series` and `hourly_series` remain retained internal wire / schema / engine / export capabilities.
 
 ### 6.4 Calculation settings
 
@@ -190,12 +192,14 @@ In the setup UI, these defaults are shown as active values with metadata before 
 
 | Parameter | Unit | assumptionSource | assumptionStatus |
 |---|---|---|---|
-| methanePriceEurPerTon | EUR/t_CH4 | customer_provided | confirmed or pending_customer_confirmation |
+| methanePriceEurPerTch4 | EUR/t_CH4 | customer_provided | confirmed or pending_customer_confirmation |
 | hydrogenPriceEurPerKg | EUR/kg_H2 | customer_provided | confirmed or pending_customer_confirmation |
 | otherOpexEurPerYear | EUR/year | customer_provided | confirmed or pending_customer_confirmation |
 | electrolyzerCapexEur | EUR | customer_provided | confirmed or pending_customer_confirmation |
 | methanationCapexEur | EUR | customer_provided | confirmed or pending_customer_confirmation |
 | capexLifetimeYears | year | customer_provided | confirmed or pending_customer_confirmation |
+
+Current setup UI defaults for these editable commercial inputs are `1200 EUR/t_CH4` for methane and `4 EUR/kg_H2` for hydrogen. They are scenario defaults, not product-locked calculation assumptions.
 
 ---
 
@@ -301,7 +305,7 @@ Else:
 `totalCostEur_day = variableCostEur_day + allocatedCapexCostEur_day`
 
 ### F-011 Methane revenue
-`methaneRevenueEur_day = (methaneProducedKg_day / 1000) * methanePriceEurPerTon`
+`methaneRevenueEur_day = (methaneProducedKg_day / 1000) * methanePriceEurPerTch4`
 
 ### F-012 Hydrogen alternative revenue
 `hydrogenAlternativeRevenueEur_day = hydrogenNeededKg_day * hydrogenPriceEurPerKg`
