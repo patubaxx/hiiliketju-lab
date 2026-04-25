@@ -265,12 +265,6 @@ function ElectricityPurchaseBlock({
   setElectricityMode: (mode: ElectricityModeForm) => void;
   block: "basic" | "advancedDailyHourly";
 }) {
-  if (block === "advancedDailyHourly") {
-    if (form.electricity.mode !== "daily_series" && form.electricity.mode !== "hourly_series") {
-      return null;
-    }
-  }
-
   if (block === "basic" && (form.electricity.mode === "daily_series" || form.electricity.mode === "hourly_series")) {
     return (
       <div data-testid="electricity-daily-hourly-hint" className="space-y-3">
@@ -295,6 +289,9 @@ function ElectricityPurchaseBlock({
   }
 
   if (block === "advancedDailyHourly") {
+    if (form.electricity.mode !== "daily_series" && form.electricity.mode !== "hourly_series") {
+      return null;
+    }
     const el = form.electricity;
     return (
       <div className="space-y-3">

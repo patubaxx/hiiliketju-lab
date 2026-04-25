@@ -1,5 +1,8 @@
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
-import { USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS } from "@/core/domain/user-facing-process-assumptions";
+import {
+  USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS,
+  type UserFacingExportProcessAssumptionKey,
+} from "@/core/domain/user-facing-process-assumptions";
 import type { CalculationResult, DailyResult, MonthlySummary, ScenarioSummary } from "@/core/domain/result";
 import type { ScenarioInput } from "@/core/domain/scenario";
 import { translate, type Locale } from "@/i18n/messages";
@@ -26,9 +29,8 @@ import {
  * User-facing process assumption rows in Excel/PDF (WP23). Inactive `plantAvailabilityPct` and
  * `processEfficiencyPct` stay on the canonical input but are omitted here.
  */
-export const PROCESS_ASSUMPTION_EXPORT_ORDER: readonly (keyof ProcessAssumptionsInput)[] = [
-  ...USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS,
-] as const;
+export const PROCESS_ASSUMPTION_EXPORT_ORDER: readonly UserFacingExportProcessAssumptionKey[] =
+  USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS;
 
 export const PROCESS_ASSUMPTION_EXPORT_LABELS: Record<keyof ProcessAssumptionsInput, string> = {
   stoichiometricHydrogenDemandFactorKgH2PerKgCo2: "Stoichiometric H₂ demand",

@@ -1,4 +1,7 @@
-import { USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS } from "@/core/domain/user-facing-process-assumptions";
+import {
+  USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS,
+  type UserFacingExportProcessAssumptionKey,
+} from "@/core/domain/user-facing-process-assumptions";
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
 import type { CalculationResult } from "@/core/domain/result";
 import { DEFAULT_SEASONAL_CO2_RELATIVE_WEIGHTS } from "@/core/domain/seasonal-co2-default-weights";
@@ -54,14 +57,14 @@ export type UsedAssumptionRow = {
   readonly kind?: UsedAssumptionKind;
 };
 
-const PROCESS_LABEL_KEYS: Record<(typeof USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS)[number], string> = {
+const PROCESS_LABEL_KEYS: Record<UserFacingExportProcessAssumptionKey, string> = {
   stoichiometricHydrogenDemandFactorKgH2PerKgCo2: "advanced.field_stoichH2",
   stoichiometricMethaneYieldFactorKgCh4PerKgCo2: "advanced.field_stoichCh4",
   electrolyzerSpecificEnergyConsumptionKwhPerKgH2: "advanced.field_secKwh",
   electrolyzerSpecificEnergyConsumptionMwhPerKgH2: "advanced.field_secMwh",
 };
 
-const PROCESS_UNIT_KEYS: Record<(typeof USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS)[number], string> = {
+const PROCESS_UNIT_KEYS: Record<UserFacingExportProcessAssumptionKey, string> = {
   stoichiometricHydrogenDemandFactorKgH2PerKgCo2: "advanced.unit_stoichH2",
   stoichiometricMethaneYieldFactorKgCh4PerKgCo2: "advanced.unit_stoichCh4",
   electrolyzerSpecificEnergyConsumptionKwhPerKgH2: "advanced.unit_secKwh",
