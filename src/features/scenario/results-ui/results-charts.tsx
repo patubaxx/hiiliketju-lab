@@ -13,23 +13,40 @@ import {
 } from "recharts";
 
 import type { CalculationResult } from "@/core/domain/result";
+import { pickEurPerDayYScaleFromMaxAbsEur, pickMassPerDayYScaleFromMaxAbsKg } from "@/core/presentation/chart-daily-scales";
+import { formatDisplayNumber } from "@/core/presentation/format-scaled-number";
+import type { Locale } from "@/i18n/messages";
+
+const localeForIntl: Record<Locale, string> = { en: "en-GB", fi: "fi-FI", sv: "sv-SE" };
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
-/** Fixed SVG height; X-axis title is rendered below the chart (HTML) to avoid tick/label overlap inside Recharts. */
-const CHART_CONTAINER_HEIGHT_PX = 300;
+const CHART_CONTAINER_HEIGHT_PX = 320;
 
 const responsiveChartProps = {
   width: "100%" as const,
   height: CHART_CONTAINER_HEIGHT_PX,
   minHeight: CHART_CONTAINER_HEIGHT_PX,
   minWidth: 0 as const,
-  /** Avoid first-paint width/height -1 and console warning before ResizeObserver runs. */
   initialDimension: { width: 800, height: CHART_CONTAINER_HEIGHT_PX },
 };
 
-const chartMarginDefault = { top: 8, right: 12, left: 4, bottom: 36 };
-const chartMarginWithLegend = { top: 8, right: 12, left: 4, bottom: 52 };
+const chartMarginDefault = { top: 10, right: 14, left: 6, bottom: 44 };
+const chartMarginWithLegend = { top: 10, right: 14, left: 6, bottom: 58 };
+
+const tickStyle = { fontSize: 12, fill: "var(--muted-foreground)" } as const;
+const axisLabelStyle = { fontSize: 12, fill: "var(--muted-foreground)" };
+
+function maxAbsOf(nums: readonly number[]): number {
+  if (nums.length === 0) {
+    return 0;
+  }
+  return Math.max(...nums.map((n) => Math.abs(n)));
+}
+
+function fmt2(value: number, locale: Locale): string {
+  return formatDisplayNumber(value, { maxDecimals: 2, locale: localeForIntl[locale] });
+}
 
 function ChartCard({
   title,
@@ -59,49 +76,120 @@ function ChartCard({
   );
 }
 
-export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn }) {
+export function ResultsCharts({
+  result,
+  locale,
+  t,
+}: {
+  result: CalculationResult;
+  locale: Locale;
+  t: TFn;
+}) {
+  const co2Raw = result.resolvedDailyCo2;
+  const co2YScale = React.useMemo(() => {
+    const m = maxAbsOf(co2Raw.map((p) => p.availableCO2Kg));
+    return pickMassPerDayYScaleFromMaxAbsKg(m);
+  }, [co2Raw]);
+
   const co2Data = React.useMemo(
     () =>
-      result.resolvedDailyCo2.map((p) => ({
+      co2Raw.map((p) => ({
         x: p.dayIndex,
         label: p.dateLabel,
-        availableCO2Kg: p.availableCO2Kg,
+        y: p.availableCO2Kg / co2YScale.divisor,
       })),
-    [result.resolvedDailyCo2],
+    [co2Raw, co2YScale.divisor],
   );
+
+  const co2YLabel =
+    co2YScale.unitId === "t"
+      ? t("results.chart.axis.yTpd")
+      : co2YScale.unitId === "kt"
+        ? t("results.chart.axis.yKtd")
+        : t("results.chart.axis.yKgd");
 
   const priceData = React.useMemo(
     () =>
       result.resolvedDailyElectricityPrice.map((p) => ({
         x: p.dayIndex,
         label: p.dateLabel,
-        priceEurPerMwh: p.electricityPriceEurPerMWh,
+        y: p.electricityPriceEurPerMWh,
       })),
     [result.resolvedDailyElectricityPrice],
   );
 
+  const methaneRaw = result.dailyResults;
+  const methaneYScale = React.useMemo(() => {
+    const m = maxAbsOf(methaneRaw.map((r) => r.methaneProducedKg));
+    return pickMassPerDayYScaleFromMaxAbsKg(m);
+  }, [methaneRaw]);
+
   const methaneData = React.useMemo(
     () =>
-      result.dailyResults.map((row) => ({
+      methaneRaw.map((row) => ({
         x: row.dayIndex,
         label: row.dateLabel,
-        methaneProducedKg: row.methaneProducedKg,
+        y: row.methaneProducedKg / methaneYScale.divisor,
       })),
-    [result.dailyResults],
+    [methaneRaw, methaneYScale.divisor],
   );
+
+  const methaneYLabel =
+    methaneYScale.unitId === "t"
+      ? t("results.chart.axis.yMethaneTpd")
+      : methaneYScale.unitId === "kt"
+        ? t("results.chart.axis.yMethaneKtd")
+        : t("results.chart.axis.yMethaneKgd");
+
+  const costRevRaw = result.dailyResults;
+  const eurYScale = React.useMemo(() => {
+    const m = maxAbsOf(
+      costRevRaw.flatMap((r) => [r.totalCostEur, r.methaneRevenueEur] as const),
+    );
+    return pickEurPerDayYScaleFromMaxAbsEur(m);
+  }, [costRevRaw]);
 
   const costRevData = React.useMemo(
     () =>
-      result.dailyResults.map((row) => ({
+      costRevRaw.map((row) => ({
         x: row.dayIndex,
         label: row.dateLabel,
-        totalCostEur: row.totalCostEur,
-        methaneRevenueEur: row.methaneRevenueEur,
+        cost: row.totalCostEur / eurYScale.divisor,
+        rev: row.methaneRevenueEur / eurYScale.divisor,
       })),
-    [result.dailyResults],
+    [costRevRaw, eurYScale.divisor],
   );
 
-  const tickFormatter = React.useCallback((v: number) => String(v), []);
+  const eurYLabel =
+    eurYScale.unitId === "kEUR"
+      ? t("results.chart.axis.yCostKEurD")
+      : eurYScale.unitId === "MEUR"
+        ? t("results.chart.axis.yCostMeurD")
+        : t("results.chart.axis.yCostEurD");
+
+  const eurUnitHint =
+    eurYScale.unitId === "kEUR"
+      ? t("results.chart.unit.kEurPerD")
+      : eurYScale.unitId === "MEUR"
+        ? t("results.chart.unit.meurPerD")
+        : t("results.chart.unit.eurPerD");
+
+  const tickFormatterX = React.useCallback((v: number) => String(v), []);
+
+  const tooltipFormatter = React.useCallback(
+    (value: number | string, name: string) => {
+      if (typeof value !== "number" || !Number.isFinite(value)) {
+        return [String(value), name];
+      }
+      return [`${fmt2(value, locale)}`, name];
+    },
+    [locale],
+  );
+
+  const co2YTick = React.useCallback((v: number) => fmt2(v, locale), [locale]);
+  const priceYTick = React.useCallback((v: number) => fmt2(v, locale), [locale]);
+  const methaneYTick = co2YTick;
+  const eurYTick = co2YTick;
 
   return (
     <section className="space-y-5 border-t border-border/70 pt-10" aria-labelledby="results-charts-heading">
@@ -112,24 +200,32 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">{t("results.section.chartsLead")}</p>
       </div>
       <div className="grid min-w-0 gap-5 lg:grid-cols-2">
-        <ChartCard title={t("results.chart.co2Availability")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
+        <ChartCard title={t("results.chart.co2Availability")} xAxisCaption={t("results.chart.axis.xDate")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={co2Data} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
-                tickFormatter={tickFormatter}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                tickMargin={6}
+                tickFormatter={tickFormatterX}
+                tick={tickStyle}
+                tickMargin={8}
                 interval={30}
+                height={36}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                width={52}
-                tickFormatter={(v) => (typeof v === "number" ? v.toExponential(0) : String(v))}
+                tick={tickStyle}
+                width={64}
+                tickFormatter={co2YTick}
+                label={{
+                  value: co2YLabel,
+                  angle: -90,
+                  position: "insideLeft",
+                  style: axisLabelStyle,
+                }}
               />
               <Tooltip
-                labelFormatter={(_, payload) => {
+                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
                 }}
@@ -137,12 +233,12 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                   background: "var(--card)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "13px",
                 }}
               />
               <Line
                 type="monotone"
-                dataKey="availableCO2Kg"
+                dataKey="y"
                 name={t("results.chart.series.availableCo2Kg")}
                 stroke="var(--chart-2)"
                 dot={false}
@@ -153,20 +249,32 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.electricityPrice")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
+        <ChartCard title={t("results.chart.electricityPrice")} xAxisCaption={t("results.chart.axis.xDate")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={priceData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
-                tickFormatter={tickFormatter}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                tickMargin={6}
+                tickFormatter={tickFormatterX}
+                tick={tickStyle}
+                tickMargin={8}
                 interval={30}
+                height={36}
               />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
+              <YAxis
+                tick={tickStyle}
+                width={56}
+                tickFormatter={priceYTick}
+                label={{
+                  value: t("results.chart.axis.yEurPerMwh"),
+                  angle: -90,
+                  position: "insideLeft",
+                  style: axisLabelStyle,
+                }}
+              />
               <Tooltip
-                labelFormatter={(_, payload) => {
+                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
                 }}
@@ -174,12 +282,12 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                   background: "var(--card)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "13px",
                 }}
               />
               <Line
                 type="monotone"
-                dataKey="priceEurPerMwh"
+                dataKey="y"
                 name={t("results.chart.series.electricityPrice")}
                 stroke="var(--chart-3)"
                 dot={false}
@@ -190,20 +298,27 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.methaneProduction")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
+        <ChartCard title={t("results.chart.methaneProduction")} xAxisCaption={t("results.chart.axis.xDate")}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={methaneData} margin={chartMarginDefault}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
-                tickFormatter={tickFormatter}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                tickMargin={6}
+                tickFormatter={tickFormatterX}
+                tick={tickStyle}
+                tickMargin={8}
                 interval={30}
+                height={36}
               />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
+              <YAxis
+                tick={tickStyle}
+                width={64}
+                tickFormatter={methaneYTick}
+                label={{ value: methaneYLabel, angle: -90, position: "insideLeft", style: axisLabelStyle }}
+              />
               <Tooltip
-                labelFormatter={(_, payload) => {
+                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
                 }}
@@ -211,12 +326,12 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                   background: "var(--card)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "13px",
                 }}
               />
               <Line
                 type="monotone"
-                dataKey="methaneProducedKg"
+                dataKey="y"
                 name={t("results.chart.series.methaneProducedKg")}
                 stroke="var(--chart-1)"
                 dot={false}
@@ -227,20 +342,27 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title={t("results.chart.costVsRevenueDaily")} xAxisCaption={t("results.chart.axis.dayOfYear")}>
+        <ChartCard title={t("results.chart.costVsRevenueDaily")} xAxisCaption={`${t("results.chart.axis.xDate")} · ${eurUnitHint}`}>
           <ResponsiveContainer {...responsiveChartProps}>
             <LineChart data={costRevData} margin={chartMarginWithLegend}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="x"
-                tickFormatter={tickFormatter}
-                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                tickMargin={6}
+                tickFormatter={tickFormatterX}
+                tick={tickStyle}
+                tickMargin={8}
                 interval={30}
+                height={36}
               />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} />
+              <YAxis
+                tick={tickStyle}
+                width={68}
+                tickFormatter={eurYTick}
+                label={{ value: eurYLabel, angle: -90, position: "insideLeft", style: axisLabelStyle }}
+              />
               <Tooltip
-                labelFormatter={(_, payload) => {
+                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
                 }}
@@ -248,24 +370,24 @@ export function ResultsCharts({ result, t }: { result: CalculationResult; t: TFn
                   background: "var(--card)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "13px",
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: "11px" }} />
+              <Legend wrapperStyle={{ fontSize: "12px" }} />
               <Line
                 type="monotone"
-                dataKey="totalCostEur"
+                dataKey="cost"
                 name={t("results.chart.series.totalCostEur")}
-                stroke="var(--chart-4)"
+                stroke="var(--results-cost-revenue-cost)"
                 dot={false}
                 strokeWidth={2}
                 isAnimationActive={false}
               />
               <Line
                 type="monotone"
-                dataKey="methaneRevenueEur"
+                dataKey="rev"
                 name={t("results.chart.series.methaneRevenueEur")}
-                stroke="var(--chart-5)"
+                stroke="var(--results-cost-revenue-revenue)"
                 dot={false}
                 strokeWidth={2}
                 isAnimationActive={false}

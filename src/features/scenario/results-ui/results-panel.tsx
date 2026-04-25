@@ -7,8 +7,9 @@
 import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
-import { formatResultEur } from "./format-result-values";
-import { ResultsAssumptions } from "./results-assumptions";
+import { formatResultEurCompact } from "./format-result-values";
+import { ResultsEconomicVerdictCard } from "./results-economic-verdict-card";
+import { ResultsUsedAssumptions } from "./results-used-assumptions";
 import { ResultsCharts } from "./results-charts";
 import { ResultsKpiHeadline, ResultsKpiSecondary } from "./results-kpi-grid";
 import { ResultsTables } from "./results-tables";
@@ -60,6 +61,9 @@ export function ResultsPanel({
         {t("results.success")}
       </p>
 
+      <ResultsEconomicVerdictCard result={result} t={t} />
+      <ResultsUsedAssumptions result={result} locale={locale} t={t} />
+
       <p className="text-xs leading-relaxed text-muted-foreground">{t("results.narrative.outcomeIntro")}</p>
 
       {/* 2. Headline KPIs */}
@@ -78,13 +82,13 @@ export function ResultsPanel({
           <div className="rounded-lg border border-consultancy/12 bg-consultancy-subtle/40 px-5 py-4 dark:bg-consultancy-subtle/25">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.methaneRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
-              {formatResultEur(s.annualMethaneRevenueEur, locale)}
+              {formatResultEurCompact(s.annualMethaneRevenueEur, locale, t)}
             </p>
           </div>
           <div className="rounded-lg border border-consultancy/12 bg-consultancy-subtle/40 px-5 py-4 dark:bg-consultancy-subtle/25">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.hydrogenAltRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
-              {formatResultEur(s.hydrogenSalesAlternativeRevenueEur, locale)}
+              {formatResultEurCompact(s.hydrogenSalesAlternativeRevenueEur, locale, t)}
             </p>
           </div>
         </div>
@@ -97,13 +101,10 @@ export function ResultsPanel({
       <ResultsWarnings result={result} t={t} />
 
       {/* 6. Charts */}
-      <ResultsCharts result={result} t={t} />
+      <ResultsCharts result={result} locale={locale} t={t} />
 
       {/* 7. Tables (progressive detail) */}
       <ResultsTables result={result} locale={locale} t={t} />
-
-      {/* 8. Assumption transparency */}
-      <ResultsAssumptions process={result.input.process} locale={locale} t={t} />
     </div>
   );
 }

@@ -145,6 +145,12 @@ Koska tulevaisuudessa päästöjä ei riitä vain vähentää — myös hiilidio
 
 ---
 
+# Päivitys (huhtikuu 2026)
+
+Käyttöliittymän oletuskieli on **suomi**, jos käyttäjä ei ole valinnut toista kieltä. Sivun yläosan aloitusalueella voi näkyä **Business Finlandin** ja **LAB-ammattikorkeakoulun** tunnukset, kun vastaavat tiedostot on lisätty palvelimen `public/`-kansioon (ks. tekninen dokumentaatio). Tulosnäkymässä on lyhyt **taloudellinen tulkinta** ja **laskennassa käytetyt oletukset** — ne eivät ole sijoitussuosituksia.
+
+---
+
 # Rehellinen huomio
 
 Tämä ei ole tehdassuunnitelma eikä lopullinen investointipäätösraportti.

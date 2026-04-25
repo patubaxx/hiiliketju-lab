@@ -1,158 +1,144 @@
 # Hiiliketju — MVP Release Memo
 
 **Date:** April 2026  
-**Scope:** WP15–WP18 accepted baseline  
+**Scope:** Accepted product after **WP22–WP27** customer-delivery tranche (on top of earlier MVP foundations)  
 **Audience:** Internal team and customer handoff
 
 ---
 
-## 1. What the tool now does
+## 1. What the tool does
 
-Hiiliketju is a browser-based techno-economic scenario calculator for biogenic CO₂ utilization. It compares two value-chain paths for a fixed 365-day annual period:
+Hiiliketju is a browser-based techno-economic scenario calculator for biogenic CO₂ utilization. It compares two value-chain paths for a fixed **365-day** annual period:
 
 - **Path A — synthetic methane:** CO₂ + H₂ → CH₄ via electrolysis and methanation. The tool computes hydrogen demand, electricity consumption, full cost stack, and methane sales revenue.
-- **Path B — hydrogen sales alternative:** CO₂ is released, the hydrogen is sold directly. The tool computes the corresponding annual revenue and compares it against Path A.
+- **Path B — hydrogen sales alternative:** CO₂ is released; hydrogen is sold directly. The tool computes the corresponding annual revenue and compares it against Path A.
 
-All numbers come from a single canonical calculation (`calculateScenario`) that runs a daily-resolution engine (365 timesteps per year). The UI and both export formats (Excel, PDF) consume the same result — no business logic is duplicated across layers.
+All business numbers come from a single canonical calculation: **`calculateScenario(validated ScenarioInput) → CalculationResult`**. The UI and both export formats consume that result — formulas are not duplicated across layers.
 
 ---
 
 ## 2. Current user-visible capabilities
 
-### Scenario inputs
+### Locale and setup (WP22)
 
-| Input | Details |
-|---|---|
-| Annual CO₂ availability | kt/year (fixed unit); flat annual, seasonal monthly weights, daily time series (365 kg/day), or hourly time series (8 760 kg/h) |
-| CO₂ utilization rate | % of available CO₂ actually processed |
-| Electricity purchase price | Constant (EUR/MWh or c/kWh) or imported market data (Finland 2025, daily or hourly; user can override with own series) |
-| Methane assumed sales price | EUR/t CH₄ — default 1 200 EUR/t CH₄ |
-| Hydrogen assumed sales price | EUR/kg H₂ — default 4 EUR/kg H₂ |
-| Other annual OPEX | EUR/year |
-| CAPEX (optional) | Electrolyzer and methanation CAPEX (EUR) with lifetime (years); allocated linearly over 365 days |
-| Advanced process assumptions | Five overridable parameters with explicit source/status/note metadata (see below) |
+- **Default language:** the app **first-paints in Finnish** when no stored preference exists; **English** and **Swedish** are selectable. A stored browser preference still applies after hydration.
+- **Simple-first:** the main screen shows **Basic inputs** — annual **CO₂** (`kt/year`), **utilization rate**, and **electricity purchase price** (constant or imported market data). **Scenario name** and full configuration live under **Advanced setup**.
 
-### Advanced process assumptions (overridable with metadata)
+### Scenario inputs (summary)
 
-| Parameter | Default value | Source |
-|---|---|---|
-| Stoichiometric H₂ demand | 0.1832 kg H₂ / kg CO₂ | Literature-based, estimated |
-| Stoichiometric CH₄ yield | 0.3645 kg CH₄ / kg CO₂ | Literature-based, estimated |
-| Electrolyzer SEC | 54 kWh / kg H₂ | Literature-based, estimated |
-| Plant availability | 100 % | Literature-based (neutral MVP default; not yet applied in engine — see caveats) |
-| Process efficiency | 100 % | Literature-based (neutral MVP default; not yet applied in engine — see caveats) |
+| Area | Details |
+|------|---------|
+| Annual CO₂ | `kt/year` in the form; default **seasonal** mode (**WP24**) with **winter-weighted** monthly **relative** weights (normalized to the annual total in-engine). **`flat_annual`**, **daily / hourly** time series, etc., remain in Advanced. |
+| CO₂ utilization | % of available CO₂ processed |
+| Electricity | **Purchase** price: **constant** (`EUR/MWh` or `c/kWh` in the form → canonical `EUR/MWh`) or **imported market data** (Finland 2025 bundled defaults; user can paste/import own series). |
+| Economics | Methane and hydrogen **assumed sales** prices (defaults **1 200 EUR/t CH₄**, **4 EUR/kg H₂** — verify for your case), other OPEX |
+| CAPEX | Optional; simple linear allocation over the selected lifetime |
+| Advanced process | **Engine-active** parameters only (**WP23**): stoichiometric H₂ demand, stoichiometric CH₄ yield, electrolyzer SEC (+ derived MWh where shown). **`plantAvailabilityPct`** and **`processEfficiencyPct`** exist on the wire for **future** use; they are **not** user-facing active inputs and **not** shown in “assumptions used” or export assumption summaries. |
 
-### Outputs
+### Outputs and readouts
 
-- **Annual KPIs:** CO₂ available and utilized, recycling rate, methane production, hydrogen demand, electricity consumption, variable cost, CAPEX allocation, total cost, methane revenue, hydrogen-sales alternative revenue
-- **Derived profitability:** break-even methane sales price, methane price at 10 % and 30 % markup on cost
-- **Path comparison:** annual revenue delta between Path A (methane) and Path B (hydrogen sales)
-- **Time series:** daily charts for CO₂ availability, electricity purchase price, methane production, cost vs revenue
-- **Tables:** annual summary, monthly aggregates, daily row preview
-- **Exports:** Excel workbook and PDF report — both include all process assumption metadata (source, status, note)
-- **Warnings:** engine warnings (e.g. literature-based defaults in use, SEC inconsistency) appear in results and exports
+- **KPIs, charts, tables** as before (annual, monthly, daily preview; time series charts).
+- **Economic verdict (WP25):** small, color-coded band (favourable / mixed / unfavourable / not computable) — **interpretive only**, from existing annual summary fields; **not** an investment recommendation.
+- **Assumptions used in this calculation (WP25):** grouped list (scenario, CO₂, electricity, economics, CAPEX, process), including Simple defaults. Excludes internal future-only fields not surfaced as active (e.g. plant availability / process efficiency in user-facing lists).
+
+### Presentation (WP26)
+
+- Charts: **axis labels and units**; compact units (EUR / kEUR / MEUR, mass, energy) where helpful; **≤ 2 decimals** in typical ticks/tooltips/tables. **One** lower caption per chart (duplicate in-SVG X label removed in follow-up). **Cost vs. revenue** uses clearly distinct line colours.
+- **PDF:** improved chart margins, y-domain padding, clamped plot coordinates, compact ticks, larger fonts.
+- **Excel:** numeric data cells preserved; **number formats** for display where appropriate (not wholesale string replacement).
+
+### Home hero (WP27)
+
+- Optional **Business Finland** and **LAB** marks: static URLs **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (files in **`public/`**). **i18n alt** text; **no** visible “Partners / Kumppanit / Samarbetspartners” label; logos are **not** in a separate card (follow-up).
+
+### Exports
+
+- **Excel** and **PDF** include material consistent with the **verdict** and **used assumptions** readouts, alongside inputs, series, and summaries.  
+- **Export API:** `POST` with **`{ "scenario": <wire> }`** only; server validates, merges defaults, runs **`calculateScenario`**, builds bytes — **no** authoritative client-sent **`CalculationResult`**.
 
 ---
 
-## 3. Important caveats and limitations
+## 3. Important caveats and limitations (MVP)
 
 ### 3.1 Imported electricity defaults include consumer VAT
 
-`sources/electricity_prices.csv` (porssisahko.net) provides Finnish consumer-facing prices **including VAT** (25.5 % in 2025). The generated artifact `src/data/electricity-defaults-2025-fi.ts` inherits this. Industrial electricity procurement prices are typically ex-VAT and therefore ~20–25 % lower.
+Bundled Finland 2025 data (`sources/electricity_prices.csv` → generated artifact) reflects consumer-facing prices **including VAT** (25.5 % in 2025). Industrial procurement is often ex-VAT.
 
-**User action required:** Replace the defaults with actual contracted procurement prices for any industrial scenario. The UI tooltip states "VAT included." A more prominent UI disclosure is planned for WP20.
+**User action:** Replace with your actual contract or procurement prices when the case requires it. The UI surfaces visible disclosure on the imported path.
 
-### 3.2 Plant availability and process efficiency not yet applied
+### 3.2 Plant availability and process efficiency
 
-Both parameters are stored with assumption metadata, shown in advanced assumptions, and included in exports — but the MVP daily calculation engine does not apply them. Setting plant availability to 80 % has no effect on computed outputs. Both values are neutral at 100 % in the engine.
+Both fields remain on **`ScenarioInput`** with neutral **100 %** defaults in merge logic. The **shipped daily engine does not apply them as multipliers.** They are **not** offered as active user-facing Advanced inputs and **not** listed in user-facing “assumptions used” summaries (**WP23**). Future engine wiring would be a **separate scoped** change.
 
-The UI displays an amber notice and the PDF export includes an explanatory paragraph. Activation is planned for WP23 after product-level semantics are agreed.
+### 3.3 Commercial default prices
 
-### 3.3 Commercial default prices need user verification
+Methane and hydrogen form defaults are **starting points**, not confirmed project values.
 
-Methane (1 200 EUR/t CH₄) and hydrogen (4 EUR/kg H₂) form defaults are starting-point estimates, not confirmed project values. Results change significantly with different prices; users should always verify these before reading conclusions.
+### 3.4 Stoichiometric / SEC literature defaults
 
-### 3.4 Stoichiometric defaults are literature estimates
+Active process defaults (H₂ demand, CH₄ yield, SEC) are **literature-based** and flagged; override in Advanced when you have project data.
 
-All five process defaults (stoichiometric factors, SEC) are literature-based and flagged as `estimated`. They appear in results and exports with explicit metadata. Override with project-specific values in the Advanced section when available.
+### 3.5 Fixed 365-day period
 
-### 3.5 Fixed 365-day non-leap-year period
-
-The analysis period is always 365 days. Leap years and multi-year analyses are not supported.
+Non-leap year; no multi-year model in MVP.
 
 ### 3.6 No scenario persistence
 
-All form state is held in browser memory. Refreshing the page resets the form. There is no save, load, or multi-scenario comparison feature. Scenario persistence is planned for WP22.
+Form state is **browser memory** only (refresh clears). **No** save/load in MVP. *(Earlier internal roadmaps may have named “WP22” for persistence — that naming is **obsolete**; **WP22** in the **accepted** codebase is default Finnish + Simple-first.)*
 
 ### 3.7 No authentication or rate limiting
 
-The application has no user authentication. Export endpoints have no rate limiting or abuse protection beyond platform defaults.
+As before.
 
-### 3.8 Electricity data covers Finland 2025 only
+### 3.8 Electricity bundled data: Finland 2025
 
-The bundled default covers one market (Finland) and one year (2025). Users from other markets or wanting multi-year averages must supply their own series via paste or CSV import.
+Users from other markets need their own series.
 
-### 3.9 CSV time-series import is browser-side only
+### 3.9 CSV import is browser-side
 
-CSV import fills the existing series text field; it does not introduce new calculation modes or server-side ingest. Supported formats are defined in `parse-time-series-csv.ts`. Arbitrary spreadsheet dialects may not parse correctly.
+Fills the existing bulk series path; not a new server ingest contract.
 
 ### 3.10 ASCII-only export filenames
 
-Content-Disposition uses `filename=` only (no RFC 5987 `filename*`). Non-ASCII characters in scenario names are sanitized in the download filename.
+As before.
+
+### 3.11 Non-goals (unchanged)
+
+No dispatch optimization, storage dynamics, **NPV/IRR/payback**, or full investment suite in MVP.
 
 ---
 
-## 4. Assumptions users should verify before treating results as decision-ready
+## 4. Assumptions to verify before decision use
 
-Before using results for project decisions, confirm the following:
-
-1. **Electricity purchase price** — Is the entered price (or imported default) representative of your actual industrial procurement cost, ex-VAT?
-2. **Methane assumed sales price** — Does 1 200 EUR/t CH₄ reflect your expected market or contracted price?
-3. **Hydrogen assumed sales price** — Does 4 EUR/kg H₂ reflect your expected market or contracted price?
-4. **CO₂ availability and utilization rate** — Do the entered values reflect your actual plant capacity and availability profile?
-5. **Stoichiometric process parameters** — Are the literature defaults appropriate, or do you have project-specific electrolysis performance data?
-6. **CAPEX** — If CAPEX is included, are the investment figures and lifetime representative of your project?
-7. **Plant availability** — Note that the engine currently ignores this value; it is recorded for future use only.
+1. **Electricity purchase price** — Representative of your real procurement (note VAT on bundled defaults).  
+2. **Methane / hydrogen assumed sales prices** — Match your market or contract expectations.  
+3. **CO₂ and utilization** — Match plant/data reality.  
+4. **Stoichiometric / SEC** — Replace literature defaults if you have better data.  
+5. **CAPEX** — If included, check amounts and lifetime.  
+6. **Plant availability / process efficiency** — **Not** applied in the engine today; do not treat UI/export as if they were active levers.
 
 ---
 
-## 5. Recommended next-step roadmap
+## 5. Architecture invariants (maintainers)
 
-The following improvements are planned after WP18, in priority order:
-
-### WP19 — Homepage guidance enhancement (this release)
-Improve hero text and add a "before interpreting results" callout on the front page. Produce this memo as a deliverable.
-
-### WP20 — Imported electricity UX: VAT prominence + data summary statistics
-Upgrade the VAT caveat from a small tooltip to a visible warning in the electricity section. Add inline summary statistics (mean, min, max) for the loaded Finland 2025 dataset.
-
-### WP21 — Commercial assumption confirmation UX
-Add a visible prompt when methane or hydrogen prices still match the form defaults, reminding users to verify project-specific values.
-
-### WP22 — Scenario persistence (browser localStorage)
-Allow users to save and reload named scenarios from browser local storage. Includes a schema-version guard for safe future evolution.
-
-### WP23 — Plant availability and process efficiency activation
-Wire both parameters into the daily calculation engine after the product semantics are formally agreed and documented.
-
-### Later / strategic
-- Multi-market and multi-year electricity defaults
-- Scenario side-by-side comparison view
-- Structured warnings with severity levels
-- Richer Excel assumptions summary tab
+- **`calculateScenario` → `CalculationResult`** is the **only** source of business numbers for UI and exports.  
+- **Export routes** accept **`{ "scenario": <wire> }`**, Zod-validate, **`mergeProcessAssumptionsInput`**, recompute, then build — **no** client result object as authority.  
+- **Hidden wire modes** (`daily_series` / `hourly_series` for electricity, etc.) stay valid in schema/engine/exports where applicable; visible selector remains narrower.  
+- Full checklist: **[`docs/repository-invariants.md`](repository-invariants.md)**.
 
 ---
 
-## 6. Architecture and contract invariants (for maintainers)
+## 6. Historical internal roadmap (pre-WP22 naming)
 
-The following must not regress across future work:
+The following items appeared in an **earlier** internal memo (WP15–WP18 era) as **planned** follow-ups. **They are not commitment dates.** Some ideas shipped under **different** WP numbers (e.g. VAT prominence and assumption nudges were absorbed into later UX; **“WP22 = persistence”** is **not** the accepted meaning of **WP22** in the current codebase — see **§2** above).
 
-- `calculateScenario(validated ScenarioInput) → CalculationResult` is the **only** source of business numbers for UI and exports.
-- Export routes (`POST /api/export/excel`, `POST /api/export/pdf`) accept `{ "scenario": <wire> }`, validate with Zod, merge process defaults, and recompute. They do **not** accept a client-sent result object as authoritative.
-- Process assumption metadata (`assumptionSource`, `assumptionStatus`, `assumptionNote`) propagates from domain defaults or user overrides through calculation into exports without modification by mappers.
-- Hidden wire modes (`daily_series`, `hourly_series`) remain valid in schema, domain, engine, and exports even though they are not visible in the UI selector.
-- See [`docs/repository-invariants.md`](repository-invariants.md) for the full regression checklist.
+- Homepage / hero / electricity disclosure refinements  
+- Optional future: browser **localStorage** scenario persistence (not in current MVP)  
+- Optional future: engine activation of **plant availability / process efficiency** after agreed semantics  
+- Broader: multi-market defaults, side-by-side scenarios, structured warning severities
+
+For the **original WP1–WP10 build sequence** and the **separate WP22–WP27 list**, see **[`docs/solution-spec-v2.md`](solution-spec-v2.md) §16**.
 
 ---
 
-*This memo reflects the accepted state as of April 2026 (WP15–WP18 baseline). For calculation contracts and formula details see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope and principles see [`docs/solution-spec-v2.md`](solution-spec-v2.md).*
+*This memo reflects the **April 2026** accepted state after **WP22–WP27**. For formulas and contracts see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope see [`docs/solution-spec-v2.md`](solution-spec-v2.md). Not a source file for automated agents — see [`AGENTS.md`](../AGENTS.md).*

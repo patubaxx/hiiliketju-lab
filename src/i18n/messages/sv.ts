@@ -21,13 +21,32 @@ export const sv = {
         item3:
           "Stökiometriska processantaganden är litteraturbaserade uppskattningar — åsidosätt i avsnittet Avancerade antaganden om du har projektspecifika värden.",
         item4:
-          "Anläggningstillgänglighet och processeffektivitet registreras med antagandemetadata men används ännu inte av beräkningsmotorn — båda är för tillfället neutral 100 %.",
+          "I avancerade processantaganden visas bara de parametrar som den aktuella motorn använder; ersätt litteraturbaserade värden när du har projektspecifika siffror.",
       },
+      logos: {
+        businessFinlandAlt: "Business Finland",
+        labAlt: "LAB Yrkeshögskolan",
+      },
+    },
+    setup: {
+      simple: {
+        title: "Grundinställningar",
+        lead:
+          "Börja med årlig CO₂, utnyttjandegrad och inköpspris för el. Du kan köra beräkningen här. Öppna avancerat för scenariosnamn, CO₂-situation, ekonomi och processantaganden.",
+      },
+      advanced: {
+        heading: "Avancerat",
+        lead: "Scenariosnamn, versions- och Anteckningar, CO₂-tillgång, ekonomi och avancerade processfält.",
+      },
+      showAdvanced: "Visa avancerat",
+      hideAdvanced: "Dölj avancerat",
+      electricitySeriesRequiresAdvanced:
+        "El prissätts med dags- eller timserie. Öppna avancerat för att visa och redigera serien.",
     },
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
-        "Arbeta uppifrån och ned: CO₂-tillgång → inköpspris för el → ekonomi → avancerade antaganden (vid behov). Använd fältet överst för att köra beräkningen, återställa, byta språk, exportera eller gå direkt till resultaten.",
+        "Du börjar med grundinställningar. Fäll ut avancerat när hela formuläret behövs (CO₂-tidsserier, försäljningspris, antaganden för CAPEX, process). Fältet överst: kör, återställ, språk, export, gå till resultat.",
       actionsCardTitle: "Beräkning",
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",
@@ -36,6 +55,36 @@ export const sv = {
       toolbarAriaLabel: "Scenarioåtgärder",
       jumpToOutcome: "Gå till utfall",
       exportGroupLabel: "Exportera",
+    },
+    guidance: {
+      simpleSetup:
+        "Här anger du det årliga biogena CO₂ som finns, hur stor del anläggningen använder (utnyttjandegrad) samt elens inköpspris. Det styr den dagliga tillgängliga CO₂-massan och kostnaden för elektrolys. Som standard fördelas CO₂ med ett vintertyngt säsongsutdrag—öppna avancerat om du behöver ändra profil, läge eller andra fält.\n\nDu kan köra en full 365-dagarsberäkning här utan att öppna avancerat.",
+      co2Availability:
+        "Det här avsnittet styr hur din årsmängd blir en daglig tillgänglighetsprofil. Den årliga totalen (kt/år) sätter massan. Utnyttjandegraden är andelen CO₂ processen faktiskt använder. Säsongs- (månadsvis relativ vikt) sprider mängden över dygnen; vikter är relativa och normalisas i motorn så att årsmängden, efter utnyttjande, behålls. I avancerat kan du behålla vintertunga standardvikter, redigera månad för månad eller byta till jämn tidsserie när du har bättre data.",
+      electricityPurchase:
+        "Inköpspriset används mot elkostnaden i vätgasproduktion. Konstant: ett pris hela året. Importerad marknadsdata: en daglig eller timvis EUR/MWh-serie (timmar räknas om till dagsnivå). De förpackade 2025-data för Finland är en start; ersätt med faktiskt upphandlade priser när resultatet ska motsvara ditt fall.",
+      economics:
+        "Metan- och vätefälten här är antagna försäljningspriser, inte spotkurser. De styr intäkter i metanvägen och vätgasalternativet och påverkar vilket spår som ser bäst ut. Formulärets standardvärden är inbyggda startpunkter—kontrollera dem före beslut.",
+      capex:
+        "CAPEX är frivilligt. När det är på fördelas dina siffror med den valda livslängden enligt MVP:s enkla årsfördelning och läggs i kostnaderna. Låt det vara av om du endast vill se rörliga kostnader i den här körningen.",
+      advancedProcess:
+        "Här finns de processantaganden som motorn faktiskt använder. Värdena börjar från litteraturen. Ersätt med projektspecifika, spårbara siffror när du har dem.",
+    },
+  },
+  calendar: {
+    months: {
+      january: "Januari",
+      february: "Februari",
+      march: "Mars",
+      april: "April",
+      may: "Maj",
+      june: "Juni",
+      july: "Juli",
+      august: "Augusti",
+      september: "September",
+      october: "Oktober",
+      november: "November",
+      december: "December",
     },
   },
   locale: {
@@ -107,7 +156,9 @@ export const sv = {
     mode_time_series_daily: "Tidsserie (daglig kg/dygn, 365 värden)",
     mode_time_series_hourly: "Tidsserie (timvis kg/h, 8760 värden)",
     seasonalHelp:
-      "Tolv relativa vikter (en per kalendermånad). Nollor tillåtna; minst en månad måste vara större än noll. Motorn skalar vikterna till den årliga totalen.",
+      "En relativ vikt per namngiven kalendermånad nedan. Nollor tillåtna, men minst en månad måste vara större än noll. Motorn normaliserar vikterna, bygger dagsfördelning och bevarar ändå ditt årliga värde (kt/år) efter utnyttjandegrad.",
+    seasonalDefaultProfileNote:
+      "Standardkurvan är högre vinterhalvåret (typiskt säsongsjusterad industriell tillgång). Vikter är endast relativa—endast mönstret räknas före normalisering. Byt mot egna siffror när du har dem, eller tidsserieläget om det passar bättre.",
     month: "Månad",
     seriesDailyLabel: "Daglig tillgänglig CO₂ (kg/dygn × 365)",
     seriesDailyHelp:
@@ -171,9 +222,6 @@ export const sv = {
   },
   advanced: {
     internalKey: "Parameter-id",
-    inactiveFactorsTitle: "Används ännu inte i dagliga formler",
-    inactiveFactorsBody:
-      "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
     usingLiteratureDefault: "Använder litteraturbaserat standardvärde",
     usingCustomValue: "Använder eget värde",
     override: "Åsidosätt standard",
@@ -265,7 +313,7 @@ export const sv = {
     success: "Beräkningen slutfördes utan fel.",
     narrative: {
       outcomeIntro:
-        "Ordning: huvudsiffror, jämförelse mellan alternativ, kompletterande mängder, sedan tidsserier och tabeller för detaljkontroll.",
+        "Först en ekonomisk tolkning och en ögonblicksbild av antagandena, sedan huvudtal, alternativ och tabeller. Inget investeringsråd—bara nuvarande indata.",
     },
     summary: {
       lead: "Alla siffror nedan kommer direkt från beräkningen; gränssnittet räknar inte om dem.",
@@ -275,6 +323,16 @@ export const sv = {
     },
     value: {
       na: "—",
+    },
+    displayUnit: {
+      EUR: "EUR",
+      kEUR: "kEUR",
+      MEUR: "MEUR",
+      kg: "kg",
+      t: "t",
+      kt: "kt",
+      MWh: "MWh",
+      GWh: "GWh",
     },
     section: {
       kpis: "Nyckeltal",
@@ -287,7 +345,68 @@ export const sv = {
       tablesDetailLead:
         "Exakta siffror för export och kontroll. Årsraderna följer sammanfattningen; månads- och dagsvyer ger mer detalj.",
       assumptions: "Processantaganden (från dina indata)",
+      usedAssumptions: "Antaganden som använts i denna beräkning",
       warnings: "Meddelanden från beräkningen",
+    },
+    verdict: {
+      favorableTitle: "Gynnsamt under gällande antaganden (indikativt)",
+      favorableBody:
+        "Metaniseringsstråket tycks i den här körningen täcka den modellerade totala årskostnaden och stå minst lika bra som försäljning av vätgas. Detta är en riktningsangivelse, ingen garanti för verklig lönsamhet.",
+      mixedTitle: "Motstridig bild — granska antaganden",
+      mixedBody:
+        "Intäkt, kostnad och vätgastalternativet pekar inte åt samma håll. Använd resultatet som grov vägledning och kontrollera priser, CAPEX, CO₂- och elunderlag innan slutsatser dras.",
+      mixedDetail:
+        "En blandad klass kan t.ex. uppstå när intäkten överstiger kostnaden, men vätgastalternativet ändå ser starkare ut i kronor.",
+      unfavorableTitle: "Ogynnsamt under gällande antaganden (indikativt)",
+      unfavorableBody:
+        "Metanintäkterna understiger den modellerade totala kostnaden och stråket ligger också efter försäljning av vätgas i denna jämförelse. Det betyder inte i sig att anläggningen är olönsam ute i verkligheten—bara att dessa antaganden ger en svag bild här.",
+      notComputableTitle: "Ingen hållbar ekonomisk bedömning med dessa siffror",
+      notComputableBody:
+        "Det finns inte tillräcklig metanproduktion eller användbart break-even underlag i resultatet för en tydlig märkning. Justera indata (t.ex. beläggning eller CO₂-profil) och kör igen innan tolkning.",
+      disclaimer:
+        "Indikativ uppskattning, inget råd om investering, skatt eller finansiering. Speglar bara detta scenariopaket—bekräfta med egna fältdata.",
+    },
+    usedAssumptions: {
+      lead: "Översikt över indata och standardvärden som gick in i motorn i den här körningen (samma modell som i export; siffror räknas inte om här).",
+      colLabel: "Post",
+      colValue: "Värde",
+      colMeta: "Härkomst / notering",
+      scenarioName: "Scenarionamn",
+      analysisPeriod: "Analysperiod (dagar i modellen)",
+      assumptionsVersion: "Version av antagandepaketet",
+      annualCo2AvailableFromResult: "Tillgänglig CO₂ per år (ur resultatet, i linje med indata)",
+      seasonalMonthlyWeights: "Relativa månadsvikter (12, före normalisering)",
+      seasonalDefaultFlag: "Fördefinierad säsongsprofil (vintertyngd—inte kundens bekräftade data)",
+      importedSeriesStats: "Serie (antal · medel · min · max, EUR/MWh eller kg enligt rad)",
+      importedDataSource: "Datakälla (inbyggd standard vs egen serie)",
+      capexYes: "Ja — investeringskostnader fördelas in i årsresultatet",
+      capexNo: "Nej — ingen CAPEX-allokering i resultatet (övrig kostnad enligt modellen)",
+      annualCapexInResult: "Modellerad årlig CAPEX-delsumma i detta resultat (avstängd: noll enligt inställning)",
+      group: {
+        scenario: "Scenario / upplägg",
+        co2: "CO₂",
+        electricity: "El",
+        economics: "Ekonomi (försäljningspriser och OPEX)",
+        capex: "Investeringar (CAPEX)",
+        process: "Process (aktiva modellfält)",
+      },
+      unit: {
+        days: "dagar",
+        kg: "kg",
+        percent: "%",
+        eurPerMwh: "EUR/MWh",
+        eurPerTch4: "EUR/t CH₄",
+        eurPerKgH2: "EUR/kg H₂",
+        eurPerYear: "EUR/år",
+        eur: "EUR",
+        years: "år",
+      },
+      kind: {
+        default: "Standard / litteratur",
+        user: "Användar / scenariovärde",
+        derived: "Härlett i modell",
+        imported: "Importerad / inbyggd data",
+      },
     },
     kpi: {
       annualCo2Available: "Tillgänglig CO₂ per år",
@@ -324,6 +443,25 @@ export const sv = {
       costVsRevenueDaily: "Daglig total kostnad vs metanintäkt",
       axis: {
         dayOfYear: "Dagsindex (0–364)",
+        xDate: "Tid (dagsindex)",
+        yKgd: "CO₂ (kg/d)",
+        yTpd: "CO₂ (t/d)",
+        yKtd: "CO₂ (kt/d)",
+        yEurPerMwh: "Pris (EUR/MWh)",
+        yMethaneKgd: "CH₄ (kg/d)",
+        yMethaneTpd: "CH₄ (t/d)",
+        yMethaneKtd: "CH₄ (kt/d)",
+        yCostEurD: "Belopp (EUR/d)",
+        yCostKEurD: "Belopp (kEUR/d)",
+        yCostMeurD: "Belopp (MEUR/d)",
+      },
+      unit: {
+        eurPerD: "EUR/d",
+        kEurPerD: "kEUR/d",
+        meurPerD: "MEUR/d",
+        kgPerD: "kg/d",
+        tPerD: "t/d",
+        ktPerD: "kt/d",
       },
       series: {
         availableCo2Kg: "Tillgänglig CO₂ (kg/dag)",

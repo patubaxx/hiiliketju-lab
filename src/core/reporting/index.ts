@@ -1,9 +1,19 @@
 export { assertCalculationResultExportable, CalculationResultNotExportableError } from "./assert-calculation-result-exportable";
 export { safeExportBasename } from "./export-filename";
 export { buildScenarioExcelExportModel } from "./build-export-model";
+export { buildEconomicVerdict, type EconomicVerdict, type EconomicVerdictCategory } from "./build-economic-verdict";
+export {
+  buildUsedAssumptionsModel,
+  type UsedAssumptionGroupId,
+  type UsedAssumptionKind,
+  type UsedAssumptionPrintRow,
+  type UsedAssumptionRow,
+  usedAssumptionsToPrintable,
+} from "./build-used-assumptions-model";
 export type {
   AnnualMetricExportRow,
   ComparisonExportRow,
+  EconomicVerdictExportBlock,
   InputSnapshotRow,
   MonthlyExportRow,
   ProcessAssumptionExportRow,

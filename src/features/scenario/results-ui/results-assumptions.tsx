@@ -1,4 +1,5 @@
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
+import { USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS } from "@/core/domain/user-facing-process-assumptions";
 import { PROCESS_FIELD_ORDER } from "@/features/scenario/input-ui/form-state";
 
 import { formatResultNumber } from "./format-result-values";
@@ -6,6 +7,8 @@ import { formatResultNumber } from "./format-result-values";
 import type { Locale } from "@/i18n/messages";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
+
+const SHOWN_IN_RESULTS = new Set<string>(USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS);
 
 function literatureClass(source: string): string {
   return source === "literature_based"
@@ -27,12 +30,8 @@ export function ResultsAssumptions({
       <h3 id="results-assumptions-heading" className="text-base font-semibold tracking-tight text-foreground">
         {t("results.section.assumptions")}
       </h3>
-      <div className="rounded-lg border border-amber-500/25 bg-amber-500/[0.04] px-4 py-3 text-sm text-foreground/90">
-        <p className="font-medium text-amber-950 dark:text-amber-100">{t("advanced.inactiveFactorsTitle")}</p>
-        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{t("advanced.inactiveFactorsBody")}</p>
-      </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        {PROCESS_FIELD_ORDER.map(({ key, labelId }) => {
+        {PROCESS_FIELD_ORDER.filter(({ key }) => SHOWN_IN_RESULTS.has(key)).map(({ key, labelId }) => {
           const field = process[key];
           const meta = field.assumptionMeta;
           const lit = meta.assumptionSource === "literature_based";
@@ -50,7 +49,7 @@ export function ResultsAssumptions({
                 ) : null}
               </div>
               <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
-                {formatResultNumber(field.value, locale, { maximumFractionDigits: 6 })}
+                {formatResultNumber(field.value, locale, { maximumFractionDigits: 2 })}
               </p>
               <dl className="mt-4 space-y-2 text-xs leading-relaxed text-muted-foreground">
                 <div className="flex flex-wrap gap-x-2 gap-y-0.5">

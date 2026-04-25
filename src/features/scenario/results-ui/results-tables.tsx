@@ -1,7 +1,15 @@
+import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
 import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
-import { formatResultEur, formatResultNumber, formatResultPercent, formatResultTonnesFromKg } from "./format-result-values";
+import {
+  formatResultEurCompact,
+  formatResultEnergyMwhCompact,
+  formatResultMassKgCompact,
+  formatResultNumberDisplay,
+  formatResultPercent,
+  formatResultTonnesFromKg,
+} from "./format-result-values";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
@@ -32,42 +40,48 @@ export function ResultsTables({
   const totalDays = result.dailyResults.length;
 
   const annualRows: { label: string; value: string }[] = [
-    { label: t("results.kpi.annualCo2Available"), value: `${formatResultNumber(s.annualCO2AvailableKg, locale, { maximumFractionDigits: 2 })} kg` },
-    { label: t("results.kpi.annualCo2Utilized"), value: `${formatResultNumber(s.annualCO2UtilizedKg, locale, { maximumFractionDigits: 2 })} kg` },
+    { label: t("results.kpi.annualCo2Available"), value: formatResultMassKgCompact(s.annualCO2AvailableKg, locale, t) },
+    { label: t("results.kpi.annualCo2Utilized"), value: formatResultMassKgCompact(s.annualCO2UtilizedKg, locale, t) },
     {
       label: t("results.kpi.co2RecyclingRate"),
       value: s.co2RecyclingRatePct === null ? na : formatResultPercent(s.co2RecyclingRatePct, locale),
     },
-    { label: t("results.kpi.annualMethane"), value: `${formatResultNumber(s.annualMethaneProducedTons, locale, { maximumFractionDigits: 4 })} t` },
-    { label: t("results.kpi.annualHydrogen"), value: `${formatResultNumber(s.annualHydrogenNeededKg, locale, { maximumFractionDigits: 2 })} kg` },
-    { label: t("results.kpi.annualElectricity"), value: `${formatResultNumber(s.annualElectricityConsumedMwh, locale, { maximumFractionDigits: 4 })} MWh` },
-    { label: t("results.kpi.annualVariableCost"), value: formatResultEur(s.annualVariableCostEur, locale) },
-    { label: t("results.kpi.annualCapex"), value: formatResultEur(s.annualCapexCostEur, locale) },
-    { label: t("results.kpi.annualTotalCost"), value: formatResultEur(s.annualTotalCostEur, locale) },
-    { label: t("results.kpi.annualMethaneRevenue"), value: formatResultEur(s.annualMethaneRevenueEur, locale) },
-    { label: t("results.kpi.hydrogenAltRevenue"), value: formatResultEur(s.hydrogenSalesAlternativeRevenueEur, locale) },
+    {
+      label: t("results.kpi.annualMethane"),
+      value: `${formatResultNumberDisplay(s.annualMethaneProducedTons, locale)} t`,
+    },
+    { label: t("results.kpi.annualHydrogen"), value: formatResultMassKgCompact(s.annualHydrogenNeededKg, locale, t) },
+    {
+      label: t("results.kpi.annualElectricity"),
+      value: formatResultEnergyMwhCompact(s.annualElectricityConsumedMwh, locale, t),
+    },
+    { label: t("results.kpi.annualVariableCost"), value: formatResultEurCompact(s.annualVariableCostEur, locale, t) },
+    { label: t("results.kpi.annualCapex"), value: formatResultEurCompact(s.annualCapexCostEur, locale, t) },
+    { label: t("results.kpi.annualTotalCost"), value: formatResultEurCompact(s.annualTotalCostEur, locale, t) },
+    { label: t("results.kpi.annualMethaneRevenue"), value: formatResultEurCompact(s.annualMethaneRevenueEur, locale, t) },
+    { label: t("results.kpi.hydrogenAltRevenue"), value: formatResultEurCompact(s.hydrogenSalesAlternativeRevenueEur, locale, t) },
     {
       label: t("results.kpi.breakEvenMethanePrice"),
       value:
         s.breakEvenMethanePriceEurPerTon === null
           ? na
-          : `${formatResultEur(s.breakEvenMethanePriceEurPerTon, locale)} / t`,
+          : `${formatResultNumberDisplay(s.breakEvenMethanePriceEurPerTon, locale)} EUR/t`,
     },
     {
       label: t("results.kpi.methanePrice10"),
       value:
         s.methanePriceAt10PctProfitabilityEurPerTon === null
           ? na
-          : `${formatResultEur(s.methanePriceAt10PctProfitabilityEurPerTon, locale)} / t`,
+          : `${formatResultNumberDisplay(s.methanePriceAt10PctProfitabilityEurPerTon, locale)} EUR/t`,
     },
     {
       label: t("results.kpi.methanePrice30"),
       value:
         s.methanePriceAt30PctProfitabilityEurPerTon === null
           ? na
-          : `${formatResultEur(s.methanePriceAt30PctProfitabilityEurPerTon, locale)} / t`,
+          : `${formatResultNumberDisplay(s.methanePriceAt30PctProfitabilityEurPerTon, locale)} EUR/t`,
     },
-    { label: t("results.kpi.deltaVsHydrogen"), value: formatResultEur(s.deltaVsHydrogenSaleEur, locale) },
+    { label: t("results.kpi.deltaVsHydrogen"), value: formatResultEurCompact(s.deltaVsHydrogenSaleEur, locale, t) },
   ];
 
   return (
@@ -129,15 +143,15 @@ export function ResultsTables({
               {result.monthlySummary.map((m, i) => (
                 <tr key={m.monthIndex} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                   <td className={`${tdClass} font-sans`}>
-                    {t("co2.month")} {m.monthIndex + 1}
+                    {t(calendarMonthMessageId(m.monthIndex))}
                   </td>
-                  <td className={`${tdClass} text-right`}>{formatResultTonnesFromKg(m.sums.methaneProducedKg, locale)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultTonnesFromKg(m.sums.methaneProducedKg, locale, t)}</td>
                   <td className={`${tdClass} text-right`}>
-                    {formatResultNumber(m.sums.electricityConsumedMwh, locale, { maximumFractionDigits: 4 })}
+                    {formatResultNumberDisplay(m.sums.electricityConsumedMwh, locale)}
                   </td>
-                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.totalCostEur, locale)}</td>
-                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.methaneRevenueEur, locale)}</td>
-                  <td className={`${tdClass} text-right`}>{formatResultEur(m.sums.hydrogenAlternativeRevenueEur, locale)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEurCompact(m.sums.totalCostEur, locale, t)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEurCompact(m.sums.methaneRevenueEur, locale, t)}</td>
+                  <td className={`${tdClass} text-right`}>{formatResultEurCompact(m.sums.hydrogenAlternativeRevenueEur, locale, t)}</td>
                 </tr>
               ))}
             </tbody>
@@ -174,16 +188,16 @@ export function ResultsTables({
                     <tr key={row.dayIndex} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                       <td className={`${tdClass} font-sans`}>{row.dateLabel}</td>
                       <td className={`${tdClass} text-right`}>
-                        {formatResultNumber(row.availableCO2Kg, locale, { maximumFractionDigits: 2 })}
+                        {formatResultNumberDisplay(row.availableCO2Kg, locale)}
                       </td>
                       <td className={`${tdClass} text-right`}>
-                        {formatResultNumber(row.methaneProducedKg, locale, { maximumFractionDigits: 4 })}
+                        {formatResultNumberDisplay(row.methaneProducedKg, locale)}
                       </td>
                       <td className={`${tdClass} text-right`}>
-                        {formatResultNumber(row.electricityConsumedMwh, locale, { maximumFractionDigits: 6 })}
+                        {formatResultNumberDisplay(row.electricityConsumedMwh, locale)}
                       </td>
-                      <td className={`${tdClass} text-right`}>{formatResultEur(row.totalCostEur, locale)}</td>
-                      <td className={`${tdClass} text-right`}>{formatResultEur(row.methaneRevenueEur, locale)}</td>
+                      <td className={`${tdClass} text-right`}>{formatResultEurCompact(row.totalCostEur, locale, t)}</td>
+                      <td className={`${tdClass} text-right`}>{formatResultEurCompact(row.methaneRevenueEur, locale, t)}</td>
                     </tr>
                   ))}
                 </tbody>

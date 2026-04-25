@@ -71,6 +71,31 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
   }
   setColumnWidths(inputs, [44, 56]);
 
+  // --- Economic verdict (WP25) ---
+  const ev = wb.addWorksheet("Economic verdict", {
+    views: [{ state: "frozen", ySplit: 1 }],
+  });
+  ev.addRow(["Field", "Value"]);
+  styleHeaderRow(ev.getRow(1));
+  ev.addRow(["Category (qualitative)", model.economicVerdict.category]);
+  ev.addRow(["Title", model.economicVerdict.title]);
+  ev.addRow(["Conclusion", model.economicVerdict.body]);
+  for (const line of model.economicVerdict.details) {
+    ev.addRow(["Detail", line]);
+  }
+  setColumnWidths(ev, [30, 70]);
+
+  // --- Used assumptions (WP25) ---
+  const u = wb.addWorksheet("Used assumptions", {
+    views: [{ state: "frozen", ySplit: 1 }],
+  });
+  u.addRow(["Group", "Field", "Value", "Source", "Status", "Note"]);
+  styleHeaderRow(u.getRow(1));
+  for (const r of model.usedAssumptionsPrint) {
+    u.addRow([r.groupLabel, r.label, r.value, r.source ?? "", r.status ?? "", r.note ?? ""]);
+  }
+  setColumnWidths(u, [20, 28, 36, 18, 18, 32]);
+
   // --- Assumptions ---
   const assumptions = wb.addWorksheet("Assumptions", {
     views: [{ state: "frozen", ySplit: 1 }],
@@ -130,13 +155,22 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     "methaneRevenueEur",
     "hydrogenAlternativeRevenueEur",
   ]);
+  const twoDecCols = new Set([
+    "availableCO2Kg",
+    "usableCO2Kg",
+    "hydrogenNeededKg",
+    "methaneProducedKg",
+    "electricityConsumedMwh",
+  ]);
   for (const rowObj of model.dailyResults.rows) {
     const values = model.dailyResults.headers.map((h) => rowObj[h] ?? "");
     const excelRow = daily.addRow(values);
     model.dailyResults.headers.forEach((h, colIdx) => {
+      const cell = excelRow.getCell(colIdx + 1);
       if (eurDailyCols.has(h)) {
-        const cell = excelRow.getCell(colIdx + 1);
         cell.numFmt = EUR_NUMFMT;
+      } else if (twoDecCols.has(h) && typeof rowObj[h] === "number") {
+        cell.numFmt = "0.00";
       }
     });
   }
@@ -154,7 +188,7 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     if (m.unit === "EUR") {
       valueCell.numFmt = EUR_NUMFMT;
     } else if (m.value !== null && typeof m.value === "number") {
-      valueCell.numFmt = "0.########";
+      valueCell.numFmt = "0.00";
     }
   }
 
@@ -182,6 +216,8 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
       m.methaneRevenueEur,
       m.hydrogenAlternativeRevenueEur,
     ]);
+    r.getCell(4).numFmt = "0.00";
+    r.getCell(5).numFmt = "0.00";
     r.getCell(6).numFmt = EUR_NUMFMT;
     r.getCell(7).numFmt = EUR_NUMFMT;
     r.getCell(8).numFmt = EUR_NUMFMT;

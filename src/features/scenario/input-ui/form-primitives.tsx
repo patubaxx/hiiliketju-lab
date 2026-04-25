@@ -31,6 +31,7 @@ export function Section({
   children,
   className,
   headingAccent = true,
+  "data-testid": dataTestId,
 }: {
   title: string;
   description?: string;
@@ -38,9 +39,11 @@ export function Section({
   className?: string;
   /** Vertical accent bar beside the heading (setup sections); omit for outcome / plain blocks. */
   headingAccent?: boolean;
+  "data-testid"?: string;
 }) {
   return (
     <section
+      data-testid={dataTestId}
       className={cn(
         "rounded-xl border border-border/90 bg-card px-6 py-6 text-card-foreground shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.04] sm:px-7 sm:py-7 dark:ring-white/[0.06]",
         className,
@@ -77,6 +80,26 @@ export function FieldLabel({ htmlFor, children }: { htmlFor?: string; children: 
 
 export function FieldHint({ children }: { children: React.ReactNode }) {
   return <p className="text-xs text-muted-foreground leading-snug">{children}</p>;
+}
+
+/** Visible i18n guidance (WP24+); pass a `messageId` handled by the caller’s `t`. */
+export function GuidanceCallout({
+  messageId,
+  t,
+  "data-testid": dataTestId = `guidance-${messageId.replace(/\./g, "-")}`,
+}: {
+  messageId: string;
+  t: (id: string) => string;
+  "data-testid"?: string;
+}) {
+  return (
+    <div
+      className="rounded-lg border border-border/70 bg-muted/25 px-4 py-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty] whitespace-pre-line"
+      data-testid={dataTestId}
+    >
+      {t(messageId)}
+    </div>
+  );
 }
 
 export function FieldError({ message }: { message?: string }) {

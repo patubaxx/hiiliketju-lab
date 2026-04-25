@@ -21,13 +21,32 @@ export const en = {
         item3:
           "Stoichiometric process defaults are literature-based estimates — use the Advanced section to override with project-specific values if available.",
         item4:
-          "Plant availability and process efficiency are recorded with assumption metadata but not yet applied by the engine — both currently default to a neutral 100 %.",
+          "Advanced process assumptions are limited to the parameters the current engine uses; override literature-based values when you have project-specific data.",
       },
+      logos: {
+        businessFinlandAlt: "Business Finland",
+        labAlt: "LAB University of Applied Sciences",
+      },
+    },
+    setup: {
+      simple: {
+        title: "Basic inputs",
+        lead:
+          "Start with annual CO₂, utilization, and electricity purchase price. You can run the calculation from here. Open advanced setup for the scenario name, CO₂ availability, economics, and process assumptions.",
+      },
+      advanced: {
+        heading: "Advanced setup",
+        lead: "Scenario name, assumptions version and notes, CO₂ availability, economics, and advanced process fields.",
+      },
+      showAdvanced: "Show advanced setup",
+      hideAdvanced: "Hide advanced setup",
+      electricitySeriesRequiresAdvanced:
+        "Electricity is set to a daily or hourly price series. Open advanced setup to view and edit that series.",
     },
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "Work top to bottom: CO₂ availability → electricity purchase price → economics → advanced assumptions (if needed). Use the bar at the top to run, reset, change language, export, or jump to results.",
+        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). Use the top bar to run, reset, change language, export, or jump to results.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
@@ -36,6 +55,36 @@ export const en = {
       toolbarAriaLabel: "Scenario actions",
       jumpToOutcome: "Jump to outcome",
       exportGroupLabel: "Export downloads",
+    },
+    guidance: {
+      simpleSetup:
+        "What to enter: annual biogenic CO₂, how much of it is used in the plant (utilization), and the electricity purchase price. These values drive how much CO₂ is available for conversion each day and what electrolysis power costs. By default, CO₂ is distributed over the year with a winter-weighted seasonal pattern—you can open Advanced to change the profile, mode, or other inputs.\n\nYou can run a full 365-day calculation from this view without opening Advanced.",
+      co2Availability:
+        "What this section controls: how your yearly CO₂ amount is turned into a daily availability profile. The annual total (kt/year) sets the year’s available CO₂ mass. The utilization rate is the share of that CO₂ that your process can actually use. The seasonal (monthly relative weight) mode spreads the year across days; weights are relative and are normalized in the engine so the annual amount is preserved. In Advanced you can keep the default winter-weighted shape, edit monthly weights, or switch to a flat or time-series profile when you have better data.",
+      electricityPurchase:
+        "The electricity purchase (procurement) price is used to work out the cost of power for hydrogen production. Constant mode uses one price for the whole year. Imported market data uses a daily or hourly EUR/MWh series (hourly is averaged to days in the product). The bundled 2025 Finland defaults are a starting point—replace them with your real procurement or contract prices when the results need to match your case.",
+      economics:
+        "Methane and hydrogen prices here are assumed sales prices, not market spot quotes. They feed methane-path revenue and the hydrogen-sales alternative, and strongly affect which pathway looks more attractive. The form defaults are product starting points, not a confirmation that they are right for your project—check them before decision use.",
+      capex:
+        "CAPEX is optional. If you turn it on, the investments you enter are spread evenly over the selected lifetime in the MVP (simple per-year allocation) and added to the cost stack. Leave it off if you only want variable operating costs in this run.",
+      advancedProcess:
+        "This block lists the process assumptions the current calculation engine actually uses. Values begin from literature-based defaults. Replace them with project-specific numbers when you have defensible, traceable data.",
+    },
+  },
+  calendar: {
+    months: {
+      january: "January",
+      february: "February",
+      march: "March",
+      april: "April",
+      may: "May",
+      june: "June",
+      july: "July",
+      august: "August",
+      september: "September",
+      october: "October",
+      november: "November",
+      december: "December",
     },
   },
   locale: {
@@ -108,7 +157,9 @@ export const en = {
     mode_time_series_daily: "Time series (daily kg/day, 365 values)",
     mode_time_series_hourly: "Time series (hourly kg/h, 8760 values)",
     seasonalHelp:
-      "Twelve relative weights (one per calendar month). Zeros allowed; at least one month must be greater than zero. The engine scales them to match the annual total.",
+      "One relative weight per named calendar month below. Zeros are allowed, but at least one month must be greater than zero. The engine normalizes the weights, then builds daily availability so the year still matches your annual total (kt/year) after utilization.",
+    seasonalDefaultProfileNote:
+      "The default weight curve is higher in winter and lower in summer (industrial seasonality). Weights are only relative—only the pattern matters before normalization. Replace them with your own monthly data when you have it, or change CO₂ mode if a time series fits better.",
     month: "Month",
     seriesDailyLabel: "Daily available CO₂ (kg/day × 365)",
     seriesDailyHelp:
@@ -172,9 +223,6 @@ export const en = {
   },
   advanced: {
     internalKey: "Parameter id",
-    inactiveFactorsTitle: "Not yet applied in daily formulas",
-    inactiveFactorsBody:
-      "Plant availability and process efficiency are carried with assumption metadata for transparency, but the current MVP daily engine does not multiply outputs by these values (defaults are neutral 100%).",
     usingLiteratureDefault: "Using literature-based default",
     usingCustomValue: "Using custom value",
     override: "Override default",
@@ -266,7 +314,7 @@ export const en = {
     success: "Calculation finished successfully.",
     narrative: {
       outcomeIntro:
-        "Order of sections: headline figures, pathway comparison, supporting quantities, then charts and tables for checking details.",
+        "Economic readout and assumption snapshot first, then headline figures, pathway comparison, and supporting series/tables. Not investment advice—only the current inputs.",
     },
     summary: {
       lead: "All numbers below come from the calculation output; the interface does not recompute them.",
@@ -276,6 +324,16 @@ export const en = {
     },
     value: {
       na: "—",
+    },
+    displayUnit: {
+      EUR: "EUR",
+      kEUR: "kEUR",
+      MEUR: "MEUR",
+      kg: "kg",
+      t: "t",
+      kt: "kt",
+      MWh: "MWh",
+      GWh: "GWh",
     },
     section: {
       kpis: "Key results",
@@ -288,7 +346,67 @@ export const en = {
       tablesDetailLead:
         "Exact figures for export and checking. Annual rows match the summary; month and day views add detail.",
       assumptions: "Process assumptions (from your inputs)",
+      usedAssumptions: "Assumptions used in this calculation",
       warnings: "Calculation notices",
+    },
+    verdict: {
+      favorableTitle: "Favorable under current assumptions (indicative)",
+      favorableBody:
+        "The methanation pathway appears, under the inputs in this run, to cover the modeled total annual cost and to do at least as well as the hydrogen-sale alternative. This is directional, not a guarantee of real-world profitability.",
+      mixedTitle: "Mixed signal — check assumptions",
+      mixedBody:
+        "Revenue, total cost, and the hydrogen alternative do not all point the same way. Treat the picture as rough guidance and review prices, CAPEX settings, and CO₂ and electricity profile assumptions before drawing conclusions.",
+      mixedDetail: "A mixed label can occur when, for example, revenue exceeds modeled cost but the hydrogen path still has higher economic appeal in this comparison.",
+      unfavorableTitle: "Unfavorable under current assumptions (indicative)",
+      unfavorableBody:
+        "Methane revenue is below the modeled total annual cost and the pathway is also behind the hydrogen-sale alternative in this comparison. This does not, by itself, mean the project is unviable in reality—only that these assumptions produce a weak picture here.",
+      notComputableTitle: "Economic readout not available for this result",
+      notComputableBody:
+        "There is not enough modeled methane output or a usable break-even price in this result to label pathway economics. Adjust inputs (for example utilization or the CO₂ series) and run again before interpreting profitability.",
+      disclaimer:
+        "Indicative, suuntaa-antava view only. Not investment, financing, or tax advice. It reflects the current scenario assumptions; verify with your own site-specific and market data.",
+    },
+    usedAssumptions: {
+      lead: "Snapshot of the inputs and defaults that entered the engine for this run (same basis as PDF/Excel exports; values are not recalculated here).",
+      colLabel: "Item",
+      colValue: "Value",
+      colMeta: "Provenance / notes",
+      scenarioName: "Scenario name",
+      analysisPeriod: "Analysis period (days in model)",
+      assumptionsVersion: "Assumptions package version",
+      annualCo2AvailableFromResult: "Annual CO₂ available (result, consistent with input)",
+      seasonalMonthlyWeights: "Relative monthly CO₂ shape (12 weights, pre-normalization)",
+      seasonalDefaultFlag: "Default seasonal profile (winter-weighted template)",
+      importedSeriesStats: "Imported / internal series (count · mean · min · max, EUR/MWh or kg units as per row)",
+      importedDataSource: "Data source (bundled default vs your series)",
+      capexYes: "Yes — investment costs spread into the annual result",
+      capexNo: "No — no CAPEX allocation in the annual result (other costs still apply as modeled)",
+      annualCapexInResult: "Modeled annual CAPEX allocation in this result (when CAPEX is off, this is zero by settings)",
+      group: {
+        scenario: "Scenario / setup",
+        co2: "CO₂",
+        electricity: "Electricity",
+        economics: "Economics (sales and OPEX)",
+        capex: "Capital expenditure",
+        process: "Process (active model inputs)",
+      },
+      unit: {
+        days: "days",
+        kg: "kg",
+        percent: "%",
+        eurPerMwh: "EUR/MWh",
+        eurPerTch4: "EUR/t CH₄",
+        eurPerKgH2: "EUR/kg H₂",
+        eurPerYear: "EUR/year",
+        eur: "EUR",
+        years: "years",
+      },
+      kind: {
+        default: "Default / literature",
+        user: "User / scenario",
+        derived: "Derived in model",
+        imported: "Imported / bundled data",
+      },
     },
     kpi: {
       annualCo2Available: "Annual CO₂ available",
@@ -325,6 +443,25 @@ export const en = {
       costVsRevenueDaily: "Daily total cost vs methane revenue",
       axis: {
         dayOfYear: "Day index (0–364)",
+        xDate: "Date (day index)",
+        yKgd: "CO₂ (kg/d)",
+        yTpd: "CO₂ (t/d)",
+        yKtd: "CO₂ (kt/d)",
+        yEurPerMwh: "Price (EUR/MWh)",
+        yMethaneKgd: "CH₄ (kg/d)",
+        yMethaneTpd: "CH₄ (t/d)",
+        yMethaneKtd: "CH₄ (kt/d)",
+        yCostEurD: "Amount (EUR/d)",
+        yCostKEurD: "Amount (kEUR/d)",
+        yCostMeurD: "Amount (MEUR/d)",
+      },
+      unit: {
+        eurPerD: "EUR/d",
+        kEurPerD: "kEUR/d",
+        meurPerD: "MEUR/d",
+        kgPerD: "kg/d",
+        tPerD: "t/d",
+        ktPerD: "kt/d",
       },
       series: {
         availableCo2Kg: "Available CO₂ (kg/day)",

@@ -1,6 +1,10 @@
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
+import { USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS } from "@/core/domain/user-facing-process-assumptions";
 import type { CalculationResult, DailyResult, MonthlySummary, ScenarioSummary } from "@/core/domain/result";
 import type { ScenarioInput } from "@/core/domain/scenario";
+import { translate, type Locale } from "@/i18n/messages";
+import { buildEconomicVerdict, type EconomicVerdictCategory } from "@/core/reporting/build-economic-verdict";
+import { usedAssumptionsToPrintable, type UsedAssumptionPrintRow } from "@/core/reporting/build-used-assumptions-model";
 import {
   CO2_MODE_FLAT_ANNUAL,
   CO2_MODE_SEASONAL_DAILY,
@@ -18,14 +22,12 @@ import {
  * and stringifies: it does not re-harmonize time series, re-aggregate KPIs, or trust any client-supplied totals.
  */
 
-/** Stable export order and English labels (workbook headers; not UI i18n). */
+/**
+ * User-facing process assumption rows in Excel/PDF (WP23). Inactive `plantAvailabilityPct` and
+ * `processEfficiencyPct` stay on the canonical input but are omitted here.
+ */
 export const PROCESS_ASSUMPTION_EXPORT_ORDER: readonly (keyof ProcessAssumptionsInput)[] = [
-  "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
-  "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
-  "electrolyzerSpecificEnergyConsumptionKwhPerKgH2",
-  "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
-  "plantAvailabilityPct",
-  "processEfficiencyPct",
+  ...USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS,
 ] as const;
 
 export const PROCESS_ASSUMPTION_EXPORT_LABELS: Record<keyof ProcessAssumptionsInput, string> = {
@@ -83,8 +85,22 @@ export type ComparisonExportRow = {
   readonly valueEur: number;
 };
 
+/** Localized (export locale) block from `buildEconomicVerdict` for Excel/PDF. */
+export type EconomicVerdictExportBlock = {
+  readonly category: EconomicVerdictCategory;
+  readonly title: string;
+  readonly body: string;
+  readonly details: readonly string[];
+};
+
+const EXPORT_TEXT_LOCALE: Locale = "en";
+
 export type ScenarioExcelExportModel = {
   readonly inputs: readonly InputSnapshotRow[];
+  /** WP25: same verdict helper as Results UI; strings in `EXPORT_TEXT_LOCALE` for current PDF/Excel copy. */
+  readonly economicVerdict: EconomicVerdictExportBlock;
+  /** WP25: shared used-assumptions model as printable rows (en). */
+  readonly usedAssumptionsPrint: readonly UsedAssumptionPrintRow[];
   readonly processAssumptions: readonly ProcessAssumptionExportRow[];
   readonly co2Profile: {
     readonly headers: readonly string[];
@@ -269,6 +285,7 @@ function dailyResultToRow(d: DailyResult): Record<string, string | number> {
  */
 export function buildScenarioExcelExportModel(result: CalculationResult): ScenarioExcelExportModel {
   const input = result.input;
+  const verdictDto = buildEconomicVerdict(result.annualSummary);
 
   const dailyHeaders = [
     "dayIndex",
@@ -288,6 +305,13 @@ export function buildScenarioExcelExportModel(result: CalculationResult): Scenar
 
   return {
     inputs: serializeScenarioInputSnapshot(input),
+    economicVerdict: {
+      category: verdictDto.category,
+      title: translate(EXPORT_TEXT_LOCALE, verdictDto.titleKey),
+      body: translate(EXPORT_TEXT_LOCALE, verdictDto.bodyKey),
+      details: verdictDto.detailKeys.map((k) => translate(EXPORT_TEXT_LOCALE, k)),
+    },
+    usedAssumptionsPrint: usedAssumptionsToPrintable(result, EXPORT_TEXT_LOCALE),
     processAssumptions: buildProcessAssumptionRows(input.process),
     co2Profile: {
       headers: ["dayIndex", "dateLabel", "availableCO2Kg", "unit"],

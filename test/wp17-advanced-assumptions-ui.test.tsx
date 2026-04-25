@@ -1,19 +1,35 @@
 /** @vitest-environment jsdom */
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-app";
 import { LocaleProvider } from "@/i18n/locale-context";
 
+import { waitForStoredLocaleEnApplied } from "./wait-for-stored-locale";
+
+beforeEach(() => {
+  localStorage.setItem("hiiliketju.locale", "en");
+});
+afterEach(() => {
+  cleanup();
+  localStorage.removeItem("hiiliketju.locale");
+});
+
+async function expandAdvanced() {
+  await waitForStoredLocaleEnApplied();
+  fireEvent.click(screen.getByTestId("toggle-advanced-setup"));
+}
+
 describe("WP17 – advanced assumptions transparency UX", () => {
-  it("shows literature-based defaults and metadata before any override", () => {
+  it("shows literature-based defaults and metadata before any override", async () => {
     render(
       <LocaleProvider>
         <ScenarioInputApp />
       </LocaleProvider>,
     );
+    await expandAdvanced();
 
-    expect(screen.getAllByText("Literature-based")).toHaveLength(5);
+    expect(screen.getAllByText("Literature-based")).toHaveLength(3);
     expect(screen.getByText("0.1832")).toBeTruthy();
     expect(screen.getByText("0.3645")).toBeTruthy();
     expect(screen.getByText("54")).toBeTruthy();
@@ -21,12 +37,13 @@ describe("WP17 – advanced assumptions transparency UX", () => {
     expect(screen.getAllByText("Estimated").length).toBeGreaterThan(0);
   });
 
-  it("switches a row to custom mode and keeps SEC editing to one visible field", () => {
+  it("switches a row to custom mode and keeps SEC editing to one visible field", async () => {
     render(
       <LocaleProvider>
         <ScenarioInputApp />
       </LocaleProvider>,
     );
+    await expandAdvanced();
 
     expect(screen.queryByLabelText("Electrolyzer SEC (MWh / kg H₂)")).toBeNull();
 
