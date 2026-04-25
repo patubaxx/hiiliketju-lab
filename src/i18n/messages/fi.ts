@@ -5,23 +5,23 @@ export const fi = {
     title: "Hiiliketju",
     tagline: "Teknis-taloudellinen skenaariotyökalu (MVP)",
     hero: {
-      headline: "Teknis-taloudelliset skenaariot biologisen CO₂:n ja vedyn arvoketjuille",
+      headline: "Teknis-taloudelliset skenaariot biogeenisen CO₂:n ja vedyn arvoketjuille",
       lead:
-        "Vertaa kahta biogeenisen CO₂:n arvoketjuvaihtoehtoa: synteettistä metaania (CO₂ + H₂ → CH₄, polku A) ja vetyä, joka myydään suoraan ja CO₂ vapautetaan (polku B). Aseta CO₂:n saatavuus ja sähkön hankintahinnat 365 päivän vuodelle ja katso tuotantomäärät, sähkönkulutus, kustannukset, tulot sekä johdetut kannattavuushinnat molemmille poluille — halutessasi CAPEX mukana — suoraan selaimessa.",
-      bullet1: "Metaanipolku (polku A: CO₂ + H₂ → CH₄) ja vedynmyyntivaihtoehto (polku B) samassa ajossa",
-      bullet2: "365 päivän vuosimalli — CO₂ ja sähkö tasaisena, kausiluonteisena tai päivittäisenä/tuntikohtaisena aikasarjana",
-      bullet3: "Johdettu kriittinen metaanihinta ja kannattavuuskynnykset — tuotanto-, energia-, kustannus- ja tuloKPI:iden rinnalla",
-      bullet4: "Kaikki oletukset näkyvissä lähde-, tila- ja huomiotietoineen — Excel- ja PDF-viennit sisältävät samat metatiedot",
+        "Vertaa kahta biogeenisen CO₂:n arvoketjuvaihtoehtoa: synteettisen metaanin tuotantoa (CO₂ + H₂ → CH₄, polku A) ja vaihtoehtoa, jossa vety myydään suoraan ja CO₂ vapautetaan (polku B). Syötä CO₂:n saatavuus ja sähkön hankintahinta 365 päivän vuodelle, ja tarkastele tuotantomääriä, sähkönkulutusta, kustannuksia, tuloja sekä johdettuja kannattavuushintoja suoraan selaimessa. Halutessasi voit sisällyttää tarkasteluun myös CAPEXin.",
+      bullet1: "Metaanipolku (CO₂ + H₂ → CH₄) ja vedyn myyntivaihtoehto samassa ajossa",
+      bullet2: "365 päivän vuosimalli — CO₂ ja sähkö tasaisena, kausiluonteisena tai päivä-/tuntikohtaisena aikasarjana",
+      bullet3: "Johdettu break-even-metaanihinta ja kannattavuuskynnykset tuotanto-, energia-, kustannus- ja tulotunnuslukujen rinnalla",
+      bullet4: "Käytetyt oletukset näkyvät lähde-, tila- ja huomiotietoineen — Excel- ja PDF-viennit sisältävät saman oletusläpinäkyvyyden",
       beforeYouRun: {
         title: "Ennen kuin aloitat",
         item1:
-          "Tuodut sähkön oletushinnat perustuvat vuoden 2025 suomalaisiin pörssisähkön hintoihin ja sisältävät kuluttajan ALV:n (25,5 %) — korvaa teollisuusskenaarioissa omalla hankintahinnalla.",
+          "Tuodut sähkön oletushinnat perustuvat vuoden 2025 suomalaisiin pörssisähkön hintoihin ja sisältävät kuluttaja-ALV:n (25,5 %). Teollisuusskenaarioissa ne kannattaa korvata omalla hankintahinnalla.",
         item2:
-          "Metaanin ja vedyn hinnat alkavat lomakkeen oletuksista (1 200 EUR/t CH₄; 4 EUR/kg H₂) — varmista ennen tulosten lukemista, että ne vastaavat projektiasi.",
+          "Metaanin ja vedyn hinnat alkavat lomakkeen oletusarvoista (1 200 EUR/t CH₄ ja 4 EUR/kg H₂). Varmista ennen tulosten tulkintaa, että ne vastaavat omaa projektiasi.",
         item3:
-          "Stoikiometriset prosessioletukset ovat kirjallisuuspohjaisia arvioita — korvaa ne Edistyneet oletukset -osiossa, jos sinulla on projektikohtaisia arvoja.",
+          "Stoikiometriset prosessioletukset ovat kirjallisuuspohjaisia arvioita. Korvaa ne lisäasetuksissa, jos käytettävissäsi on projektikohtaisia arvoja.",
         item4:
-          "Edistyneissä prosessioletuksissa ovat vain ne parametrit, joita moottori käyttää; korvaa kirjallisuusperusteiset arvot, kun sinulla on projektikohtaisia tietoja.",
+          "Lisäasetuksissa näytetään vain ne prosessiparametrit, joita nykyinen laskenta käyttää. Korvaa kirjallisuuspohjaiset arvot projektikohtaisilla tiedoilla, kun niitä on saatavilla.",
       },
       logos: {
         businessFinlandAlt: "Business Finland",
@@ -32,11 +32,12 @@ export const fi = {
       simple: {
         title: "Perusasetukset",
         lead:
-          "Aloita vuotuisesta CO₂:sta, hyödyntämisasteesta ja sähkön hankintahinnasta. Laskennan voi käynnistää tästä. Skenaarion nimi, CO₂-tilanne, talousparametrit ja prosessioletukset ovat lisäasetuksissa.",
+          "Aloita vuotuisesta CO₂-määrästä, hyödyntämisasteesta ja sähkön hankintahinnasta. Voit käynnistää laskennan jo näillä tiedoilla. Skenaarion nimi, CO₂:n tarkempi saatavuusprofiili, talousparametrit ja prosessioletukset löytyvät lisäasetuksista.",
       },
       advanced: {
         heading: "Lisäasetukset",
-        lead: "Skenaarion nimi, oletusten versio ja muistiinpanot, CO₂:n saatavuus, talous ja edistyneet prosessikentät.",
+        lead:
+          "Tarkenna skenaarion nimeä, oletusten versiota ja muistiinpanoja, CO₂:n saatavuusprofiilia, taloustietoja sekä aktiivisia prosessioletuksia.",
       },
       showAdvanced: "Näytä lisäasetukset",
       hideAdvanced: "Piilota lisäasetukset",
@@ -46,7 +47,7 @@ export const fi = {
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:
-        "Aloitetaan perusarvoilla. Laajenna lisäasetukset, kun tarvitset koko lomakkeen (CO₂-aikasarjat, myyntihinnat, CAPEX, prosessioletukset). Käytä yläpalkkia: laskenta, nollaus, kieli, vienti, hyppy tuloksiin.",
+        "Aloita perusarvoilla ja avaa lisäasetukset, kun tarvitset koko lomakkeen: CO₂-aikasarjat, myyntihinnat, CAPEXin tai prosessioletukset. Yläpalkista voit suorittaa laskennan, nollata lomakkeen, vaihtaa kieltä, siirtyä tuloksiin ja tehdä viennit.",
       actionsCardTitle: "Laskenta",
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",
@@ -58,17 +59,17 @@ export const fi = {
     },
     guidance: {
       simpleSetup:
-        "Tässä annetaan biogeenisen CO₂:n vuosimäärä, kuinka suuren osan siitä prosessi käyttää (hyötysuhde) sekä sähkön hankintahinta. Nämä vaikuttavat päivittäiseen saatavissa olevaan CO₂-massaan ja siihen, mitä elektrolyysin sähkö maksaa. Oletuksena CO₂ jakaantuu talvispainotteisella vuodenaikaprofiililla; voit avata lisäasetukset ja muuttaa profiilia, tilaa tai muita arvoja.\n\nKoko 365 päivän laskennan voi ajaa jo tästä katselusta avaamatta lisäasetuksia.",
+        "Tässä annetaan biogeenisen CO₂:n vuosimäärä, siitä prosessiin ohjattava osuus eli hyödyntämisaste sekä sähkön hankintahinta. Nämä vaikuttavat päivittäiseen käytettävissä olevaan CO₂-massaan ja elektrolyysin sähkökustannukseen. Oletuksena CO₂ jakautuu talvipainotteisen vuodenaikaprofiilin mukaan. Voit avata lisäasetukset ja muuttaa profiilia, laskentatapaa tai muita arvoja.\n\nKoko 365 päivän laskennan voi ajaa jo tästä näkymästä avaamatta lisäasetuksia.",
       co2Availability:
-        "Määritellään, miten vuotuinen CO₂ kääntyy päivittäiseksi saatavuudeksi. Vuosiluku (kt/v) asettaa koko kauden saatavilla olevan massan. Hyötysuhde on osa, joka todella käytetään prosessiin. Vuodenaikainen tila (kuukausipainot) jakaa massan vuoden päiville; painot ovat suhteellisia ja moottori normalisoi ne niin, että vuosimäärä säilyy hyötysuhteen jälkeen. Lisäasetuksissa voi pitää oletusprofiilia, muokata kuukausipainoja tai valita tasaista tai aikasarjaprofiilia, kun on parempi dataa.",
+        "Tässä määritellään, miten vuotuinen CO₂-määrä muunnetaan päivittäiseksi saatavuudeksi. Vuosiluku (kt/v) kertoo koko vuoden aikana saatavilla olevan CO₂-massan. Hyödyntämisaste kertoo, kuinka suuri osa tästä massasta ohjataan prosessiin. Vuodenaikainen profiili jakaa vuosimäärän vuoden päiville kuukausipainojen perusteella. Painot ovat suhteellisia, ja laskenta normalisoi ne niin, että kokonaisvuosimäärä säilyy. Lisäasetuksissa voit käyttää oletusprofiilia, muokata kuukausipainoja tai valita tasaisen profiilin tai aikasarjan, jos käytettävissä on parempaa dataa.",
       electricityPurchase:
-        "Hankintahintaa käytetään vedyntuotannon sähkökustannuksiin. Vakiohinta: yksi hinta koko vuodelle. Tuodut markkinatiedot: päivittäinen tai tuntinainen EUR/MWh -sarja (tunnit muunnetaan vuorokauden keskiarvoksi). Suomi 2025 -oletusdata on aloituspiste; korvaa oikeilla hankinta- tai sopimushinnoilla, jos haluat tulokset vastaamaan todellista tapaustasi.",
+        "Sähkön hankintahintaa käytetään vedyntuotannon sähkökustannusten laskentaan. Vakiohinta käyttää samaa hintaa koko vuodelle. Tuodut markkinatiedot käyttävät päivittäistä tai tuntikohtaista EUR/MWh-sarjaa; tuntisarjat muunnetaan vuorokausikeskiarvoiksi. Suomi 2025 -oletusdata on aloituspiste. Korvaa se omilla hankinta- tai sopimushinnoilla, jos haluat tulosten vastaavan todellista tapaustasi.",
       economics:
-        "Metaani- ja vetykentät ovat oletettuja myyntihintoja, eivät markkinapörssin reaaliaikahintaa. Ne syöttävät metaanipolun tulot ja vedyn myyntivaihtoehdon, ja vaikuttavat siihen, kumpi polku näyttää houkuttelevammalta. Lomakkeen oletukset ovat tuotepohjaisia aloitusarvoja; tarkista ne ennen päätöskäyttöä.",
+        "Metaani- ja vetykentät ovat oletettuja myyntihintoja, eivät reaaliaikaisia markkinahintoja. Niitä käytetään metaanipolun tulojen ja vedyn myyntivaihtoehdon laskentaan, ja ne vaikuttavat vahvasti siihen, kumpi polku näyttää taloudellisesti houkuttelevammalta. Lomakkeen arvot ovat lähtöoletuksia, jotka kannattaa tarkistaa ennen päätöskäyttöä.",
       capex:
-        "CAPEX on vapaaehtoinen. Kun päällä, syöttämäsi investoinnit jaetaan valitun eliniän yli vuositasolla tässä MVP:ssa (yksinkertainen vuosivakiointi) ja lisätään kustannuksiin. Jätä pois, jos haluat vain varhaiskustannukset tähän ajoon.",
+        "CAPEX on vapaaehtoinen. Kun se on käytössä, syöttämäsi investoinnit jaetaan valitun eliniän yli vuosikustannukseksi tässä MVP-versiossa. Jätä CAPEX pois, jos haluat tarkastella vain sähkön, OPEX:n ja muiden mallissa mukana olevien kustannusten vaikutusta.",
       advancedProcess:
-        "Tässä ovat moottorin tällä hetkellä käyttämät prosessiparametrit. Oletusarvot perustuvat kirjallisuuteen. Korvaa ne projektiin sopivilla, jäljitettävillä luvuilla, kun ne ovat saatavilla.",
+        "Tässä näytetään prosessiparametrit, joita nykyinen laskenta käyttää. Oletusarvot perustuvat kirjallisuuteen. Korvaa ne projektikohtaisilla ja jäljitettävillä arvoilla, kun sellaisia on saatavilla.",
     },
   },
   calendar: {
@@ -133,54 +134,54 @@ export const fi = {
   sections: {
     co2: "Hiilidioksidin saatavuus",
     co2Intro:
-      "Vuosittainen CO₂-saatavuus, kuinka suuren osan siitä käytät ja miten jakautuminen menee vuoden yli. Jos käytät aikasarjaa, päiväkohtaiset määrät tulevat siitä; vuosiluku on silti pakollinen, mutta sitä ei käytetä sarjan skaalaamiseen. Vuosimäärä annetaan yksikössä kt/v.",
+      "Määritä vuotuinen CO₂-saatavuus, prosessiin ohjattava osuus ja se, miten CO₂ jakautuu vuoden aikana. Jos käytät aikasarjaa, päiväkohtaiset määrät tulevat suoraan sarjasta. Vuosiluku on silti pakollinen raportoinnin ja skenaarion kokonaiskuvan vuoksi. Vuosimäärä annetaan yksikössä kt/v.",
     electricity: "Sähkön hankintahinta",
     electricityIntro:
-      "Miten sähkön hankintahinta annetaan koko vuodelle. Tuntiarvot muunnetaan kalenteripäivän keskiarvoiksi. Tasaisessa hinnassa voit käyttää EUR/MWh tai c/kWh; sarjat ovat aina EUR/MWh.",
+      "Määritä, miten sähkön hankintahinta annetaan vuoden ajalle. Tuntiarvot muunnetaan kalenteripäivän keskiarvoiksi. Vakiohinnassa voit käyttää yksikköä EUR/MWh tai c/kWh; sarjat annetaan aina yksikössä EUR/MWh.",
     economics: "Taloudelliset tiedot",
     economicsIntro:
       "Metaanin ja vedyn oletetut myyntihinnat, muut vuosittaiset käyttökulut ja valinnainen investointi (CAPEX).",
     advanced: "Edistyneet prosessioletukset",
     advancedIntro:
-      "Muuta kirjallisuudesta tulevia oletuksia vain, jos sinulla on kohteeseen liittyviä lukuja. Jokaisen arvon yhteyteen tallentuu lähde ja tila.",
+      "Muuta kirjallisuuspohjaisia prosessioletuksia vain, jos käytettävissäsi on kohdekohtaisia arvoja. Jokaisen arvon yhteyteen tallentuu lähde ja tila.",
     results: "Laskentatulos",
   },
   co2: {
     annualAmount: "Vuotuinen CO₂",
     annualAmountHint: "Syötä vuotuinen CO₂-kokonaismäärä yksikössä kt/v.",
     annualKt: "Vuotuinen CO₂ (kt/v)",
-    utilization: "Hyötysuhde (%)",
+    utilization: "Hyödyntämisaste (%)",
     mode: "Ajallinen profiili",
     mode_flat_annual: "Tasainen (jakautuu tasaisesti vuoteen)",
     mode_seasonal_daily: "Vuodenaikainen (kuukausipainot)",
     mode_time_series_daily: "Aikasarja (päivittäinen kg/päivä, 365 arvoa)",
     mode_time_series_hourly: "Aikasarja (tuntikohtainen kg/h, 8760 arvoa)",
     seasonalHelp:
-      "Yksi suhteellinen paino jokaiselle alla nimetylle kuukaudelle. Nollat sallitaan, mutta vähintään yhden kuukauden tulee olla nollaa suurempi. Moottori normalisoi painot, muodostaa päivittäisen saatavuuden ja varmistaa, että hyötysuhteen jälkeen vuosi vastaa silti vuotuista (kt/v) määrääsi.",
+      "Anna yksi suhteellinen paino jokaiselle kuukaudelle. Nollat sallitaan, mutta vähintään yhden kuukauden painon on oltava suurempi kuin nolla. Laskenta normalisoi painot, muodostaa päivittäisen saatavuusprofiilin ja säilyttää vuotuisen CO₂-kokonaismäärän.",
     seasonalDefaultProfileNote:
-      "Oletus käyttää kylmempään vuodenaikaan painottuvaa käyrää (teollisen tuotannon tyypillinen jaksotus). Painot ovat vain suhteellisia—ennen normalisointia merkitsevät vain kuvion muodon. Vaihda omat kuukausittaiset tietosi tilalle tai aikasarjaprofiili, jos se sopii paremmin.",
+      "Oletus käyttää talvipainotteista kausiprofiilia, jossa CO₂:ta on enemmän saatavilla kylmempänä vuodenaikana ja vähemmän kesällä. Painot ovat suhteellisia ja kuvaavat vain profiilin muotoa ennen normalisointia. Korvaa oletus omilla kuukausitiedoilla tai aikasarjalla, jos sellainen kuvaa tapaustasi paremmin.",
     month: "Kuukausi",
     seriesDailyLabel: "Päivittäinen saatava CO₂ (kg/päivä × 365)",
     seriesDailyHelp:
       "Syötä tasan 365 ei-negatiivista lukua pilkuilla, puolipisteillä tai rivinvaihdoilla eroteltuna.",
     seriesHourlyLabel: "Tuntikohtainen saatava CO₂ (kg/h × 8760)",
     seriesHourlyHelp:
-      "Syötä tasan 8760 ei-negatiivista lukua. Tunnit summataan kalenteripäiviksi moottorissa.",
+      "Syötä tasan 8760 ei-negatiivista lukua. Tunnit summataan kalenteripäiviksi laskennassa.",
     timeSeriesAnnualHint:
-      "Aikasarjamodeissa moottori käyttää vain sarjaa saatavuuteen; pidä vuosimäärä linjassa omien raporttiesi kanssa, jos käytät sitä.",
+      "Aikasarjamodeissa laskenta käyttää saatavuuteen vain sarjaa; pidä vuosimäärä linjassa omien raporttiesi kanssa, jos käytät sitä.",
     fillOnes365: "Täytä 365 × 1",
     fillOnes8760: "Täytä 8760 × 1",
   },
   electricity: {
     mode: "Hankintahintatapa",
-    mode_constant: "Vakio hankintahinta (EUR/MWh)",
-    mode_daily_series: "Päiväsarja (365 EUR/MWh hankintahintaa)",
-    mode_hourly_series: "Tuntisarja (8760 EUR/MWh hankintahintaa)",
+    mode_constant: "Vakiohinta (EUR/MWh)",
+    mode_daily_series: "Päiväsarja (365 hankintahintaa, EUR/MWh)",
+    mode_hourly_series: "Tuntisarja (8 760 hankintahintaa, EUR/MWh)",
     mode_historical_imported: "Tuodut markkinatiedot (päivä- tai tuntikohtainen hankintahintasarja)",
     constantPrice: "Sähkön hankintahinta",
     constantPriceUnitAria: "Vakiohankintahinnan yksikkö",
     constantPriceHint:
-      "Vain vakiomoodi: syötä EUR/MWh tai c/kWh (eurosenttiä per kWh); moottori käyttää EUR/MWh. Sarjat ovat EUR/MWh.",
+      "Vain vakiomoodi: syötä EUR/MWh tai c/kWh (eurosenttiä per kWh); laskenta käyttää EUR/MWh-yksikköä. Sarjat ovat EUR/MWh.",
     seriesDailyLabel: "Päivittäiset hankintahinnat (EUR/MWh × 365)",
     seriesHourlyLabel: "Tuntikohtaiset hankintahinnat (EUR/MWh × 8760)",
     seriesHelp:
@@ -205,13 +206,13 @@ export const fi = {
   economics: {
     methanePrice: "Metaanin oletettu myyntihinta (EUR/t CH₄)",
     methanePriceHint:
-      "Käytetään metaanipolun tuloissa. Ei ole sama asia kuin tulososion tasapaino- tai kannattavuushinnat.",
+      "Käytetään metaanipolun tuloissa. Ei ole sama asia kuin tulososion break-even- tai kannattavuushinnat.",
     hydrogenPrice: "Vedyn oletettu myyntihinta (EUR/kg H₂)",
     hydrogenPriceHint: "Käytetään vedyn myynnin vaihtoehtoisissa tuloissa.",
     methanePriceDefaultVerifyHint:
-      "Tämä on tuotteen oletushinta—tarkista hankkeellesi sopiva metaanin markkinahinta ennen kuin tuloksia tai vientiä käytetään päätöksentekoon.",
+      "Tämä on tuotteen oletushinta. Tarkista hankkeellesi sopiva metaanin markkina- tai sopimushinta ennen kuin käytät tuloksia tai vientitiedostoja päätöksenteossa.",
     hydrogenPriceDefaultVerifyHint:
-      "Tämä on tuotteen oletushinta—tarkista hankkeellesi sopiva vedyn markkinahinta ennen kuin tuloksia tai vientiä käytetään päätöksentekoon.",
+      "Tämä on tuotteen oletushinta. Tarkista hankkeellesi sopiva vedyn markkina- tai sopimushinta ennen kuin käytät tuloksia tai vientitiedostoja päätöksenteossa.",
     otherOpex: "Muut käyttökulut (EUR/v)",
     includeCapex: "Laske investointi mukaan kustannuksiin",
     includeCapexHint:
@@ -274,9 +275,9 @@ export const fi = {
       annualCo2MustBeNumber: "Vuotuisen CO₂-määrän on oltava luku.",
       annualCo2MustBeFinite: "Vuotuisen CO₂-määrän on oltava äärellinen luku.",
       annualCo2NonNegative: "Vuotuinen CO₂ ei voi olla negatiivinen.",
-      utilizationMustBeNumber: "Hyötysuhteen on oltava luku.",
-      utilizationMustBeFinite: "Hyötysuhteen on oltava äärellinen luku.",
-      utilizationOutOfRange: "Hyötysuhde on oltava välillä 0–100 (%).",
+      utilizationMustBeNumber: "Hyödyntämisasteen on oltava luku.",
+      utilizationMustBeFinite: "Hyödyntämisasteen on oltava äärellinen luku.",
+      utilizationOutOfRange: "Hyödyntämisasteen on oltava välillä 0–100 (%).",
       methaneAssumedPriceMustBeNumber: "Metaanin oletetun myyntihinnan on oltava luku.",
       methaneAssumedPriceMustBeFinite: "Metaanin oletetun myyntihinnan on oltava äärellinen luku.",
       methaneAssumedPriceNonNegative: "Metaanin oletettu myyntihinta ei voi olla negatiivinen.",
@@ -313,7 +314,7 @@ export const fi = {
     success: "Laskenta valmistui onnistuneesti.",
     narrative: {
       outcomeIntro:
-        "Aluksi taloudellinen tulkinta ja tähän laskentaan valitut oletukset, sitten pääluvut, polkuvertailu, täydentävät määrät, kuvaajat ja taulukot. Ei sijoitus- tai rahoitusneuvo.",
+        "Aluksi näytetään taloudellinen tulkinta ja tässä laskennassa käytetyt oletukset. Sen jälkeen näet pääluvut, polkuvertailun, täydentävät määrät, kuvaajat ja taulukot. Tämä ei ole sijoitus- tai rahoitusneuvo.",
     },
     summary: {
       lead: "Kaikki alla olevat luvut tulevat suoraan laskennan tuloksesta; käyttöliittymä ei laske niitä uudelleen.",
@@ -338,7 +339,7 @@ export const fi = {
       kpis: "Pääluvut",
       kpisHeadline: "Yhteenveto",
       kpisSecondary: "Täydentävät tunnusluvut",
-      pathComparison: "Polkuvertailu (metaani vs vetykauppa)",
+      pathComparison: "Polkuvertailu (metaani vs. vedyn myynti)",
       charts: "Aikasarjat",
       chartsLead: "Päivittäinen aikasarja laskennasta (sama 365 päivän jakso kuin taulukoissa).",
       tables: "Taulukkotarkenne",
@@ -349,24 +350,24 @@ export const fi = {
       warnings: "Laskennan huomautukset",
     },
     verdict: {
-      favorableTitle: "Myönteinen suunta nykyisillä oletuksilla (suuntaa antavaa)",
+      favorableTitle: "Myönteinen tulos nykyisillä oletuksilla (suuntaa antava)",
       favorableBody:
-        "Metanointipolku näyttää tämän ajoituksen luvuilla kattavan mallinnetut vuosikustannukset ja vähintään yhtä hyvälle vedyn myynnin vaihtoehtoon verrattuna. Tämä ei ole takeita toteutuvasta kannattavuudesta.",
+        "Metanointipolku näyttää tämän ajon perusteella kattavan mallinnetut vuosikustannukset ja olevan vähintään yhtä hyvä kuin vedyn myyntivaihtoehto. Tämä ei takaa toteutuvaa kannattavuutta, vaan kuvaa tulosta nykyisillä oletuksilla.",
       mixedTitle: "Tulos on ristiriitainen — tarkista oletukset",
       mixedBody:
-        "Metaanituotto, kokonaiskustannus ja vetyvaihtoehto eivät osoita yhtenäistä kuvaa. Käytä tätä suuntaa antavana ja tarkista hinnat, CAPEX-asetukset sekä CO₂- ja sähköprofiilit ennen jatkopäätelmiä.",
-      mixedDetail: "Eri suunnat voivat syntyä esimerkiksi siitä, että tuotto ylittää kustannuksen, mutta vetyreitti näyttää euroissa edullisemmalta.",
-      unfavorableTitle: "Ei-näytä kannattavalle nykyisillä oletuksilla (suuntaa antavaa)",
+        "Metaanituotto, kokonaiskustannus ja vedyn myyntivaihtoehto eivät osoita yhtenäistä kuvaa. Käytä tätä suuntaa antavana tulkintana ja tarkista hinnat, CAPEX-asetukset sekä CO₂- ja sähköprofiilit ennen jatkopäätelmiä.",
+      mixedDetail: "Eri suunnat voivat syntyä esimerkiksi siitä, että tuotto ylittää kustannuksen, mutta vedyn myyntivaihtoehto näyttää euroissa edullisemmalta.",
+      unfavorableTitle: "Heikko tulos nykyisillä oletuksilla (suuntaa antava)",
       unfavorableBody:
-        "Metaanin tuotot alittavat mallinnetut vuosikustannukset ja jäävät myös vetyvaihtoehtoon verrattuna. Tämä ei yksinään tarkoita, että hanke on kannattamaton oikeassa ympäristössä—vain että näillä oletuksilla kuva on heikko.",
+        "Metaanin tuotot jäävät alle mallinnettujen vuosikustannusten ja myös vedyn myyntivaihtoehdon tuottojen. Tämä ei yksin tarkoita, että hanke olisi todellisessa ympäristössä kannattamaton, mutta näillä oletuksilla taloudellinen kuva on heikko.",
       notComputableTitle: "Kannattavuutta ei voida arvioida näillä syötteillä",
       notComputableBody:
-        "Laskennassa ei ole riittävää metaanin tuotosmäärää tai muuten käyttökelpoista kannattavuuspohjaa (esim. tasapainonäkökulma) taloustulkintaan. Säädä syötteitä (käyttö, CO₂, sähkö) ja aja uudelleen.",
+        "Laskenta ei tuota riittävää metaanimäärää tai muuta käyttökelpoista pohjaa taloudelliselle tulkinnalle. Säädä esimerkiksi CO₂-määrää, hyödyntämisastetta tai sähkön hintaa ja suorita laskenta uudelleen.",
       disclaimer:
-        "Suuntaa antava, ei sijoitus-, rahoitus- tai veroneuvo. Kuvastaa tätä oletussettiä; vahvista omat paikalliset markkina- ja kustannuslukusi.",
+        "Suuntaa antava tulkinta, ei sijoitus-, rahoitus- tai veroneuvo. Tulos kuvaa tätä oletusjoukkoa; vahvista omat markkina- ja kustannuslukusi ennen päätöksentekoa.",
     },
     usedAssumptions: {
-      lead: "Kooste syötteistä ja oletusarvoista, jotka menivät tähän laskentaan (sama rakenne kuin vienneissä; lukuja ei lasketa uudelleen tässä).",
+      lead: "Kooste syötteistä ja oletusarvoista, joita tässä laskennassa käytettiin. Rakenne vastaa vientitiedostoja; tässä osiossa lukuja ei lasketa uudelleen.",
       colLabel: "Erä",
       colValue: "Arvo",
       colMeta: "Lähde / huomiot",
@@ -375,19 +376,19 @@ export const fi = {
       assumptionsVersion: "Oletuspaketin versionimi",
       annualCo2AvailableFromResult: "Vuotuinen saatavilla oleva CO₂ (tuloksesta, linjassa syötteen kanssa)",
       seasonalMonthlyWeights: "Suhteelliset kuukausipainot (12 arvoa, ennen normalisointia)",
-      seasonalDefaultFlag: "Oletusvuodenaikaprofiili (talvipainotettu malli—ei vahvistettu asiakasdataa)",
+      seasonalDefaultFlag: "Oletuskausiprofiili (talvipainotteinen malli — ei vahvistettua asiakasdataa)",
       importedSeriesStats: "Sarja (lkm · keskiarvo · min · max, EUR/MWh tai kg riveittäin)",
-      importedDataSource: "Datalähde (mukana toimitettu oletus vs oma sarja)",
-      capexYes: "Kyllä — investointi vuosikustannuksiin jaettu",
-      capexNo: "Ei — vuosikustannuksiin ei lasketa CAPEX-jakoa (muut kustannukset kuten mallissa)",
-      annualCapexInResult: "Mallinnettu vuosittainen CAPEX-kustannus tässä tuloksessa (pois päältä: nolla näillä asetuksilla)",
+      importedDataSource: "Datalähde (mukana toimitettu oletus vs. oma sarja)",
+      capexYes: "Kyllä — investointi jaetaan vuosikustannuksiin",
+      capexNo: "Ei — vuosikustannuksiin ei sisällytetä CAPEX-jakoa",
+      annualCapexInResult: "Mallinnettu vuosittainen CAPEX-kustannus tässä tuloksessa",
       group: {
         scenario: "Skenaario / asetukset",
         co2: "CO₂",
         electricity: "Sähkö",
         economics: "Talous (myyntihinnat ja OPEX)",
         capex: "Investoinnit (CAPEX)",
-        process: "Prosessi (moottorissa aktiiviset kentät)",
+        process: "Prosessi (laskennassa aktiiviset kentät)",
       },
       unit: {
         days: "päivää",
@@ -417,50 +418,50 @@ export const fi = {
       annualVariableCost: "Vuosittaiset muuttuvat kustannukset",
       annualCapex: "Vuosittainen CAPEX-jako",
       annualTotalCost: "Vuosittaiset kokonaiskustannukset",
-      annualMethaneRevenue: "Vuosittaiset metaanituotot",
-      hydrogenAltRevenue: "Vedyn myynnin vaihtoehtoiset tuotot",
-      breakEvenMethanePrice: "Tasapainomyyntihinta metaanille (johdettu tuloksista)",
-      methanePrice10: "Johdettu metaanin oletettu myyntihinta 10 %:n kannattavuudella",
-      methanePrice30: "Johdettu metaanin oletettu myyntihinta 30 %:n kannattavuudella",
-      deltaVsHydrogen: "Ero verrattuna vetykauppaan",
+      annualMethaneRevenue: "Vuosittaiset metaanitulot",
+      hydrogenAltRevenue: "Vedyn myyntivaihtoehdon tuotot",
+      breakEvenMethanePrice: "Metaanin break-even-myyntihinta",
+      methanePrice10: "Metaanin myyntihinta 10 %:n kannattavuudella",
+      methanePrice30: "Metaanin myyntihinta 30 %:n kannattavuudella",
+      deltaVsHydrogen: "Ero vedyn myyntivaihtoehtoon",
     },
     kpiSecondary: {
       lead:
-        "Massa- ja energiatasapaino, kustannukset ja kannattavuuskynnykset. Tässä näkyvät metaanihinnat lasketaan skenaariostasi (tasapaino ja tavoitemarginaalit)—ne eivät ole samoja kuin yllä antamasi oletetut myyntihinnat. Polkujen tuotot ovat seuraavassa osiossa.",
+        "Massa- ja energiatasapaino, kustannukset ja kannattavuuskynnykset. Tässä näkyvät metaanihinnat lasketaan skenaariostasi (break-even ja tavoitemarginaalit) — ne eivät ole samoja kuin yllä antamasi oletetut myyntihinnat. Polkujen tuotot näkyvät seuraavassa osiossa.",
     },
     pathComparison: {
-      title: "Polkujen tuotot (vuosi)",
-      help: "Vuositason tuotot: metaanipolku ja vedyn myynti rinnakkain. Ero vetyvaihtoehtoon näkyy yllä olevassa yhteenvedossa.",
+      title: "Polkujen tuotot vuositasolla",
+      help: "Vuositason tuotot metaanipolulle ja vedyn myyntivaihtoehdolle rinnakkain. Ero vedyn myyntivaihtoehtoon näkyy yhteenvedossa.",
       methaneRevenue: "Metaanipolku (CH₄-myynti)",
-      hydrogenAltRevenue: "Vedyn myynnin vaihtoehto",
-      delta: "Ero (metaani miinus H₂-vaihtoehto)",
+      hydrogenAltRevenue: "Vedyn myyntivaihtoehto",
+      delta: "Ero (metaani miinus vedyn myyntivaihtoehto)",
     },
     chart: {
       co2Availability: "CO₂:n saatavuus (päiväsarja)",
       electricityPrice: "Sähkön hankintahinta (päiväsarja)",
       methaneProduction: "Metaanituotanto (päivittäin)",
-      costVsRevenueDaily: "Päivittäinen kokonaiskustannus vs metaanituotto",
+      costVsRevenueDaily: "Päivittäinen kokonaiskustannus vs. metaanituotto",
       axis: {
         dayOfYear: "Päiväindeksi (0–364)",
         xDate: "Aika (päiväindeksi)",
-        yKgd: "CO₂ (kg/vrk)",
-        yTpd: "CO₂ (t/vrk)",
-        yKtd: "CO₂ (kt/vrk)",
+        yKgd: "CO₂ (kg/päivä)",
+        yTpd: "CO₂ (t/päivä)",
+        yKtd: "CO₂ (kt/päivä)",
         yEurPerMwh: "Hinta (EUR/MWh)",
-        yMethaneKgd: "CH₄ (kg/vrk)",
-        yMethaneTpd: "CH₄ (t/vrk)",
-        yMethaneKtd: "CH₄ (kt/vrk)",
-        yCostEurD: "Summa (EUR/vrk)",
-        yCostKEurD: "Summa (kEUR/vrk)",
-        yCostMeurD: "Summa (MEUR/vrk)",
+        yMethaneKgd: "CH₄ (kg/päivä)",
+        yMethaneTpd: "CH₄ (t/päivä)",
+        yMethaneKtd: "CH₄ (kt/päivä)",
+        yCostEurD: "Summa (EUR/päivä)",
+        yCostKEurD: "Summa (kEUR/päivä)",
+        yCostMeurD: "Summa (MEUR/päivä)",
       },
       unit: {
-        eurPerD: "EUR/vrk",
-        kEurPerD: "kEUR/vrk",
-        meurPerD: "MEUR/vrk",
-        kgPerD: "kg/vrk",
-        tPerD: "t/vrk",
-        ktPerD: "kt/vrk",
+        eurPerD: "EUR/päivä",
+        kEurPerD: "kEUR/päivä",
+        meurPerD: "MEUR/päivä",
+        kgPerD: "kg/päivä",
+        tPerD: "t/päivä",
+        ktPerD: "kt/päivä",
       },
       series: {
         availableCo2Kg: "Saatavilla oleva CO₂ (kg/päivä)",
@@ -472,7 +473,7 @@ export const fi = {
     },
     table: {
       annualTitle: "Vuosiyhteenveto",
-      annualIntro: "Yksi rivi tunnuslukua kohti—vastaa laskennan vuosiyhteenvetoa.",
+      annualIntro: "Yksi rivi tunnuslukua kohti — vastaa laskennan vuosiyhteenvetoa.",
       monthlyTitle: "Kuukausikohtaiset summat",
       monthlyIntro: "Kuukausisummat samasta päivittäisestä laskennasta.",
       dailyPreviewTitle: "Päiväesikatselu",
@@ -489,7 +490,7 @@ export const fi = {
         methaneRevenueEur: "Metaanituotto (EUR)",
         hydrogenAltRevenueEur: "H₂-vaihtoehdon tuotto (EUR)",
         date: "Päivä",
-        availableCo2Kg: "Saatavilla CO₂ (kg)",
+        availableCo2Kg: "Saatavilla oleva CO₂ (kg)",
         methaneKg: "CH₄ (kg)",
       },
     },
