@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 
 import type { CalculationResult } from "@/core/domain/result";
 import { pickEurPerDayYScaleFromMaxAbsEur, pickMassPerDayYScaleFromMaxAbsKg } from "@/core/presentation/chart-daily-scales";
@@ -176,12 +177,19 @@ export function ResultsCharts({
 
   const tickFormatterX = React.useCallback((v: number) => String(v), []);
 
-  const tooltipFormatter = React.useCallback(
-    (value: number | string, name: string) => {
-      if (typeof value !== "number" || !Number.isFinite(value)) {
-        return [String(value), name];
+  const tooltipFormatter = React.useCallback<NonNullable<TooltipProps["formatter"]>>(
+    (value, name) => {
+      const label = name == null ? "" : String(name);
+      if (value === undefined) {
+        return ["", label];
       }
-      return [`${fmt2(value, locale)}`, name];
+      if (Array.isArray(value)) {
+        return [String(value), label];
+      }
+      if (typeof value !== "number" || !Number.isFinite(value)) {
+        return [String(value), label];
+      }
+      return [`${fmt2(value, locale)}`, label];
     },
     [locale],
   );
@@ -224,7 +232,7 @@ export function ResultsCharts({
                 }}
               />
               <Tooltip
-                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                formatter={tooltipFormatter}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
@@ -273,7 +281,7 @@ export function ResultsCharts({
                 }}
               />
               <Tooltip
-                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                formatter={tooltipFormatter}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
@@ -317,7 +325,7 @@ export function ResultsCharts({
                 label={{ value: methaneYLabel, angle: -90, position: "insideLeft", style: axisLabelStyle }}
               />
               <Tooltip
-                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                formatter={tooltipFormatter}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";
@@ -361,7 +369,7 @@ export function ResultsCharts({
                 label={{ value: eurYLabel, angle: -90, position: "insideLeft", style: axisLabelStyle }}
               />
               <Tooltip
-                formatter={tooltipFormatter as unknown as (v: number, n: string) => [string, string]}
+                formatter={tooltipFormatter}
                 labelFormatter={(_label, payload) => {
                   const row = payload?.[0]?.payload as { label?: string } | undefined;
                   return row?.label ?? "";

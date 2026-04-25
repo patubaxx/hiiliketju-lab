@@ -49,8 +49,9 @@ export function summarizeImportedElectricitySeriesText(seriesText: string):
   if (!parsed.ok) {
     return { ok: false, reason: "unparseable" };
   }
-  if (parsed.values.length === 0) {
+  const stats = computeNumericSeriesStats(parsed.values);
+  if (stats === null) {
     return { ok: false, reason: "empty" };
   }
-  return { ok: true, stats: computeNumericSeriesStats(parsed.values) };
+  return { ok: true, stats };
 }
