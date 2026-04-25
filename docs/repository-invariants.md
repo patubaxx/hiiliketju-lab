@@ -48,6 +48,7 @@
 1. **`build-export-model.ts`** (and dependents) **map and format** from `CalculationResult` / `ScenarioInput`; they do **not** re-harmonize temporal inputs or re-derive annual KPIs.
 2. **WP25 (readout layer):** The results surface shows a qualitative **economic verdict** from `buildEconomicVerdict(annualSummary)` and an **assumptions-used** summary from `buildUsedAssumptionsModel` / `usedAssumptionsToPrintable` (no duplicate KPI math). The same DTOs feed Excel and PDF. Active process fields only, consistent with the WP23 policy.
 3. **`assertCalculationResultExportable`** and **`assertExcelModelReady`** are **throw-only** structural checks (lengths, `warnings` as `string[]`); they must not mutate results or substitute business defaults.
+4. **WP26 (display formatting):** Result charts, tables, and PDF use presentation-only scaling (e.g. kEUR, MEUR, compact mass/energy units), explicit axis labels with units, and at most two decimal places in visible labels where applicable. **`CalculationResult` numeric values are unchanged**; Excel data sheets keep numeric cells for further analysis (number formats, not pre-rounded strings, on display-oriented columns where used).
 
 ---
 

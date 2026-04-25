@@ -321,6 +321,16 @@ export const en = {
     value: {
       na: "—",
     },
+    displayUnit: {
+      EUR: "EUR",
+      kEUR: "kEUR",
+      MEUR: "MEUR",
+      kg: "kg",
+      t: "t",
+      kt: "kt",
+      MWh: "MWh",
+      GWh: "GWh",
+    },
     section: {
       kpis: "Key results",
       kpisHeadline: "Summary",
@@ -429,6 +439,25 @@ export const en = {
       costVsRevenueDaily: "Daily total cost vs methane revenue",
       axis: {
         dayOfYear: "Day index (0–364)",
+        xDate: "Date (day index)",
+        yKgd: "CO₂ (kg/d)",
+        yTpd: "CO₂ (t/d)",
+        yKtd: "CO₂ (kt/d)",
+        yEurPerMwh: "Price (EUR/MWh)",
+        yMethaneKgd: "CH₄ (kg/d)",
+        yMethaneTpd: "CH₄ (t/d)",
+        yMethaneKtd: "CH₄ (kt/d)",
+        yCostEurD: "Amount (EUR/d)",
+        yCostKEurD: "Amount (kEUR/d)",
+        yCostMeurD: "Amount (MEUR/d)",
+      },
+      unit: {
+        eurPerD: "EUR/d",
+        kEurPerD: "kEUR/d",
+        meurPerD: "MEUR/d",
+        kgPerD: "kg/d",
+        tPerD: "t/d",
+        ktPerD: "kt/d",
       },
       series: {
         availableCo2Kg: "Available CO₂ (kg/day)",

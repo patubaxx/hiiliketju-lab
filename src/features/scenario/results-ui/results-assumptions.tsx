@@ -49,7 +49,7 @@ export function ResultsAssumptions({
                 ) : null}
               </div>
               <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
-                {formatResultNumber(field.value, locale, { maximumFractionDigits: 6 })}
+                {formatResultNumber(field.value, locale, { maximumFractionDigits: 2 })}
               </p>
               <dl className="mt-4 space-y-2 text-xs leading-relaxed text-muted-foreground">
                 <div className="flex flex-wrap gap-x-2 gap-y-0.5">

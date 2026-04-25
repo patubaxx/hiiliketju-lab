@@ -320,6 +320,16 @@ export const fi = {
     value: {
       na: "—",
     },
+    displayUnit: {
+      EUR: "EUR",
+      kEUR: "kEUR",
+      MEUR: "MEUR",
+      kg: "kg",
+      t: "t",
+      kt: "kt",
+      MWh: "MWh",
+      GWh: "GWh",
+    },
     section: {
       kpis: "Pääluvut",
       kpisHeadline: "Yhteenveto",
@@ -428,6 +438,25 @@ export const fi = {
       costVsRevenueDaily: "Päivittäinen kokonaiskustannus vs metaanituotto",
       axis: {
         dayOfYear: "Päiväindeksi (0–364)",
+        xDate: "Aika (päiväindeksi)",
+        yKgd: "CO₂ (kg/vrk)",
+        yTpd: "CO₂ (t/vrk)",
+        yKtd: "CO₂ (kt/vrk)",
+        yEurPerMwh: "Hinta (EUR/MWh)",
+        yMethaneKgd: "CH₄ (kg/vrk)",
+        yMethaneTpd: "CH₄ (t/vrk)",
+        yMethaneKtd: "CH₄ (kt/vrk)",
+        yCostEurD: "Summa (EUR/vrk)",
+        yCostKEurD: "Summa (kEUR/vrk)",
+        yCostMeurD: "Summa (MEUR/vrk)",
+      },
+      unit: {
+        eurPerD: "EUR/vrk",
+        kEurPerD: "kEUR/vrk",
+        meurPerD: "MEUR/vrk",
+        kgPerD: "kg/vrk",
+        tPerD: "t/vrk",
+        ktPerD: "kt/vrk",
       },
       series: {
         availableCo2Kg: "Saatavilla oleva CO₂ (kg/päivä)",

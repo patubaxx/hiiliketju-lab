@@ -3,6 +3,7 @@ import { Document, G, Line, Page, Path, StyleSheet, Svg, Text, Tspan, View } fro
 import type { PdfReportModel } from "./build-pdf-report-model";
 import { buildPdfCostRevenueChartLayout, buildPdfDayValueChartLayout } from "./pdf-chart-geometry";
 import { formatPdfChartAxisTick, formatPdfEur, formatPdfMetricCell, formatPdfNumber } from "./pdf-format";
+import { translate } from "@/i18n/messages";
 
 const CHART_W = 230;
 /** SVG height includes space for X tick labels below the plot. */
@@ -85,8 +86,8 @@ const styles = StyleSheet.create({
   },
   chartGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 6 },
   chartBox: { width: CHART_W, marginBottom: 10, marginRight: 12 },
-  chartTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", marginBottom: 4, color: "#374151" },
-  chartCaption: { fontSize: 7, color: "#6b7280", marginTop: 2 },
+  chartTitle: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginBottom: 4, color: "#374151" },
+  chartCaption: { fontSize: 7.5, color: "#6b7280", marginTop: 2 },
   footNote: { fontSize: 8, color: "#6b7280", marginTop: 14, fontStyle: "italic" },
   monthlyTh: { fontFamily: "Helvetica-Bold", fontSize: 7, color: "#374151" },
   monthlyCell: { fontSize: 7, textAlign: "right" },
@@ -101,10 +102,12 @@ const styles = StyleSheet.create({
   verdictDetail: { fontSize: 7.5, color: "#4b5563", marginBottom: 2 },
 });
 
+const PDF_LOCALE = "en" as const;
+
 const PDF_CHART_AXIS_STROKE = "#9ca3af";
 const PDF_CHART_GRID_STROKE = "#e5e7eb";
-const PDF_CHART_TICK_STYLE = { fontSize: 5.8, fill: "#6b7280", fontFamily: "Helvetica" } as const;
-const PDF_CHART_X_LABEL_STYLE = { fontSize: 5.8, fill: "#6b7280", fontFamily: "Helvetica" } as const;
+const PDF_CHART_TICK_STYLE = { fontSize: 7, fill: "#6b7280", fontFamily: "Helvetica" } as const;
+const PDF_CHART_X_LABEL_STYLE = { fontSize: 7, fill: "#6b7280", fontFamily: "Helvetica" } as const;
 
 function PdfDayValueLineChart({
   series,
@@ -355,7 +358,7 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
               {lit ? <Text style={styles.assumptionBadge}>Literature-based</Text> : null}
               <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 2 }}>{a.fieldLabel}</Text>
               <Text style={styles.assumptionValue}>
-                {formatPdfNumber(a.value, 6)} {a.unit}
+                {formatPdfNumber(a.value, 2)} {a.unit}
               </Text>
               <Text style={styles.metaLine}>assumptionSource: {a.assumptionSource}</Text>
               <Text style={styles.metaLine}>assumptionStatus: {a.assumptionStatus}</Text>
@@ -386,7 +389,7 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
         </Text>
         <View style={styles.chartGrid}>
           <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>CO₂ available (kg/day)</Text>
+            <Text style={styles.chartTitle}>{translate(PDF_LOCALE, "results.chart.co2Availability")}</Text>
             <PdfDayValueLineChart
               series={charts.co2KgPerDay}
               width={CHART_W}
@@ -394,10 +397,12 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
               lastDayIndex={lastDayIndex}
               stroke="#2563eb"
             />
-            <Text style={styles.chartCaption}>Y: kg/day · X: day index (0 = first day)</Text>
+            <Text style={styles.chartCaption}>
+              {translate(PDF_LOCALE, "results.chart.axis.xDate")} · Y (compact ticks) · 0=first
+            </Text>
           </View>
           <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Electricity purchase price (EUR/MWh)</Text>
+            <Text style={styles.chartTitle}>{translate(PDF_LOCALE, "results.chart.electricityPrice")}</Text>
             <PdfDayValueLineChart
               series={charts.priceEurPerMwh}
               width={CHART_W}
@@ -405,10 +410,12 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
               lastDayIndex={lastDayIndex}
               stroke="#7c3aed"
             />
-            <Text style={styles.chartCaption}>Y: EUR/MWh · X: day index (0 = first day)</Text>
+            <Text style={styles.chartCaption}>
+              {translate(PDF_LOCALE, "results.chart.axis.yEurPerMwh")} · {translate(PDF_LOCALE, "results.chart.axis.xDate")}
+            </Text>
           </View>
           <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Methane produced (kg/day)</Text>
+            <Text style={styles.chartTitle}>{translate(PDF_LOCALE, "results.chart.methaneProduction")}</Text>
             <PdfDayValueLineChart
               series={charts.methaneKgPerDay}
               width={CHART_W}
@@ -416,12 +423,16 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
               lastDayIndex={lastDayIndex}
               stroke="#059669"
             />
-            <Text style={styles.chartCaption}>Y: kg/day · X: day index (0 = first day)</Text>
+            <Text style={styles.chartCaption}>
+              {translate(PDF_LOCALE, "results.chart.axis.yKgd")} · {translate(PDF_LOCALE, "results.chart.axis.xDate")}
+            </Text>
           </View>
           <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Daily total cost vs methane revenue (EUR/day)</Text>
+            <Text style={styles.chartTitle}>{translate(PDF_LOCALE, "results.chart.costVsRevenueDaily")}</Text>
             <PdfCostRevenueLineChart series={charts.costRevenue} width={CHART_W} height={CHART_H} lastDayIndex={lastDayIndex} />
-            <Text style={styles.chartCaption}>Y: EUR/day · Red: total cost · Green: methane revenue</Text>
+            <Text style={styles.chartCaption}>
+              {translate(PDF_LOCALE, "results.chart.axis.yCostEurD")} · {translate(PDF_LOCALE, "results.chart.axis.xDate")} (compact)
+            </Text>
           </View>
         </View>
       </Page>

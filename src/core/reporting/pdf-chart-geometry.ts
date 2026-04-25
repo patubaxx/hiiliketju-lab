@@ -38,12 +38,12 @@ export type PdfCostRevenueChartLayout = {
   readonly revenuePathD: string;
 };
 
-/** Inner margins inside the SVG for axes and tick labels (pt). */
+/** Inner margins inside the SVG for axes and tick labels (pt). Wider left for compact k/M tick labels. */
 const PDF_CHART_MARGINS = {
-  left: 38,
+  left: 52,
   right: 8,
-  top: 8,
-  bottom: 20,
+  top: 10,
+  bottom: 24,
 } as const;
 
 const Y_TICK_TARGET = 4;
@@ -92,7 +92,8 @@ export function pdfChartLinearYTicks(dataMin: number, dataMax: number, maxTicks:
     maxV = e.max;
   }
   const span = maxV - minV;
-  const pad = span * 0.02 || Math.abs(maxV) * 0.02 || 1;
+  /** Extra headroom so lines are not drawn on the top/bottom border (WP26). */
+  const pad = Math.max(span * 0.06, Math.abs(maxV) * 0.04, 1e-6);
   const lo = minV - pad;
   const hi = maxV + pad;
   const step = niceStep((hi - lo) / Math.max(1, maxTicks - 1));
@@ -118,7 +119,8 @@ export function pdfChartLinearYTicks(dataMin: number, dataMax: number, maxTicks:
 
 function valueToPlotY(value: number, axisMin: number, axisMax: number, plot: PdfChartPlotRect): number {
   const span = axisMax - axisMin || 1;
-  return plot.y0 + plot.h - ((value - axisMin) / span) * plot.h;
+  const y = plot.y0 + plot.h - ((value - axisMin) / span) * plot.h;
+  return Math.min(Math.max(y, plot.y0), plot.y0 + plot.h);
 }
 
 function dayToPlotX(dayIndex: number, lastDayIndex: number, plot: PdfChartPlotRect): number {
@@ -252,10 +254,11 @@ export function buildPdfDayValueChartLayout(
     x: dayToPlotX(day, dLast, plot),
   }));
 
-  const pts: PdfPathPoint[] = series.map((s) => ({
-    x: dayToPlotX(s.dayIndex, dLast, plot),
-    y: valueToPlotY(s.value, axisMin, axisMax, plot),
-  }));
+  const pts: PdfPathPoint[] = series.map((s) => {
+    const x = dayToPlotX(s.dayIndex, dLast, plot);
+    const y = valueToPlotY(s.value, axisMin, axisMax, plot);
+    return { x, y };
+  });
 
   return {
     svgWidth,
@@ -320,14 +323,16 @@ export function buildPdfCostRevenueChartLayout(
     x: dayToPlotX(day, dLast, plot),
   }));
 
-  const costPts: PdfPathPoint[] = series.map((s) => ({
-    x: dayToPlotX(s.dayIndex, dLast, plot),
-    y: valueToPlotY(s.totalCostEur, axisMin, axisMax, plot),
-  }));
-  const revenuePts: PdfPathPoint[] = series.map((s) => ({
-    x: dayToPlotX(s.dayIndex, dLast, plot),
-    y: valueToPlotY(s.methaneRevenueEur, axisMin, axisMax, plot),
-  }));
+  const costPts: PdfPathPoint[] = series.map((s) => {
+    const x = dayToPlotX(s.dayIndex, dLast, plot);
+    const y = valueToPlotY(s.totalCostEur, axisMin, axisMax, plot);
+    return { x, y };
+  });
+  const revenuePts: PdfPathPoint[] = series.map((s) => {
+    const x = dayToPlotX(s.dayIndex, dLast, plot);
+    const y = valueToPlotY(s.methaneRevenueEur, axisMin, axisMax, plot);
+    return { x, y };
+  });
 
   return {
     svgWidth,

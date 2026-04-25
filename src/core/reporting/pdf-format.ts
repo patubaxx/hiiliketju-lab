@@ -14,7 +14,10 @@ export function formatPdfNumber(value: number, maximumFractionDigits = 4): strin
   }).format(value);
 }
 
-/** Compact tick labels for small PDF chart axes (reporting layer only). */
+/**
+ * Compact Y-axis tick labels (max 2 meaningful decimals, k/M suffix for large values).
+ * Used by PDF line charts; does not change underlying series.
+ */
 export function formatPdfChartAxisTick(value: number): string {
   if (!Number.isFinite(value)) {
     return "—";
@@ -22,24 +25,19 @@ export function formatPdfChartAxisTick(value: number): string {
   const a = Math.abs(value);
   if (a >= 1_000_000) {
     const m = value / 1_000_000;
-    return Number.isInteger(m) ? `${m}M` : `${m.toFixed(1)}M`;
+    return `${m.toFixed(2)}M`;
   }
-  if (a >= 100_000) {
-    return `${Math.round(value / 1_000)}k`;
-  }
-  if (a >= 10_000) {
-    return `${(value / 1_000).toFixed(1)}k`;
-  }
-  if (a >= 1000) {
-    return formatPdfNumber(value, 0);
+  if (a >= 1_000) {
+    const k = value / 1_000;
+    return `${k.toFixed(2)}k`;
   }
   if (a >= 100) {
-    return formatPdfNumber(value, 1);
+    return formatPdfNumber(value, 2);
   }
   if (a >= 1) {
     return formatPdfNumber(value, 2);
   }
-  return formatPdfNumber(value, 3);
+  return formatPdfNumber(value, 2);
 }
 
 export function formatPdfPercentRatio(value: number): string {

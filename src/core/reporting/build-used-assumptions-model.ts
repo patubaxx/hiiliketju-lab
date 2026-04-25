@@ -16,6 +16,11 @@ import {
 import { computeNumericSeriesStats } from "@/features/scenario/input-ui/imported-electricity-series";
 import { FINLAND_2025_DAILY_EUR_PER_MWH, FINLAND_2025_HOURLY_EUR_PER_MWH } from "@/data/electricity-defaults-2025-fi";
 import { translate, type Locale } from "@/i18n/messages";
+import {
+  DISPLAY_VALUE_NA,
+  formatDisplayNumber,
+  formatScaledCurrencyEur,
+} from "@/core/presentation/format-scaled-number";
 
 /**
  * Grouped, canonical snapshot of inputs that fed `calculateScenario` (plus a few display-only
@@ -407,6 +412,11 @@ export type UsedAssumptionPrintRow = {
   readonly kind?: UsedAssumptionKind;
 };
 
+const EUR_AS_TOTAL_EUR_UNIT_KEYS = new Set<string>([
+  "results.usedAssumptions.unit.eur",
+  "results.usedAssumptions.unit.eurPerYear",
+]);
+
 function formatValueCell(
   row: UsedAssumptionRow,
   locale: Locale,
@@ -421,13 +431,27 @@ function formatValueCell(
   if (typeof row.value === "string") {
     return row.value;
   }
+  const n = row.value;
+  if (row.unitKey && EUR_AS_TOTAL_EUR_UNIT_KEYS.has(row.unitKey)) {
+    const s = formatScaledCurrencyEur(n, { maxDecimals: 2 });
+    if (s.formatted === DISPLAY_VALUE_NA) {
+      return translate(locale, "results.value.na");
+    }
+    if (s.unit === "EUR") {
+      return new Intl.NumberFormat(opts.numberLocale, {
+        style: "currency",
+        currency: "EUR",
+        maximumFractionDigits: 2,
+      }).format(n);
+    }
+    return `${s.formatted} ${translate(locale, `results.displayUnit.${s.unit}`)}`;
+  }
   if (row.unitKey) {
     const u = translate(locale, row.unitKey);
-    const dec = /eur|€/i.test(u) ? 2 : 6;
-    const n = new Intl.NumberFormat(opts.numberLocale, { maximumFractionDigits: dec }).format(row.value);
-    return u ? `${n} ${u}` : String(n);
+    const num = formatDisplayNumber(n, { maxDecimals: 2, locale: opts.numberLocale });
+    return u ? `${num} ${u}` : num;
   }
-  return new Intl.NumberFormat(opts.numberLocale, { maximumFractionDigits: 8 }).format(row.value);
+  return formatDisplayNumber(n, { maxDecimals: 2, locale: opts.numberLocale });
 }
 
 /**

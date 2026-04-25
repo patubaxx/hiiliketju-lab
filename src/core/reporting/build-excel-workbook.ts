@@ -155,13 +155,22 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     "methaneRevenueEur",
     "hydrogenAlternativeRevenueEur",
   ]);
+  const twoDecCols = new Set([
+    "availableCO2Kg",
+    "usableCO2Kg",
+    "hydrogenNeededKg",
+    "methaneProducedKg",
+    "electricityConsumedMwh",
+  ]);
   for (const rowObj of model.dailyResults.rows) {
     const values = model.dailyResults.headers.map((h) => rowObj[h] ?? "");
     const excelRow = daily.addRow(values);
     model.dailyResults.headers.forEach((h, colIdx) => {
+      const cell = excelRow.getCell(colIdx + 1);
       if (eurDailyCols.has(h)) {
-        const cell = excelRow.getCell(colIdx + 1);
         cell.numFmt = EUR_NUMFMT;
+      } else if (twoDecCols.has(h) && typeof rowObj[h] === "number") {
+        cell.numFmt = "0.00";
       }
     });
   }
@@ -179,7 +188,7 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     if (m.unit === "EUR") {
       valueCell.numFmt = EUR_NUMFMT;
     } else if (m.value !== null && typeof m.value === "number") {
-      valueCell.numFmt = "0.########";
+      valueCell.numFmt = "0.00";
     }
   }
 
@@ -207,6 +216,8 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
       m.methaneRevenueEur,
       m.hydrogenAlternativeRevenueEur,
     ]);
+    r.getCell(4).numFmt = "0.00";
+    r.getCell(5).numFmt = "0.00";
     r.getCell(6).numFmt = EUR_NUMFMT;
     r.getCell(7).numFmt = EUR_NUMFMT;
     r.getCell(8).numFmt = EUR_NUMFMT;

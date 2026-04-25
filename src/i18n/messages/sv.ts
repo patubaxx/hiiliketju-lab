@@ -320,6 +320,16 @@ export const sv = {
     value: {
       na: "—",
     },
+    displayUnit: {
+      EUR: "EUR",
+      kEUR: "kEUR",
+      MEUR: "MEUR",
+      kg: "kg",
+      t: "t",
+      kt: "kt",
+      MWh: "MWh",
+      GWh: "GWh",
+    },
     section: {
       kpis: "Nyckeltal",
       kpisHeadline: "Sammanfattning",
@@ -429,6 +439,25 @@ export const sv = {
       costVsRevenueDaily: "Daglig total kostnad vs metanintäkt",
       axis: {
         dayOfYear: "Dagsindex (0–364)",
+        xDate: "Tid (dagsindex)",
+        yKgd: "CO₂ (kg/d)",
+        yTpd: "CO₂ (t/d)",
+        yKtd: "CO₂ (kt/d)",
+        yEurPerMwh: "Pris (EUR/MWh)",
+        yMethaneKgd: "CH₄ (kg/d)",
+        yMethaneTpd: "CH₄ (t/d)",
+        yMethaneKtd: "CH₄ (kt/d)",
+        yCostEurD: "Belopp (EUR/d)",
+        yCostKEurD: "Belopp (kEUR/d)",
+        yCostMeurD: "Belopp (MEUR/d)",
+      },
+      unit: {
+        eurPerD: "EUR/d",
+        kEurPerD: "kEUR/d",
+        meurPerD: "MEUR/d",
+        kgPerD: "kg/d",
+        tPerD: "t/d",
+        ktPerD: "kt/d",
       },
       series: {
         availableCo2Kg: "Tillgänglig CO₂ (kg/dag)",

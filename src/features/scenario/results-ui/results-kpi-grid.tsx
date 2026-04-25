@@ -1,7 +1,13 @@
 import type { ScenarioSummary } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
-import { formatResultEur, formatResultNumber, formatResultPercent } from "./format-result-values";
+import {
+  formatResultEurCompact,
+  formatResultEnergyMwhCompact,
+  formatResultMassKgCompact,
+  formatResultNumberDisplay,
+  formatResultPercent,
+} from "./format-result-values";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
@@ -92,12 +98,12 @@ function kpiContent(
     case "annualCo2Available":
       return {
         label: t("results.kpi.annualCo2Available"),
-        value: `${formatResultNumber(summary.annualCO2AvailableKg, locale, { maximumFractionDigits: 2 })} kg`,
+        value: formatResultMassKgCompact(summary.annualCO2AvailableKg, locale, t),
       };
     case "annualCo2Utilized":
       return {
         label: t("results.kpi.annualCo2Utilized"),
-        value: `${formatResultNumber(summary.annualCO2UtilizedKg, locale, { maximumFractionDigits: 2 })} kg`,
+        value: formatResultMassKgCompact(summary.annualCO2UtilizedKg, locale, t),
       };
     case "co2RecyclingRate":
       return {
@@ -108,42 +114,42 @@ function kpiContent(
     case "annualMethane":
       return {
         label: t("results.kpi.annualMethane"),
-        value: `${formatResultNumber(summary.annualMethaneProducedTons, locale, { maximumFractionDigits: 4 })} t`,
+        value: `${formatResultNumberDisplay(summary.annualMethaneProducedTons, locale)} t`,
       };
     case "annualHydrogen":
       return {
         label: t("results.kpi.annualHydrogen"),
-        value: `${formatResultNumber(summary.annualHydrogenNeededKg, locale, { maximumFractionDigits: 2 })} kg`,
+        value: formatResultMassKgCompact(summary.annualHydrogenNeededKg, locale, t),
       };
     case "annualElectricity":
       return {
         label: t("results.kpi.annualElectricity"),
-        value: `${formatResultNumber(summary.annualElectricityConsumedMwh, locale, { maximumFractionDigits: 4 })} MWh`,
+        value: formatResultEnergyMwhCompact(summary.annualElectricityConsumedMwh, locale, t),
       };
     case "annualVariableCost":
       return {
         label: t("results.kpi.annualVariableCost"),
-        value: formatResultEur(summary.annualVariableCostEur, locale),
+        value: formatResultEurCompact(summary.annualVariableCostEur, locale, t),
       };
     case "annualCapex":
       return {
         label: t("results.kpi.annualCapex"),
-        value: formatResultEur(summary.annualCapexCostEur, locale),
+        value: formatResultEurCompact(summary.annualCapexCostEur, locale, t),
       };
     case "annualTotalCost":
       return {
         label: t("results.kpi.annualTotalCost"),
-        value: formatResultEur(summary.annualTotalCostEur, locale),
+        value: formatResultEurCompact(summary.annualTotalCostEur, locale, t),
       };
     case "annualMethaneRevenue":
       return {
         label: t("results.kpi.annualMethaneRevenue"),
-        value: formatResultEur(summary.annualMethaneRevenueEur, locale),
+        value: formatResultEurCompact(summary.annualMethaneRevenueEur, locale, t),
       };
     case "hydrogenAltRevenue":
       return {
         label: t("results.kpi.hydrogenAltRevenue"),
-        value: formatResultEur(summary.hydrogenSalesAlternativeRevenueEur, locale),
+        value: formatResultEurCompact(summary.hydrogenSalesAlternativeRevenueEur, locale, t),
       };
     case "breakEvenMethanePrice":
       return {
@@ -151,7 +157,7 @@ function kpiContent(
         value:
           summary.breakEvenMethanePriceEurPerTon === null
             ? na
-            : `${formatResultEur(summary.breakEvenMethanePriceEurPerTon, locale)} / t`,
+            : `${formatResultEurCompact(summary.breakEvenMethanePriceEurPerTon, locale, t)}/t`,
       };
     case "methanePrice10":
       return {
@@ -159,7 +165,7 @@ function kpiContent(
         value:
           summary.methanePriceAt10PctProfitabilityEurPerTon === null
             ? na
-            : `${formatResultEur(summary.methanePriceAt10PctProfitabilityEurPerTon, locale)} / t`,
+            : `${formatResultEurCompact(summary.methanePriceAt10PctProfitabilityEurPerTon, locale, t)}/t`,
       };
     case "methanePrice30":
       return {
@@ -167,12 +173,12 @@ function kpiContent(
         value:
           summary.methanePriceAt30PctProfitabilityEurPerTon === null
             ? na
-            : `${formatResultEur(summary.methanePriceAt30PctProfitabilityEurPerTon, locale)} / t`,
+            : `${formatResultEurCompact(summary.methanePriceAt30PctProfitabilityEurPerTon, locale, t)}/t`,
       };
     case "deltaVsHydrogen":
       return {
         label: t("results.kpi.deltaVsHydrogen"),
-        value: formatResultEur(summary.deltaVsHydrogenSaleEur, locale),
+        value: formatResultEurCompact(summary.deltaVsHydrogenSaleEur, locale, t),
       };
     default: {
       const _x: never = key;
