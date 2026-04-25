@@ -8,7 +8,7 @@
 - **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** — Calculation contracts, units, formulas.
 - **[`docs/repository-invariants.md`](docs/repository-invariants.md)** — Current export boundary and regression checklist (consolidated from former milestone handoffs).
 - **[`docs/internal-memo-fi.md`](docs/internal-memo-fi.md)** — Finnish memo of project Hiiliketju general functionalities intended for human use; not to be used as source or guidance for agents.
-- **[`docs/release-memo-mvp.md`](docs/release-memo-mvp.md)** — English memo of project Hiiliketju general functionalities intended for human use; not to be used as source or guidance for agents.
+- **[`docs/release-memo-mvp.md`](docs/release-memo-mvp.md)** — English handoff memo (updated with **WP22–WP27**); human-facing; not an automation spec.
 - **[`.cursor/rules.md`](.cursor/rules.md)** — Cursor workspace copy of core policy (keep for tool discoverability).
 - **[`cursor_agents/README.md`](cursor_agents/README.md)** — Optional legacy prompts; not required for runtime.
 
@@ -32,9 +32,9 @@ Do not collapse these layers together.
 
 ---
 
-## Accepted input UX (WP1–WP3, current product)
+## Accepted input UX (WP1–WP3 and WP22–WP27, current product)
 
-These are **documentation anchors** for behaviour already shipped; they do not relax calculation or wire contracts.
+These are **documentation anchors** for behaviour already shipped; they do not relax calculation or wire contracts. **Source of detail:** [`docs/repository-invariants.md`](docs/repository-invariants.md).
 
 - **Copy:** electricity is framed as **purchase / procurement price**; methane and hydrogen economics as **assumed sales prices**; profitability KPIs that depend on costs remain **derived** from **`calculateScenario`**. Wire field names were not renamed for wording.
 - **Display units:** the form shows **annual CO₂** as `kt/year` (fixed, no unit selector) and **constant** electricity purchase price as `EUR/MWh` or `c/kWh` (user-selectable). Convert in **`buildScenarioPayload`** (or shared domain helpers), not scattered in presentational components. **Canonical wire** stays `kt/year` / `EUR/MWh` for those fields; **time-series** and **exports** stay canonical. (Internal conversion helpers for `kg/year` remain in domain code to preserve future flexibility; they are not exposed in the visible UI.)
@@ -42,6 +42,13 @@ These are **documentation anchors** for behaviour already shipped; they do not r
 - **Imported market defaults:** `historical_market_data_imported` initializes from deterministic repository-local Finland 2025 data. Hourly defaults come from the delivered source material; daily defaults are derived from those hourly prices by arithmetic mean per calendar date.
 - **Current commercial setup defaults:** methane assumed sales price initializes to `1200 EUR/t_CH4`; hydrogen assumed sales price initializes to `4 EUR/kg_H2`.
 - **CSV import:** browser-only parsing into the existing bulk **`seriesText`** path for CO₂ and electricity time-series where the UI offers it; **no** new calculation modes and **no** new `ScenarioInput` shapes.
+- **Default UI language (WP22):** **Finnish** first paint when no `localStorage` locale; **en** / **sv** available; stored preference applies after mount.
+- **Simple-first (WP22):** main path shows **annual CO₂**, **utilization**, **electricity purchase price**; **Advanced** holds scenario name, full CO₂ modes, economics, CAPEX, and **engine-active** process overrides only.
+- **Default CO₂ mode (WP24):** new scenarios start **`seasonal_daily`** with **winter-weighted** default monthly **relative** weights (see invariants for numbers).
+- **Active process policy (WP23):** user-facing Advanced and “assumptions used” / export surfaces list **only** parameters the **engine** uses (stoichiometric factors, SEC, derived MWh where applicable). **`plantAvailabilityPct` / `processEfficiencyPct`:** retained on `ScenarioInput` for possible future work — **not** user-facing active inputs, **not** in used-assumption summaries as active levers.
+- **Results readout (WP25):** **economic verdict** + **assumptions used** — reporting interpretation from existing summary fields, **not** new KPI math; **not** investment advice. Excel/PDF include consistent readout material.
+- **Presentation (WP26):** axis labels, compact units, two-decimal display in typical UI/PDF labels; PDF chart robustness; Excel keeps numeric cells.
+- **Home hero (WP27):** optional partner SVGs from **`/business-finland-logo.svg`**, **`/lab-logo.svg`** (`public/`); i18n alts.
 
 ---
 
@@ -166,15 +173,15 @@ These defaults must be implemented as clearly flagged assumptions, not hard-code
 ### UI layer
 
 * UI may format and visualize results, but must not recalculate business outputs.
-* Display literature-based assumptions clearly in advanced assumptions and exports.
+* Display **engine-active** literature-based assumptions clearly in **Advanced** and in results/exports. Do **not** present **`plantAvailabilityPct` / `processEfficiencyPct`** as user-facing active inputs until product requires it.
 * Show warnings if customer confirmation is still pending.
 
 ### Reporting layer
 
-* Export layers consume canonical result only (map and format; no independent KPI or harmonization math).
+* Export layers consume **canonical `CalculationResult` only** (map and format; no independent KPI or harmonization **math**). **Verdict** and **used assumptions** are allowed as **readout/interpretation** from existing summary fields, not as substitute engine output.
 * Shipped Excel/PDF downloads use server routes that validate a wire `scenario`, run `calculateScenario`, then build bytes from that result. Do not accept a client-sent result object as authoritative input on the export API.
-* Excel and PDF must include assumptions metadata.
-* Literature-based defaults must be visible in exports.
+* Excel and PDF must include **assumptions metadata** for **active** fields and align **verdict / used assumptions** with the UI readout layer.
+* Literature-based defaults for **active** process parameters must be visible where those parameters are user-facing.
 
 ---
 

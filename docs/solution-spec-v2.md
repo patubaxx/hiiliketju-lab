@@ -2,7 +2,7 @@
 **Project:** Hiiliketju – browser-based techno-economic calculation application  
 **Implementation model:** Next.js + TypeScript + Cursor-agent guided implementation  
 **Status:** Updated after revised tender requirements  
-**Language of UI:** UI is multilingual-ready; MVP primary language is English, with Finnish and Swedish supported incrementally with i18n.
+**Language of UI (current):** **Finnish** is the default first paint when no stored locale exists; **English** and **Swedish** are available through the in-app locale control. Copy lives in `src/i18n/messages/` (dot-path keys).
 **Core principle:** daily-first engine, hourly-capable input contract
 
 **Related:** [`docs/index.md`](index.md) · [`repository-invariants.md`](repository-invariants.md) · [`AGENTS.md`](../AGENTS.md) · root [`README.md`](../README.md)
@@ -67,7 +67,7 @@ The MVP must produce, at minimum:
 - storage dynamics
 - full investment analysis metrics such as NPV / IRR / payback
 - user authentication
-- persistent saved scenarios
+- persistent saved scenarios (browser state only; no server-side scenario store in MVP)
 - multi-path process editor
 - advanced process simulation beyond stoichiometric core + assumption modifiers
 
@@ -192,39 +192,26 @@ The following defaults are locked for MVP and must be flagged as `literature_bas
 - `plantAvailabilityPct = 100`
 - `processEfficiencyPct = 100`
 
-### 6.4 Modifier policy
-Availability and efficiency modifiers may exist in advanced assumptions, but the stoichiometric core must remain visible and separable from modifier effects.
-Plant availability and process efficiency are schema- and assumption-ready MVP fields. They may be displayed and versioned before they are applied as active multipliers in the first engine iteration.
+### 6.4 Modifier policy (process parameters on the wire)
+**Stoichiometric factors and SEC** are user-facing, **calculation-active** process parameters with full assumption metadata in Advanced and in exports.
+
+**`plantAvailabilityPct` and `processEfficiencyPct`** remain on the canonical **`ScenarioInput`** with literature-style defaults for **future** engine use. They are **not** shown as active user inputs in the current product UI, **not** listed in “assumptions used” readouts, and **not** applied as multipliers in the shipped daily engine until explicitly wired in a future scoped change. The stoichiometric core stays separable from any future modifier layer.
 
 ---
 
 ## 7. Functional View Structure
 
-### 7.1 Inputs view
-User can define:
-- scenario name
-- annual CO₂ amount
-- utilization rate
-- CO₂ availability mode
-- temporal input data or seasonal parameters (including optional browser **CSV import** into the same bulk series path as manual entry, where the UI exposes time-series modes)
-- electricity **purchase** price mode
-- electricity **purchase** price values or price series
-- methane **assumed sales** price
-- hydrogen **assumed sales** price
-- other OPEX
-- optional CAPEX inputs
-- advanced assumptions
+### 7.1 Inputs view (Simple-first + Advanced)
+**Basic (default) path:** annual **CO₂** (`kt/year`), **utilization rate**, and **electricity purchase price** (constant or imported market data). **Scenario name** is not required on the Simple surface; it remains in **Advanced**.
 
-### 7.2 Advanced assumptions
-Advanced assumptions may include:
-- stoichiometric factors
-- SEC defaults
-- plant availability
-- process efficiency
-- future extension fields
+**Advanced** adds: scenario metadata, full **CO₂ availability** mode and profiles (default new scenario: **`seasonal_daily`** with winter-weighted monthly relative weights — see invariants for numeric defaults), **economics**, optional **CAPEX**, and **process** overrides. Optional browser **CSV import** fills the same bulk **`seriesText`** path as paste for supported time-series modes.
 
-All non-customer-provided values must display their source flag.
-The setup UI must show active literature-based defaults immediately (value, unit, source/status, optional note) and allow explicit user overrides per supported field.
+All of the following still exist on the wire where applicable: scenario name, annual CO₂, utilization, CO₂ mode and data, electricity mode and values, methane/hydrogen assumed sales prices, other OPEX, optional CAPEX, process assumption fields (see §7.2).
+
+### 7.2 Advanced assumptions (user-facing, engine-active only)
+The **visible** Advanced process block lists **only** parameters the **shipped engine** uses: **stoichiometric H₂ demand**, **stoichiometric CH₄ yield**, **electrolyzer SEC** (kWh/kg H₂), plus **derived SEC (MWh)** where shown. **`plantAvailabilityPct`** and **`processEfficiencyPct`** are **not** included in this user-facing list (retained internally on the wire for future work).
+
+All non-customer-provided values among the **shown** fields must display their source flag. The setup UI shows active literature-based defaults immediately (value, unit, source/status, optional note) and allows explicit overrides.
 
 ### 7.3 Results view
 
@@ -246,6 +233,10 @@ At minimum:
 - methane price at 30% profitability
 - delta vs hydrogen sales alternative
 
+#### Qualitative readouts (reporting interpretation, not new engine output)
+- **Economic verdict:** a small, color-coded band (favourable / mixed / unfavourable / not computable) derived **only** from existing annual summary fields — **not** an investment recommendation.
+- **Assumptions used in this calculation:** grouped summary (scenario, CO₂, electricity, economics, CAPEX, process) reflecting what was actually merged into the run, including Simple defaults. Excludes internal future-capability-only fields not surfaced in UI (e.g. plant availability / process efficiency as user-facing active assumptions).
+
 #### Visualizations
 At minimum:
 - CO₂ availability over time
@@ -253,6 +244,8 @@ At minimum:
 - methane production over time
 - cost vs revenue
 - methane path vs hydrogen sales comparison
+
+**Presentation (current):** charts have **axis labels with units**, compact display units where helpful, and at most **two decimal places** in typical tick/tooltip/table display. The **lower caption** under each chart carries the date/unit context; the SVG no longer duplicates that string. **Cost vs. revenue** uses clearly distinct line colours.
 
 #### Tables
 At minimum:
@@ -265,19 +258,22 @@ At minimum:
 #### Excel
 Must include:
 - inputs
-- assumptions
-- flags for literature-based assumptions
+- assumptions (with flags for literature-based values where applicable)
+- **economic verdict** and **used assumptions** material consistent with the results readout layer
 - time series results
 - annual summary
 - comparison summary
+
+**Data sheets** keep **numeric** cells; number formats apply display rounding where used — raw engine values are not replaced by pre-rounded strings for analysis columns.
 
 #### PDF
 Must include:
 - scenario overview
 - key assumptions
+- **economic verdict** and **used assumptions** summary aligned with the UI readout layer
 - visible literature-based flags for estimated values
 - KPI summary
-- charts
+- charts (with improved margins/typography vs. early MVP — see invariants)
 - comparison conclusion
 
 ---
@@ -296,11 +292,9 @@ Must include:
 - price mode
 - price series or constant value
 
-#### C. Process assumptions
-- stoichiometric factors
-- SEC
-- plant availability
-- process efficiency
+#### C. Process assumptions (conceptual groups)
+- **Engine-active (user-facing in Advanced):** stoichiometric factors, SEC (and derived MWh presentation where used)
+- **Retained on wire for future engine work:** plant availability, process efficiency (not user-facing active assumptions in the current product)
 
 #### D. Economics
 - methane price
@@ -435,7 +429,8 @@ Warnings may be emitted for:
 - literature-based defaults in use
 - customer confirmation still pending for business-critical values
 - imported historical data gaps that required filling
-- plant availability or process efficiency still using neutral defaults
+
+(Internal wire fields such as plant availability / process efficiency may still carry neutral defaults on the merged input; they are **not** promoted to user-facing “active assumption” warnings while those parameters are not engine-applied or user-edited in the visible Advanced list.)
 
 ### 11.4 Error handling principle
 The UI must show user-friendly errors, not technical exceptions.
@@ -447,9 +442,11 @@ The UI must show user-friendly errors, not technical exceptions.
 ### 12.1 Usability
 - clear and expert-oriented
 - no heavy multi-step navigation
-- quick to use with defaults
-- advanced assumptions should be available without overwhelming the main workflow
+- quick to use with defaults — **Simple-first** main path; **Advanced** for full control
+- default **Finnish** copy when no locale is stored; **locale** control for EN/SV
+- advanced engine-active assumptions are available without overwhelming the main workflow; guidance callouts explain major sections
 - primary chrome is a **sticky top bar**: run, reset, language, jump to outcome, and Excel/PDF export (exports disabled until a successful run exists); a successful run **scrolls** to the outcome section (`#scenario-outcome`); this is layout/UX only and does not change calculation or export contracts
+- **Home hero (WP27):** optional static partner marks (**Business Finland**, **LAB**) from **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (place files in **`public/`**); i18n **alt** text; no visible “Partners” label; not inside a separate card
 
 ### 12.2 Performance
 - a single scenario calculation should complete effectively instantly in a normal browser
@@ -690,6 +687,18 @@ The labels below describe the **original implementation sequence** for the MVP. 
 
 * documentation alignment with accepted implementation
 * handoff and explicit MVP limitations (no product expansion)
+
+### Customer-delivery tranche (WP22–WP27, historical reference)
+
+**Note:** the labels below are a **later** implementation sequence (customer feedback), **not** the same as WP1–WP10. **Current behaviour** = repository code + **[`docs/repository-invariants.md`](repository-invariants.md)**.
+
+- **WP22** — Default **Finnish** + **Simple-first** setup (Basic inputs only on the main path; full scenario name and details in Advanced); hydration-safe locale; no separate `SimpleScenarioInput` type.
+- **WP22** — hotfix: locale hydration consistency.
+- **WP23** — **Active assumptions policy:** only engine-used process parameters in user-facing Advanced and in “assumptions used” / export surfaces; `plantAvailabilityPct` / `processEfficiencyPct` retained on wire, not user-facing active.
+- **WP24** — Default **seasonal** CO₂ mode with **winter-weighted** monthly relative weights; **localized** month names; visible **guidance** callouts.
+- **WP25** — **Economic verdict** + **assumptions used in this calculation** in UI, Excel, and PDF (interpretive; no new KPI math).
+- **WP26** — **Chart / table / PDF** presentation: axis labels, compact units, two-decimal display, PDF robustness; **follow-up:** single X-axis caption per chart; clearer **cost vs. revenue** colours.
+- **WP27** — **Hero** partner marks (**Business Finland**, **LAB**) via static `public/` SVG URLs; **follow-up:** larger logos, no card wrapper, no visible “Partners” line.
 
 ---
 

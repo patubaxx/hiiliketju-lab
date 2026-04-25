@@ -186,7 +186,9 @@ The visible scenario UI offers only `constant` and `historical_market_data_impor
 | plantAvailabilityPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 | processEfficiencyPct | 100 | % | literature_based | estimated | Neutral MVP default until customer-specific value exists |
 
-In the setup UI, these defaults are shown as active values with metadata before any override is entered; payload mapping keeps untouched fields omitted so `mergeProcessAssumptionsInput` remains the canonical default source.
+In the **visible** Advanced process section, **stoichiometric factors and SEC** (and derived MWh where shown) appear as active, overridable values with metadata. **`plantAvailabilityPct`** and **`processEfficiencyPct`** remain in merge defaults and on the wire for **future** engine use but are **not** user-facing active inputs in the current product and are **not** listed in “assumptions used” readouts (WP23+). Payload mapping keeps untouched fields omitted so `mergeProcessAssumptionsInput` remains the canonical default source.
+
+**UI default for new scenarios (not a formula change):** **`co2AvailabilityMode`** initializes to **`seasonal_daily`** with a **winter-weighted** default monthly relative profile (implementation: `DEFAULT_SEASONAL_CO2_RELATIVE_WEIGHTS`); the engine’s seasonal path normalizes weights to the annual mass.
 
 ### 7.2 Inputs that remain customer/business inputs
 
@@ -344,9 +346,10 @@ Else:
 
 ### Soft warnings
 - literature-based defaults in use
-- plant availability or efficiency still at neutral default
 - imported historical data contains gaps that required filling
 - customer confirmation still pending for business-critical values
+
+(Neutral defaults on **internal** wire fields that are not engine-applied or user-edited in the visible Advanced list — e.g. plant availability / process efficiency while those parameters are not active multipliers — should not be described as user-visible “inactive assumption” problems; see product invariants.)
 
 ---
 
@@ -373,6 +376,8 @@ The result model must contain:
 - annual summary
 - warnings array
 - export-ready formatted sections
+
+**Reporting readouts (UI/Excel/PDF):** an **economic verdict** and **assumptions-used** summary may be **derived in the reporting layer** from the existing **`ScenarioSummary` / input** — qualitative interpretation only; **not** additional calculated business columns in `CalculationResult`.
 
 HTTP Excel/PDF export in the shipped app builds file bytes only after server-side validation of `scenario` and a fresh `calculateScenario` run; reporting code maps that result and must not substitute a client-posted result snapshot for engine output.
 

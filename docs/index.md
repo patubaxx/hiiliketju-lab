@@ -13,8 +13,8 @@ Start with the root **[`README.md`](../README.md)** for setup, architecture summ
 
 | Document | Content |
 |----------|---------|
-| [`repository-invariants.md`](repository-invariants.md) | Canonical result, export API contract, mapper rules, warnings, checklists, known non-goals (includes current visible-vs-internal UX boundaries: annual CO₂ fixed to `kt/year`, constant electricity display-unit switching only, CSV ingest, retained hidden wire modes) |
-| [`release-memo-mvp.md`](release-memo-mvp.md) | MVP release/handoff memo: what the tool now does, user-visible capabilities, important caveats, assumptions to verify, and next-phase roadmap |
+| [`repository-invariants.md`](repository-invariants.md) | **Maintainer first-line reference:** export boundary, WP22–WP27 accepted product behaviour (default Finnish, Simple-first, seasonal CO₂ default, active-assumption policy, verdict + used assumptions, chart/PDF display formatting, hero logos), “do not regress” checklist, electricity pipeline, MVP limits |
+| [`release-memo-mvp.md`](release-memo-mvp.md) | English handoff memo: current capabilities, caveats, and architecture invariants (updated with WP22–WP27 customer-delivery tranche) |
 
 ## Implementation policy (automation-friendly)
 
@@ -31,4 +31,4 @@ Start with the root **[`README.md`](../README.md)** for setup, architecture summ
 
 ## Historical note
 
-Earlier milestone handoff files (WP8–WP10 style) were **consolidated** into [`repository-invariants.md`](repository-invariants.md) so one place describes current behaviour and regression guardrails. [`solution-spec-v2.md`](solution-spec-v2.md) §16 still lists the original **delivery sequence** as historical reference only. Accepted UX refinements are reflected in invariants and spec touch-ups as of the April 2026 documentation pass: annual CO₂ is visibly fixed to `kt/year`, constant electricity retains the only visible display-unit switch, CSV time-series import feeds the existing bulk path, and hidden wire capabilities stay intact.
+Earlier milestone handoff files (WP8–WP10 style) were **consolidated** into [`repository-invariants.md`](repository-invariants.md) so one place describes current behaviour and regression guardrails. [`solution-spec-v2.md`](solution-spec-v2.md) §16 lists the **original WP1–WP10 implementation sequence**; a **later customer-feedback sequence (WP22–WP27)** is documented there as a separate historical list. The **source of truth for accepted behaviour** is the repository code plus [`repository-invariants.md`](repository-invariants.md) (April 2026: default Finnish, Simple-first, seasonal default CO₂ profile, active assumption visibility, verdict + used assumptions, export readouts, presentation formatting, hero partner assets).

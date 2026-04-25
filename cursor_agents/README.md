@@ -15,4 +15,6 @@ This folder holds **legacy Cursor task prompts** and ad-hoc audit notes used dur
 - `agent1.md`, `agent2.md`, `agent3.md` — historical “agent split” prompts (domain vs engine vs UI). Useful only if you intentionally recreate that workflow; otherwise prefer `AGENTS.md` + specs.
 - `ui-audit.md` — one-off UI audit notes; not a spec.
 
+Milestone content under `cursor_agents/` is **historical**; **current** product behaviour and policy are in **[`docs/repository-invariants.md`](../docs/repository-invariants.md)** and **[`AGENTS.md`](../AGENTS.md)** (including **WP22–WP27**).
+
 **Deliverable note:** If the customer package must exclude internal automation artifacts, omit or strip this folder; runtime behaviour is unchanged.

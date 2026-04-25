@@ -56,11 +56,13 @@ Supported modes:
 
 Any new code must respect these modes.
 
-### Form conveniences (current product, WP1–WP3)
+### Form conveniences (current product, WP1–WP3, WP22+)
 
 - **Copy** distinguishes electricity **purchase** price, methane/hydrogen **sales price** inputs, and **derived** profitability outputs; do not rename wire fields for wording.
-- **Optional display units** in the scenario form: annual CO₂ (`kt/year` | `kg/year`) and **constant** electricity purchase price (`EUR/MWh` | `c/kWh`) are converted in **`buildScenarioPayload`** so **`ScenarioInput`** and exports stay canonical. **Time-series** bulk entry does not add alternate display units in MVP.
+- **Default locale:** **Finnish** when no stored preference; **en** / **sv** available. **Simple-first** main form: annual CO₂ (`kt/year` only in the visible form), utilization, constant or imported electricity price; **Advanced** for scenario name, full CO₂ profile modes, economics, optional CAPEX, and **engine-active** process fields only.
+- **Display units** in the scenario form: annual CO₂ is **`kt/year` only** (no selector); **constant** electricity purchase price may use **`EUR/MWh` or `c/kWh`**, converted in **`buildScenarioPayload`**. **Time-series** bulk entry does not add alternate display units in MVP.
 - **Browser CSV import** for CO₂ / electricity time-series fills the same bulk text path as manual entry; it is **not** a new `ScenarioInput` mode or server ingest contract.
+- **`plantAvailabilityPct` / `processEfficiencyPct`:** on the wire for future work; **not** user-facing active inputs in the current product (see [`docs/repository-invariants.md`](../docs/repository-invariants.md)).
 
 ---
 
@@ -94,13 +96,13 @@ Any stoichiometric, SEC, or literature-estimated process value must be flagged w
 - `assumptionSource = "literature_based"`
 - `assumptionStatus = "estimated"` or `pending_customer_confirmation`
 
-This includes at minimum:
+This includes at minimum the **user-facing engine-active** parameters:
 - stoichiometricHydrogenDemandFactor
 - stoichiometricMethaneYieldFactor
 - electrolyzerSpecificEnergyConsumption
-- plantAvailabilityPct default
-- processEfficiencyPct default
-- any future literature-estimated process modifier
+- (plus any other parameter surfaced as an active Advanced input)
+
+**Note:** `plantAvailabilityPct` / `processEfficiencyPct` defaults remain in domain merge logic for **future** engine use; do **not** treat them as currently user-facing active Advanced fields in new UI. Any future literature-estimated process modifier must follow the same flagging rules.
 
 Never hide these as plain constants without metadata.
 
@@ -145,15 +147,16 @@ No duplicated formulas across files unless there is a strong reason.
 ## 8. UI and export rules
 
 UI must:
-- render inputs
+- render inputs (Simple-first; full detail in Advanced)
 - show warnings
 - render results from canonical output
-- visibly distinguish literature-based and placeholder assumptions
+- visibly distinguish literature-based and placeholder assumptions for **active** process fields
+- not present internal future-only wire fields (e.g. plant availability / process efficiency) as **active** user inputs unless product re-opens them
 
 Excel/PDF exports must:
-- include assumptions
-- include flags/metadata for literature-based assumptions
-- not create their own independent calculation logic
+- include assumptions and **verdict / used assumptions** readouts consistent with the UI reporting layer
+- include flags/metadata for literature-based **active** assumptions
+- not create their own independent **calculation** logic (readout text may interpret existing summary fields)
 
 Shipped HTTP exports (`/api/export/excel`, `/api/export/pdf`) must validate `scenario` on the server, run `calculateScenario`, then map that result. The request body must not treat a client-provided `CalculationResult` (or partial KPIs) as authoritative.
 
