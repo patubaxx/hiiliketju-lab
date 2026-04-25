@@ -23,6 +23,10 @@ export const fi = {
         item4:
           "Edistyneissä prosessioletuksissa ovat vain ne parametrit, joita moottori käyttää; korvaa kirjallisuusperusteiset arvot, kun sinulla on projektikohtaisia tietoja.",
       },
+      logos: {
+        businessFinlandAlt: "Business Finland",
+        labAlt: "LAB-ammattikorkeakoulu",
+      },
     },
     setup: {
       simple: {

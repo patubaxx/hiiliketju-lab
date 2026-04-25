@@ -23,6 +23,10 @@ export const en = {
         item4:
           "Advanced process assumptions are limited to the parameters the current engine uses; override literature-based values when you have project-specific data.",
       },
+      logos: {
+        businessFinlandAlt: "Business Finland",
+        labAlt: "LAB University of Applied Sciences",
+      },
     },
     setup: {
       simple: {

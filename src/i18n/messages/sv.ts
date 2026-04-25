@@ -23,6 +23,10 @@ export const sv = {
         item4:
           "I avancerade processantaganden visas bara de parametrar som den aktuella motorn använder; ersätt litteraturbaserade värden när du har projektspecifika siffror.",
       },
+      logos: {
+        businessFinlandAlt: "Business Finland",
+        labAlt: "LAB Yrkeshögskolan",
+      },
     },
     setup: {
       simple: {

@@ -595,6 +595,35 @@ function ElectricityPurchaseBlock({
   );
 }
 
+function HeroPartnerLogos({ t }: { t: (id: string, vars?: Record<string, string>) => string }) {
+  const ariaGroup = `${t("app.hero.logos.businessFinlandAlt")}, ${t("app.hero.logos.labAlt")}`;
+  return (
+    <aside
+      className="flex w-full min-w-0 max-w-md flex-col items-stretch justify-start gap-6 self-center sm:max-w-lg sm:gap-7 lg:max-w-none lg:basis-[38%] lg:shrink-0 lg:gap-8 lg:pt-0.5"
+      aria-label={ariaGroup}
+      data-testid="hero-partner-logos"
+    >
+      {/* Static files in public/; plain img keeps build independent of assets (WP27). */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- partner SVGs from public/ at runtime */}
+      <img
+        src="/business-finland-logo.svg"
+        alt={t("app.hero.logos.businessFinlandAlt")}
+        className="h-14 w-full max-w-[min(100%,22rem)] min-w-0 object-contain sm:h-16 lg:h-20"
+        loading="lazy"
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element -- partner SVGs from public/ at runtime */}
+      <img
+        src="/lab-logo.svg"
+        alt={t("app.hero.logos.labAlt")}
+        className="h-14 w-full max-w-[min(100%,22rem)] min-w-0 object-contain sm:h-16 lg:h-20"
+        loading="lazy"
+        decoding="async"
+      />
+    </aside>
+  );
+}
+
 export function ScenarioInputApp() {
   const { locale, setLocale, t } = useLocale();
   const [form, setForm] = React.useState<ScenarioFormState>(() => createInitialFormState());
@@ -676,55 +705,60 @@ export function ScenarioInputApp() {
           <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
 
           <div className="mt-6 border-t border-consultancy/15 pt-6">
-            <div className="rounded-xl border border-consultancy/12 bg-consultancy-subtle/45 px-5 py-5 sm:max-w-[46rem] sm:px-6 sm:py-6">
-              <div className="border-l-[3px] border-l-consultancy/50 pl-5 sm:pl-6">
-                <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem] sm:leading-snug">
-                  {t("app.hero.headline")}
-                </h1>
-                <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("app.hero.lead")}</p>
-                <ul className="mt-5 grid gap-3 text-sm leading-snug text-muted-foreground sm:grid-cols-2 sm:gap-x-10 sm:gap-y-3">
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
-                    <span>{t("app.hero.bullet1")}</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
-                    <span>{t("app.hero.bullet2")}</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
-                    <span>{t("app.hero.bullet3")}</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
-                    <span>{t("app.hero.bullet4")}</span>
-                  </li>
-                </ul>
+            <div className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+              <div className="min-w-0 flex-1 space-y-4">
+                <div className="rounded-xl border border-consultancy/12 bg-consultancy-subtle/45 px-5 py-5 sm:max-w-[46rem] sm:px-6 sm:py-6">
+                  <div className="border-l-[3px] border-l-consultancy/50 pl-5 sm:pl-6">
+                    <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem] sm:leading-snug">
+                      {t("app.hero.headline")}
+                    </h1>
+                    <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("app.hero.lead")}</p>
+                    <ul className="mt-5 grid gap-3 text-sm leading-snug text-muted-foreground sm:grid-cols-2 sm:gap-x-10 sm:gap-y-3">
+                      <li className="flex gap-3">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                        <span>{t("app.hero.bullet1")}</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                        <span>{t("app.hero.bullet2")}</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                        <span>{t("app.hero.bullet3")}</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-consultancy/70" aria-hidden />
+                        <span>{t("app.hero.bullet4")}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                {/* --- Before interpreting results: key caveats to check before reading results --- */}
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-5 py-4 sm:max-w-[46rem] sm:px-6">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-100">
+                    {t("app.hero.beforeYouRun.title")}
+                  </p>
+                  <ul className="mt-3 space-y-2 text-sm leading-snug text-muted-foreground">
+                    <li className="flex gap-3">
+                      <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                      <span>{t("app.hero.beforeYouRun.item1")}</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                      <span>{t("app.hero.beforeYouRun.item2")}</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                      <span>{t("app.hero.beforeYouRun.item3")}</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
+                      <span>{t("app.hero.beforeYouRun.item4")}</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
-            {/* --- Before interpreting results: key caveats to check before reading results --- */}
-            <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-5 py-4 sm:max-w-[46rem] sm:px-6">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-100">
-                {t("app.hero.beforeYouRun.title")}
-              </p>
-              <ul className="mt-3 space-y-2 text-sm leading-snug text-muted-foreground">
-                <li className="flex gap-3">
-                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
-                  <span>{t("app.hero.beforeYouRun.item1")}</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
-                  <span>{t("app.hero.beforeYouRun.item2")}</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
-                  <span>{t("app.hero.beforeYouRun.item3")}</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
-                  <span>{t("app.hero.beforeYouRun.item4")}</span>
-                </li>
-              </ul>
+              <HeroPartnerLogos t={t} />
             </div>
           </div>
         </div>
