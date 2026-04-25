@@ -237,11 +237,367 @@ function SeasonalDailyCo2Fields({
   );
 }
 
+type ElectricityT = (id: string, vars?: Record<string, string>) => string;
+
+/**
+ * Shared electricity form: visible modes are constant + historical_market_data_imported.
+ * `daily_series` / `hourly_series` are internal: in basic setup show only a hint; full series editor lives in advanced setup.
+ */
+function ElectricityPurchaseBlock({
+  form,
+  setForm,
+  errors,
+  locale,
+  t,
+  getErrors: ge,
+  setElectricityMode,
+  block,
+}: {
+  form: ScenarioFormState;
+  setForm: React.Dispatch<React.SetStateAction<ScenarioFormState>>;
+  errors: Map<string, string[]>;
+  locale: Locale;
+  t: ElectricityT;
+  getErrors: (map: Map<string, string[]>, path: string, tfn: ElectricityT) => string | undefined;
+  setElectricityMode: (mode: ElectricityModeForm) => void;
+  block: "basic" | "advancedDailyHourly";
+}) {
+  if (block === "advancedDailyHourly") {
+    if (form.electricity.mode !== "daily_series" && form.electricity.mode !== "hourly_series") {
+      return null;
+    }
+  }
+
+  if (block === "basic" && (form.electricity.mode === "daily_series" || form.electricity.mode === "hourly_series")) {
+    return (
+      <div data-testid="electricity-daily-hourly-hint" className="space-y-3">
+        <div>
+          <FieldLabel htmlFor="elmode">{t("electricity.mode")}</FieldLabel>
+          <select
+            id="elmode"
+            className={selectClassName}
+            data-testid="elmode"
+            value={form.electricity.mode}
+            onChange={(e) => setElectricityMode(e.target.value as ElectricityModeForm)}
+          >
+            <option value="constant">{t("electricity.mode_constant")}</option>
+            <option value="historical_market_data_imported">
+              {t("electricity.mode_historical_imported")}
+            </option>
+          </select>
+        </div>
+        <FieldHint>{t("app.setup.electricitySeriesRequiresAdvanced")}</FieldHint>
+      </div>
+    );
+  }
+
+  if (block === "advancedDailyHourly") {
+    const el = form.electricity;
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const text = Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n");
+              setForm((s) => {
+                if (s.electricity.mode === "daily_series")
+                  return { ...s, electricity: { mode: "daily_series", seriesText: text } };
+                return s;
+              });
+            }}
+            disabled={el.mode === "hourly_series"}
+          >
+            {t("electricity.fillOnes365")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const text = Array.from({ length: SCENARIO_HOURLY_SLOTS }, () => "50").join("\n");
+              setForm((s) => {
+                if (s.electricity.mode === "hourly_series")
+                  return { ...s, electricity: { mode: "hourly_series", seriesText: text } };
+                return s;
+              });
+            }}
+            disabled={el.mode === "daily_series"}
+          >
+            {t("electricity.fillOnes8760")}
+          </Button>
+          <SeriesCsvImportControl
+            inputId="electricity-series-csv-advanced"
+            resolution={el.mode === "hourly_series" ? "hourly" : "daily"}
+            expectedCount={el.mode === "hourly_series" ? SCENARIO_HOURLY_SLOTS : SCENARIO_PERIOD_DAYS}
+            t={t}
+            onImported={(seriesText) =>
+              setForm((s) => {
+                if (s.electricity.mode === "daily_series")
+                  return { ...s, electricity: { mode: "daily_series", seriesText } };
+                if (s.electricity.mode === "hourly_series")
+                  return { ...s, electricity: { mode: "hourly_series", seriesText } };
+                return s;
+              })
+            }
+          />
+        </div>
+        <FieldHint>{t("csvImport.hint")}</FieldHint>
+        <div>
+          <FieldLabel htmlFor="elseries-adv">
+            {el.mode === "daily_series" ? t("electricity.seriesDailyLabel") : t("electricity.seriesHourlyLabel")}
+          </FieldLabel>
+          <FieldHint>{t("electricity.seriesHelp")}</FieldHint>
+          <textarea
+            id="elseries-adv"
+            className={textAreaClassName + " mt-1 min-h-[180px]"}
+            value={el.seriesText}
+            onChange={(e) =>
+              setForm((s) =>
+                s.electricity.mode === "daily_series" || s.electricity.mode === "hourly_series"
+                  ? { ...s, electricity: { ...s.electricity, seriesText: e.target.value } }
+                  : s,
+              )
+            }
+          />
+          <FieldError
+            message={ge(
+              errors,
+              el.mode === "daily_series" ? "electricity.dailyPricesEurPerMwh" : "electricity.hourlyPricesEurPerMwh",
+              t,
+            )}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <FieldLabel htmlFor="elmode">{t("electricity.mode")}</FieldLabel>
+        <select
+          id="elmode"
+          className={selectClassName}
+          data-testid="elmode"
+          value={form.electricity.mode}
+          onChange={(e) => setElectricityMode(e.target.value as ElectricityModeForm)}
+        >
+          <option value="constant">{t("electricity.mode_constant")}</option>
+          <option value="historical_market_data_imported">
+            {t("electricity.mode_historical_imported")}
+          </option>
+        </select>
+      </div>
+
+      {form.electricity.mode === "constant" ? (
+        <div>
+          <FieldLabel htmlFor="elprice">{t("electricity.constantPrice")}</FieldLabel>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              id="elprice"
+              className={inputClassName + " min-w-0 flex-1 sm:max-w-[14rem]"}
+              inputMode="decimal"
+              value={form.electricity.priceEurPerMwh}
+              onChange={(e) =>
+                setForm((s) =>
+                  s.electricity.mode === "constant"
+                    ? {
+                        ...s,
+                        electricity: {
+                          mode: "constant",
+                          priceEurPerMwh: e.target.value,
+                          priceDisplayUnit: s.electricity.priceDisplayUnit,
+                        },
+                      }
+                    : s,
+                )
+              }
+            />
+            <select
+              className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
+              value={form.electricity.priceDisplayUnit}
+              aria-label={t("electricity.constantPriceUnitAria")}
+              onChange={(e) => {
+                const next = e.target.value as ElectricityPriceInputDisplayUnit;
+                setForm((s) => {
+                  if (s.electricity.mode !== "constant") return s;
+                  const v = parseFiniteNumber(s.electricity.priceEurPerMwh);
+                  if (v === undefined) {
+                    return {
+                      ...s,
+                      electricity: { ...s.electricity, priceDisplayUnit: next },
+                    };
+                  }
+                  const eurMwh = electricityPriceInputToEurPerMwh(v, s.electricity.priceDisplayUnit);
+                  const newDisplay = electricityPriceEurPerMwhToInputDisplay(eurMwh, next);
+                  return {
+                    ...s,
+                    electricity: {
+                      mode: "constant",
+                      priceDisplayUnit: next,
+                      priceEurPerMwh: String(newDisplay),
+                    },
+                  };
+                });
+              }}
+            >
+              <option value="eur_per_mwh">{t("units.electricityEurPerMwh")}</option>
+              <option value="c_per_kwh">{t("units.electricityCPerKwh")}</option>
+            </select>
+          </div>
+          <FieldHint>{t("electricity.constantPriceHint")}</FieldHint>
+          <FieldError message={ge(errors, "electricity.priceEurPerMwh", t)} />
+        </div>
+      ) : null}
+
+      {form.electricity.mode === "historical_market_data_imported" ? (
+        <>
+          <div>
+            <FieldLabel htmlFor="elres">{t("electricity.historicalResolution")}</FieldLabel>
+            <select
+              id="elres"
+              className={selectClassName}
+              value={form.electricity.resolution}
+              onChange={(e) => {
+                const resolution = e.target.value as "daily" | "hourly";
+                const seriesText =
+                  resolution === "daily"
+                    ? FINLAND_2025_DAILY_EUR_PER_MWH.join("\n")
+                    : FINLAND_2025_HOURLY_EUR_PER_MWH.join("\n");
+                setForm((s) =>
+                  s.electricity.mode === "historical_market_data_imported"
+                    ? {
+                        ...s,
+                        electricity: {
+                          mode: "historical_market_data_imported",
+                          resolution,
+                          seriesText,
+                        },
+                      }
+                    : s,
+                );
+              }}
+            >
+              <option value="daily">{t("electricity.resolution_daily")}</option>
+              <option value="hourly">{t("electricity.resolution_hourly")}</option>
+            </select>
+            <FieldHint>{t("electricity.historicalHelp")}</FieldHint>
+            <ImportedElectricityMarketDataPanel
+              resolution={form.electricity.resolution}
+              seriesText={form.electricity.seriesText}
+              locale={locale}
+              t={t}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const text = Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n");
+                setForm((s) => {
+                  if (s.electricity.mode === "historical_market_data_imported")
+                    return {
+                      ...s,
+                      electricity: {
+                        mode: "historical_market_data_imported",
+                        resolution: "daily",
+                        seriesText: text,
+                      },
+                    };
+                  return s;
+                });
+              }}
+              disabled={form.electricity.resolution !== "daily"}
+            >
+              {t("electricity.fillOnes365")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const text = Array.from({ length: SCENARIO_HOURLY_SLOTS }, () => "50").join("\n");
+                setForm((s) => {
+                  if (s.electricity.mode === "historical_market_data_imported")
+                    return {
+                      ...s,
+                      electricity: {
+                        mode: "historical_market_data_imported",
+                        resolution: "hourly",
+                        seriesText: text,
+                      },
+                    };
+                  return s;
+                });
+              }}
+              disabled={form.electricity.resolution !== "hourly"}
+            >
+              {t("electricity.fillOnes8760")}
+            </Button>
+            <SeriesCsvImportControl
+              inputId="electricity-series-csv"
+              resolution={form.electricity.resolution === "hourly" ? "hourly" : "daily"}
+              expectedCount={
+                form.electricity.resolution === "hourly" ? SCENARIO_HOURLY_SLOTS : SCENARIO_PERIOD_DAYS
+              }
+              t={t}
+              onImported={(seriesText) =>
+                setForm((s) => {
+                  if (s.electricity.mode === "historical_market_data_imported") {
+                    return {
+                      ...s,
+                      electricity: {
+                        mode: "historical_market_data_imported",
+                        resolution: s.electricity.resolution,
+                        seriesText,
+                      },
+                    };
+                  }
+                  return s;
+                })
+              }
+            />
+          </div>
+          <FieldHint>{t("csvImport.hint")}</FieldHint>
+          <div>
+            <FieldLabel htmlFor="elseries">
+              {form.electricity.resolution === "daily"
+                ? t("electricity.seriesDailyLabel")
+                : t("electricity.seriesHourlyLabel")}
+            </FieldLabel>
+            <FieldHint>{t("electricity.seriesHelp")}</FieldHint>
+            <textarea
+              id="elseries"
+              className={textAreaClassName + " min-h-[180px] mt-1"}
+              value={form.electricity.seriesText}
+              onChange={(e) =>
+                setForm((s) =>
+                  s.electricity.mode === "historical_market_data_imported"
+                    ? { ...s, electricity: { ...s.electricity, seriesText: e.target.value } }
+                    : s,
+                )
+              }
+            />
+            <FieldError message={ge(errors, "electricity.pricesEurPerMwh", t)} />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 export function ScenarioInputApp() {
   const { locale, setLocale, t } = useLocale();
   const [form, setForm] = React.useState<ScenarioFormState>(() => createInitialFormState());
   const [errors, setErrors] = React.useState<Map<string, string[]>>(new Map());
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+  const [advancedSetupExpanded, setAdvancedSetupExpanded] = React.useState(false);
   const defaultProcess = React.useMemo(() => defaultProcessAssumptionsInput(), []);
   const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
   const scrollToOutcomeAfterRunRef = React.useRef(false);
@@ -295,6 +651,7 @@ export function ScenarioInputApp() {
     setForm(createInitialFormState());
     setErrors(new Map());
     setResult(null);
+    setAdvancedSetupExpanded(false);
   };
 
   const hasErrors = errors.size > 0;
@@ -405,20 +762,12 @@ export function ScenarioInputApp() {
 
       {/* --- Main layout: setup form --- */}
       <div className="min-w-0 space-y-8">
-          <ShellSetupRegion title={t("app.shell.setupTitle")} lead={t("app.shell.setupLead")}>
-      {/* --- Scenario identity + assumptions meta --- */}
-      <Section title={t("scenarioForm.title")} description={t("scenarioForm.description")}>
-        <FieldHint>{t("scenarioForm.periodNote")}</FieldHint>
-        <div>
-          <FieldLabel htmlFor="scenarioName">{t("scenarioForm.scenarioName")}</FieldLabel>
-          <input
-            id="scenarioName"
-            className={inputClassName}
-            value={form.scenarioName}
-            onChange={(e) => setForm((s) => ({ ...s, scenarioName: e.target.value }))}
-          />
-          <FieldError message={getErrors(errors, "scenarioName", t)} />
-        </div>
+        <ShellSetupRegion title={t("app.shell.setupTitle")} lead={t("app.shell.setupLead")}>
+      <Section
+        data-testid="setup-simple-section"
+        title={t("app.setup.simple.title")}
+        description={t("app.setup.simple.lead")}
+      >
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <FieldLabel htmlFor="annualKt">{t("co2.annualAmount")}</FieldLabel>
@@ -446,6 +795,51 @@ export function ScenarioInputApp() {
             />
             <FieldError message={getErrors(errors, "co2.utilizationRatePct", t)} />
           </div>
+        </div>
+        <div className="mt-6 space-y-3 border-t border-border/60 pt-6">
+          <h3 className="text-sm font-semibold text-foreground">{t("sections.electricity")}</h3>
+          <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            {t("sections.electricityIntro")}
+          </p>
+          <ElectricityPurchaseBlock
+            form={form}
+            setForm={setForm}
+            errors={errors}
+            locale={locale}
+            t={t}
+            getErrors={getErrors}
+            setElectricityMode={setElectricityMode}
+            block="basic"
+          />
+        </div>
+      </Section>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button
+          type="button"
+          data-testid="toggle-advanced-setup"
+          variant="outline"
+          aria-expanded={advancedSetupExpanded}
+          onClick={() => setAdvancedSetupExpanded((o) => !o)}
+        >
+          {advancedSetupExpanded ? t("app.setup.hideAdvanced") : t("app.setup.showAdvanced")}
+        </Button>
+      </div>
+
+      {advancedSetupExpanded ? (
+        <div className="space-y-6" data-testid="setup-advanced-region">
+      <Section title={t("app.setup.advanced.heading")} description={t("app.setup.advanced.lead")}>
+        <FieldHint>{t("scenarioForm.periodNote")}</FieldHint>
+        <div>
+          <FieldLabel htmlFor="scenarioName">{t("scenarioForm.scenarioName")}</FieldLabel>
+          <input
+            id="scenarioName"
+            className={inputClassName}
+            data-testid="field-scenario-name"
+            value={form.scenarioName}
+            onChange={(e) => setForm((s) => ({ ...s, scenarioName: e.target.value }))}
+          />
+          <FieldError message={getErrors(errors, "scenarioName", t)} />
         </div>
         <div>
           <FieldLabel htmlFor="assumptionsVersion">{t("scenarioForm.assumptionsVersion")}</FieldLabel>
@@ -594,275 +988,20 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
-      {/* --- Electricity purchase price: mode + series / historical resolution --- */}
-      <Section title={t("sections.electricity")} description={t("sections.electricityIntro")}>
-        <div>
-          <FieldLabel htmlFor="elmode">{t("electricity.mode")}</FieldLabel>
-          <select
-            id="elmode"
-            className={selectClassName}
-            value={form.electricity.mode}
-            onChange={(e) => setElectricityMode(e.target.value as ElectricityModeForm)}
-          >
-            <option value="constant">{t("electricity.mode_constant")}</option>
-            <option value="historical_market_data_imported">
-              {t("electricity.mode_historical_imported")}
-            </option>
-          </select>
-        </div>
-
-        {form.electricity.mode === "constant" ? (
-          <div>
-            <FieldLabel htmlFor="elprice">{t("electricity.constantPrice")}</FieldLabel>
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                id="elprice"
-                className={inputClassName + " min-w-0 flex-1 sm:max-w-[14rem]"}
-                inputMode="decimal"
-                value={form.electricity.priceEurPerMwh}
-                onChange={(e) =>
-                  setForm((s) =>
-                    s.electricity.mode === "constant"
-                      ? {
-                          ...s,
-                          electricity: {
-                            mode: "constant",
-                            priceEurPerMwh: e.target.value,
-                            priceDisplayUnit: s.electricity.priceDisplayUnit,
-                          },
-                        }
-                      : s,
-                  )
-                }
-              />
-              <select
-                className={selectClassName + " w-auto min-w-[7.5rem] shrink-0"}
-                value={form.electricity.priceDisplayUnit}
-                aria-label={t("electricity.constantPriceUnitAria")}
-                onChange={(e) => {
-                  const next = e.target.value as ElectricityPriceInputDisplayUnit;
-                  setForm((s) => {
-                    if (s.electricity.mode !== "constant") return s;
-                    const v = parseFiniteNumber(s.electricity.priceEurPerMwh);
-                    if (v === undefined) {
-                      return {
-                        ...s,
-                        electricity: { ...s.electricity, priceDisplayUnit: next },
-                      };
-                    }
-                    const eurMwh = electricityPriceInputToEurPerMwh(v, s.electricity.priceDisplayUnit);
-                    const newDisplay = electricityPriceEurPerMwhToInputDisplay(eurMwh, next);
-                    return {
-                      ...s,
-                      electricity: {
-                        mode: "constant",
-                        priceDisplayUnit: next,
-                        priceEurPerMwh: String(newDisplay),
-                      },
-                    };
-                  });
-                }}
-              >
-                <option value="eur_per_mwh">{t("units.electricityEurPerMwh")}</option>
-                <option value="c_per_kwh">{t("units.electricityCPerKwh")}</option>
-              </select>
-            </div>
-            <FieldHint>{t("electricity.constantPriceHint")}</FieldHint>
-            <FieldError message={getErrors(errors, "electricity.priceEurPerMwh", t)} />
-          </div>
-        ) : null}
-
-        {form.electricity.mode === "daily_series" ||
-        form.electricity.mode === "hourly_series" ||
-        form.electricity.mode === "historical_market_data_imported" ? (
-          <>
-            {form.electricity.mode === "historical_market_data_imported" ? (
-              <div>
-                <FieldLabel htmlFor="elres">{t("electricity.historicalResolution")}</FieldLabel>
-                <select
-                  id="elres"
-                  className={selectClassName}
-                  value={form.electricity.resolution}
-                  onChange={(e) => {
-                    const resolution = e.target.value as "daily" | "hourly";
-                    const seriesText =
-                      resolution === "daily"
-                        ? FINLAND_2025_DAILY_EUR_PER_MWH.join("\n")
-                        : FINLAND_2025_HOURLY_EUR_PER_MWH.join("\n");
-                    setForm((s) =>
-                      s.electricity.mode === "historical_market_data_imported"
-                        ? {
-                            ...s,
-                            electricity: {
-                              mode: "historical_market_data_imported",
-                              resolution,
-                              seriesText,
-                            },
-                          }
-                        : s,
-                    );
-                  }}
-                >
-                  <option value="daily">{t("electricity.resolution_daily")}</option>
-                  <option value="hourly">{t("electricity.resolution_hourly")}</option>
-                </select>
-                <FieldHint>{t("electricity.historicalHelp")}</FieldHint>
-                <ImportedElectricityMarketDataPanel
-                  resolution={form.electricity.resolution}
-                  seriesText={form.electricity.seriesText}
-                  locale={locale}
-                  t={t}
-                />
-              </div>
-            ) : null}
-
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const text = Array.from({ length: SCENARIO_PERIOD_DAYS }, () => "50").join("\n");
-                  setForm((s) => {
-                    if (s.electricity.mode === "daily_series")
-                      return { ...s, electricity: { mode: "daily_series", seriesText: text } };
-                    if (s.electricity.mode === "historical_market_data_imported")
-                      return {
-                        ...s,
-                        electricity: {
-                          mode: "historical_market_data_imported",
-                          resolution: "daily",
-                          seriesText: text,
-                        },
-                      };
-                    return s;
-                  });
-                }}
-                disabled={
-                  form.electricity.mode === "hourly_series" ||
-                  (form.electricity.mode === "historical_market_data_imported" &&
-                    form.electricity.resolution !== "daily")
-                }
-              >
-                {t("electricity.fillOnes365")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const text = Array.from({ length: SCENARIO_HOURLY_SLOTS }, () => "50").join("\n");
-                  setForm((s) => {
-                    if (s.electricity.mode === "hourly_series")
-                      return { ...s, electricity: { mode: "hourly_series", seriesText: text } };
-                    if (s.electricity.mode === "historical_market_data_imported")
-                      return {
-                        ...s,
-                        electricity: {
-                          mode: "historical_market_data_imported",
-                          resolution: "hourly",
-                          seriesText: text,
-                        },
-                      };
-                    return s;
-                  });
-                }}
-                disabled={
-                  form.electricity.mode === "daily_series" ||
-                  (form.electricity.mode === "historical_market_data_imported" &&
-                    form.electricity.resolution !== "hourly")
-                }
-              >
-                {t("electricity.fillOnes8760")}
-              </Button>
-              <SeriesCsvImportControl
-                inputId="electricity-series-csv"
-                resolution={
-                  form.electricity.mode === "hourly_series" ||
-                  (form.electricity.mode === "historical_market_data_imported" &&
-                    form.electricity.resolution === "hourly")
-                    ? "hourly"
-                    : "daily"
-                }
-                expectedCount={
-                  form.electricity.mode === "hourly_series" ||
-                  (form.electricity.mode === "historical_market_data_imported" &&
-                    form.electricity.resolution === "hourly")
-                    ? SCENARIO_HOURLY_SLOTS
-                    : SCENARIO_PERIOD_DAYS
-                }
-                t={t}
-                onImported={(seriesText) =>
-                  setForm((s) => {
-                    if (s.electricity.mode === "daily_series") {
-                      return { ...s, electricity: { mode: "daily_series", seriesText } };
-                    }
-                    if (s.electricity.mode === "hourly_series") {
-                      return { ...s, electricity: { mode: "hourly_series", seriesText } };
-                    }
-                    if (s.electricity.mode === "historical_market_data_imported") {
-                      return {
-                        ...s,
-                        electricity: {
-                          mode: "historical_market_data_imported",
-                          resolution: s.electricity.resolution,
-                          seriesText,
-                        },
-                      };
-                    }
-                    return s;
-                  })
-                }
-              />
-            </div>
-            <FieldHint>{t("csvImport.hint")}</FieldHint>
-
-            <div>
-              <FieldLabel htmlFor="elseries">
-                {form.electricity.mode === "daily_series"
-                  ? t("electricity.seriesDailyLabel")
-                  : form.electricity.mode === "hourly_series"
-                    ? t("electricity.seriesHourlyLabel")
-                    : form.electricity.resolution === "daily"
-                      ? t("electricity.seriesDailyLabel")
-                      : t("electricity.seriesHourlyLabel")}
-              </FieldLabel>
-              <FieldHint>{t("electricity.seriesHelp")}</FieldHint>
-              <textarea
-                id="elseries"
-                className={textAreaClassName + " mt-1 min-h-[180px]"}
-                value={
-                  form.electricity.mode === "historical_market_data_imported" ||
-                  form.electricity.mode === "daily_series" ||
-                  form.electricity.mode === "hourly_series"
-                    ? form.electricity.seriesText
-                    : ""
-                }
-                onChange={(e) =>
-                  setForm((s) =>
-                    s.electricity.mode === "daily_series" ||
-                    s.electricity.mode === "hourly_series" ||
-                    s.electricity.mode === "historical_market_data_imported"
-                      ? { ...s, electricity: { ...s.electricity, seriesText: e.target.value } }
-                      : s,
-                  )
-                }
-              />
-              <FieldError
-                message={getErrors(
-                  errors,
-                  form.electricity.mode === "daily_series"
-                    ? "electricity.dailyPricesEurPerMwh"
-                    : form.electricity.mode === "hourly_series"
-                      ? "electricity.hourlyPricesEurPerMwh"
-                      : "electricity.pricesEurPerMwh",
-                  t,
-                )}
-              />
-            </div>
-          </>
-        ) : null}
-      </Section>
+      {form.electricity.mode === "daily_series" || form.electricity.mode === "hourly_series" ? (
+        <Section title={t("sections.electricity")} description={t("sections.electricityIntro")}>
+          <ElectricityPurchaseBlock
+            form={form}
+            setForm={setForm}
+            errors={errors}
+            locale={locale}
+            t={t}
+            getErrors={getErrors}
+            setElectricityMode={setElectricityMode}
+            block="advancedDailyHourly"
+          />
+        </Section>
+      ) : null}
 
       {/* --- Economics + optional CAPEX --- */}
       <Section title={t("sections.economics")} description={t("sections.economicsIntro")}>
@@ -1196,7 +1335,9 @@ export function ScenarioInputApp() {
           })}
         </div>
       </Section>
-          </ShellSetupRegion>
+        </div>
+      ) : null}
+        </ShellSetupRegion>
       </div>
 
       {/* --- Outcome: `ResultsPanel` from canonical result only --- */}

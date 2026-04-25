@@ -7,6 +7,8 @@
 - **[`docs/solution-spec-v2.md`](docs/solution-spec-v2.md)** — Product / MVP scope and principles.
 - **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** — Calculation contracts, units, formulas.
 - **[`docs/repository-invariants.md`](docs/repository-invariants.md)** — Current export boundary and regression checklist (consolidated from former milestone handoffs).
+- **[`docs/internal-memo-fi.md`](docs/internal-memo-fi.md)** — Finnish memo of project Hiiliketju general functionalities intended for human use; not to be used as source or guidance for agents.
+- **[`docs/release-memo-mvp.md`](docs/release-memo-mvp.md)** — English memo of project Hiiliketju general functionalities intended for human use; not to be used as source or guidance for agents.
 - **[`.cursor/rules.md`](.cursor/rules.md)** — Cursor workspace copy of core policy (keep for tool discoverability).
 - **[`cursor_agents/README.md`](cursor_agents/README.md)** — Optional legacy prompts; not required for runtime.
 

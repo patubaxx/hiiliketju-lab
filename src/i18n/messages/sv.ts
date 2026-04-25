@@ -24,10 +24,25 @@ export const sv = {
           "Anläggningstillgänglighet och processeffektivitet registreras med antagandemetadata men används ännu inte av beräkningsmotorn — båda är för tillfället neutral 100 %.",
       },
     },
+    setup: {
+      simple: {
+        title: "Grundinställningar",
+        lead:
+          "Börja med årlig CO₂, utnyttjandegrad och inköpspris för el. Du kan köra beräkningen här. Öppna avancerat för scenariosnamn, CO₂-situation, ekonomi och processantaganden.",
+      },
+      advanced: {
+        heading: "Avancerat",
+        lead: "Scenariosnamn, versions- och Anteckningar, CO₂-tillgång, ekonomi och avancerade processfält.",
+      },
+      showAdvanced: "Visa avancerat",
+      hideAdvanced: "Dölj avancerat",
+      electricitySeriesRequiresAdvanced:
+        "El prissätts med dags- eller timserie. Öppna avancerat för att visa och redigera serien.",
+    },
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
-        "Arbeta uppifrån och ned: CO₂-tillgång → inköpspris för el → ekonomi → avancerade antaganden (vid behov). Använd fältet överst för att köra beräkningen, återställa, byta språk, exportera eller gå direkt till resultaten.",
+        "Du börjar med grundinställningar. Fäll ut avancerat när hela formuläret behövs (CO₂-tidsserier, försäljningspris, antaganden för CAPEX, process). Fältet överst: kör, återställ, språk, export, gå till resultat.",
       actionsCardTitle: "Beräkning",
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",

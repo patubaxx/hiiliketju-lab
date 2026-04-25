@@ -24,10 +24,25 @@ export const fi = {
           "Laitoksen käytettävyys ja prosessin hyötysuhde kirjataan oletusmetatietoineen, mutta laskentamoottori ei vielä käytä niitä — oletusarvo on neutraali 100 %.",
       },
     },
+    setup: {
+      simple: {
+        title: "Perusasetukset",
+        lead:
+          "Aloita vuotuisesta CO₂:sta, hyödyntämisasteesta ja sähkön hankintahinnasta. Laskennan voi käynnistää tästä. Skenaarion nimi, CO₂-tilanne, talousparametrit ja prosessioletukset ovat lisäasetuksissa.",
+      },
+      advanced: {
+        heading: "Lisäasetukset",
+        lead: "Skenaarion nimi, oletusten versio ja muistiinpanot, CO₂:n saatavuus, talous ja edistyneet prosessikentät.",
+      },
+      showAdvanced: "Näytä lisäasetukset",
+      hideAdvanced: "Piilota lisäasetukset",
+      electricitySeriesRequiresAdvanced:
+        "Sähkö on päivittäis- tai tuntisarjana. Avaa lisäasetukset, jos haluat tarkastella ja muokata sarjaa.",
+    },
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:
-        "Etene ylhäältä alas: CO₂:n saatavuus → sähkön hankintahinta → talousparametrit → edistyneet oletukset (tarvittaessa). Yläpalkin kautta voit käynnistää laskennan, nollata, vaihtaa kieltä, viedä tulokset tai siirtyä suoraan tuloksiin.",
+        "Aloitetaan perusarvoilla. Laajenna lisäasetukset, kun tarvitset koko lomakkeen (CO₂-aikasarjat, myyntihinnat, CAPEX, prosessioletukset). Käytä yläpalkkia: laskenta, nollaus, kieli, vienti, hyppy tuloksiin.",
       actionsCardTitle: "Laskenta",
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",

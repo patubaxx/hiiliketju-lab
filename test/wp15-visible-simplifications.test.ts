@@ -8,7 +8,7 @@
  * 3. Internal schema/engine support for `daily_series` and `hourly_series` is preserved.
  * 4. `buildScenarioPayload` canonical output is correct with the fixed kt/year display unit.
  */
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createElement } from "react";
 import { render, screen } from "@testing-library/react";
 
@@ -21,6 +21,16 @@ import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-ap
 import { electricityPriceInputSchema } from "@/features/scenario/schemas/electricity-price-schema";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { LocaleProvider } from "@/i18n/locale-context";
+
+import { waitForStoredLocaleEnApplied } from "./wait-for-stored-locale";
+
+// UI assertions use English copy after `useEffect` applies `localStorage` (default first paint is Finnish)
+beforeEach(() => {
+  localStorage.setItem("hiiliketju.locale", "en");
+});
+afterEach(() => {
+  localStorage.removeItem("hiiliketju.locale");
+});
 
 // ─── CO₂ unit simplification ────────────────────────────────────────────────
 
@@ -52,9 +62,9 @@ describe("WP15 – electricity mode visible defaults", () => {
     expect(state.electricity.mode).toBe("constant");
   });
 
-  it("visible electricity selector exposes only constant and imported historical modes", () => {
+  it("visible electricity selector exposes only constant and imported historical modes", async () => {
     render(createElement(LocaleProvider, null, createElement(ScenarioInputApp)));
-
+    await waitForStoredLocaleEnApplied();
     expect(screen.getByRole("option", { name: /Constant purchase price/i })).toBeTruthy();
     expect(screen.getByRole("option", { name: /Imported market data/i })).toBeTruthy();
     expect(screen.queryByRole("option", { name: /Daily series/i })).toBeNull();

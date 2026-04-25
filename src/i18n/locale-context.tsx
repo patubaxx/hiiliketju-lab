@@ -25,12 +25,28 @@ function readStoredLocale(): Locale | null {
   return null;
 }
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = React.useState<Locale>("en");
+const DEFAULT_LOCALE: Locale = "fi";
 
+export function LocaleProvider({ children }: { children: React.ReactNode }) {
+  /**
+   * Always start at `fi` on server and the client’s first render so the DOM matches the server (avoids
+   * hydration mismatch). A separate effect applies `localStorage` after commit (see `readStoredLocale`).
+   */
+  const [locale, setLocaleState] = React.useState<Locale>(DEFAULT_LOCALE);
+
+  /**
+   * Apply stored locale in a new task so the initial commit stays `fi` and matches server HTML.
+   * (Testing `render()` is wrapped in `act` and would otherwise flush a synchronous `setState` from
+   * this effect before the first `expect`, hiding the pre-hydration Finnish state.)
+   */
   React.useEffect(() => {
-    const stored = readStoredLocale();
-    if (stored) setLocaleState(stored);
+    const id = window.setTimeout(() => {
+      const stored = readStoredLocale();
+      if (stored) {
+        setLocaleState(stored);
+      }
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   const setLocale = React.useCallback((next: Locale) => {

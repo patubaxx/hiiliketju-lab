@@ -31,6 +31,7 @@ export function Section({
   children,
   className,
   headingAccent = true,
+  "data-testid": dataTestId,
 }: {
   title: string;
   description?: string;
@@ -38,9 +39,11 @@ export function Section({
   className?: string;
   /** Vertical accent bar beside the heading (setup sections); omit for outcome / plain blocks. */
   headingAccent?: boolean;
+  "data-testid"?: string;
 }) {
   return (
     <section
+      data-testid={dataTestId}
       className={cn(
         "rounded-xl border border-border/90 bg-card px-6 py-6 text-card-foreground shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.04] sm:px-7 sm:py-7 dark:ring-white/[0.06]",
         className,

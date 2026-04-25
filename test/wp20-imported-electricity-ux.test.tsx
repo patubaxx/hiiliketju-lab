@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { FINLAND_2025_DAILY_EUR_PER_MWH, FINLAND_2025_HOURLY_EUR_PER_MWH } from "@/data/electricity-defaults-2025-fi";
 import {
@@ -11,23 +11,35 @@ import {
 import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-app";
 import { LocaleProvider } from "@/i18n/locale-context";
 
-function renderApp() {
-  return render(
+import { waitForStoredLocaleEnApplied } from "./wait-for-stored-locale";
+
+beforeEach(() => {
+  localStorage.setItem("hiiliketju.locale", "en");
+});
+afterEach(() => {
+  cleanup();
+  localStorage.removeItem("hiiliketju.locale");
+});
+
+async function renderApp() {
+  const utils = render(
     <LocaleProvider>
       <ScenarioInputApp />
     </LocaleProvider>,
   );
+  await waitForStoredLocaleEnApplied();
+  return utils;
 }
 
 describe("WP20 – imported market data UX (VAT disclosure + stats)", () => {
-  it("does not show imported-mode VAT or stats on constant electricity by default", () => {
-    renderApp();
+  it("does not show imported-mode VAT or stats on constant electricity by default", async () => {
+    await renderApp();
     expect(screen.queryByTestId("electricity-imported-vat-notice")).toBeNull();
     expect(screen.queryByTestId("electricity-imported-stats")).toBeNull();
   });
 
-  it("shows a visible VAT notice and inline stats in imported market data mode", () => {
-    renderApp();
+  it("shows a visible VAT notice and inline stats in imported market data mode", async () => {
+    await renderApp();
     const mode = screen.getByLabelText("Purchase price mode");
     fireEvent.change(mode, { target: { value: "historical_market_data_imported" } });
 
@@ -41,8 +53,8 @@ describe("WP20 – imported market data UX (VAT disclosure + stats)", () => {
     expect(stats.textContent).toMatch(/Daily \(365 values\)/);
   });
 
-  it("shows daily vs hourly summary stats for bundled defaults and updates when resolution changes", () => {
-    renderApp();
+  it("shows daily vs hourly summary stats for bundled defaults and updates when resolution changes", async () => {
+    await renderApp();
     fireEvent.change(screen.getByLabelText("Purchase price mode"), {
       target: { value: "historical_market_data_imported" },
     });
@@ -69,8 +81,8 @@ describe("WP20 – imported market data UX (VAT disclosure + stats)", () => {
     expect(stats.textContent).toContain(hourlyMean);
   });
 
-  it("labels stats as user-provided when the series is no longer the bundled default (exact text)", () => {
-    renderApp();
+  it("labels stats as user-provided when the series is no longer the bundled default (exact text)", async () => {
+    await renderApp();
     fireEvent.change(screen.getByLabelText("Purchase price mode"), {
       target: { value: "historical_market_data_imported" },
     });
@@ -85,8 +97,8 @@ describe("WP20 – imported market data UX (VAT disclosure + stats)", () => {
     expect(stats.textContent).not.toMatch(/Finland 2025 bundled default data/);
   });
 
-  it("keeps a single VAT notice in imported mode even when the user overrides defaults", () => {
-    renderApp();
+  it("keeps a single VAT notice in imported mode even when the user overrides defaults", async () => {
+    await renderApp();
     fireEvent.change(screen.getByLabelText("Purchase price mode"), {
       target: { value: "historical_market_data_imported" },
     });
@@ -96,8 +108,8 @@ describe("WP20 – imported market data UX (VAT disclosure + stats)", () => {
     expect(screen.getAllByTestId("electricity-imported-vat-notice")).toHaveLength(1);
   });
 
-  it("matches bundled default hourly text after switching to hourly (no stale daily stats)", () => {
-    renderApp();
+  it("matches bundled default hourly text after switching to hourly (no stale daily stats)", async () => {
+    await renderApp();
     fireEvent.change(screen.getByLabelText("Purchase price mode"), {
       target: { value: "historical_market_data_imported" },
     });

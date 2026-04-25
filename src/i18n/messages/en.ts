@@ -24,10 +24,25 @@ export const en = {
           "Plant availability and process efficiency are recorded with assumption metadata but not yet applied by the engine — both currently default to a neutral 100 %.",
       },
     },
+    setup: {
+      simple: {
+        title: "Basic inputs",
+        lead:
+          "Start with annual CO₂, utilization, and electricity purchase price. You can run the calculation from here. Open advanced setup for the scenario name, CO₂ availability, economics, and process assumptions.",
+      },
+      advanced: {
+        heading: "Advanced setup",
+        lead: "Scenario name, assumptions version and notes, CO₂ availability, economics, and advanced process fields.",
+      },
+      showAdvanced: "Show advanced setup",
+      hideAdvanced: "Hide advanced setup",
+      electricitySeriesRequiresAdvanced:
+        "Electricity is set to a daily or hourly price series. Open advanced setup to view and edit that series.",
+    },
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "Work top to bottom: CO₂ availability → electricity purchase price → economics → advanced assumptions (if needed). Use the bar at the top to run, reset, change language, export, or jump to results.",
+        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). Use the top bar to run, reset, change language, export, or jump to results.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
