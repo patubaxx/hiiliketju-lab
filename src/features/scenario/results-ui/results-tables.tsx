@@ -1,3 +1,4 @@
+import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
 import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
@@ -129,7 +130,7 @@ export function ResultsTables({
               {result.monthlySummary.map((m, i) => (
                 <tr key={m.monthIndex} className={`${zebraRowClass(i)} transition-colors hover:bg-muted/25`}>
                   <td className={`${tdClass} font-sans`}>
-                    {t("co2.month")} {m.monthIndex + 1}
+                    {t(calendarMonthMessageId(m.monthIndex))}
                   </td>
                   <td className={`${tdClass} text-right`}>{formatResultTonnesFromKg(m.sums.methaneProducedKg, locale)}</td>
                   <td className={`${tdClass} text-right`}>

@@ -1,3 +1,4 @@
+import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
 import { PROCESS_FIELD_ORDER, type ProcessSchemaKey } from "@/features/scenario/input-ui/form-state";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
@@ -14,7 +15,7 @@ export function friendlyLabelForValidationPath(path: string, t: TFn): string | n
   const monthly = /^co2\.availability\.monthlyRelativeWeights\.(\d+)$/.exec(path);
   if (monthly) {
     const idx = Number(monthly[1]);
-    return `${t("co2.month")} ${idx + 1}`;
+    return t(calendarMonthMessageId(idx));
   }
 
   if (path.startsWith("process.")) {

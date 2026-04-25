@@ -25,6 +25,7 @@
 ## Visible product behavior vs retained internal contracts
 
 - **Visible setup UI:** annual CO₂ is `kt/year` only; electricity mode selection offers only `constant` and `historical_market_data_imported`.
+- **Default CO₂ availability (WP24):** new scenarios start in **`seasonal_daily`** with a shared **winter-weighted** default monthly relative profile (`DEFAULT_SEASONAL_CO2_RELATIVE_WEIGHTS` in `src/core/domain/seasonal-co2-default-weights.ts`). **`flat_annual`**, **daily / hourly time-series** modes remain available in Advanced. Month labels in seasonal inputs and the monthly results table are **localized** (`calendar.months.*`).
 - **Retained internal contracts:** schema / domain / engine / export paths still support `daily_series` and `hourly_series`; domain conversion helpers for annual CO₂ `kg/year` remain internal only.
 - **Export authority:** exports still accept validated `scenario` input and recompute with fresh `calculateScenario`; they do not trust client-posted result objects.
 

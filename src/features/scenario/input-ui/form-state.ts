@@ -5,6 +5,7 @@ import type {
   AnnualCo2InputDisplayUnit,
   ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
+import { defaultSeasonalMonthlyWeightFormStrings } from "@/core/domain/seasonal-co2-default-weights";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 import {
   FINLAND_2025_DAILY_EUR_PER_MWH,
@@ -169,7 +170,7 @@ export function createInitialFormState(): ScenarioFormState {
     utilizationRatePct: "100",
     assumptionsVersion: "HIILIKETJU_ASSUMPTIONS_v2_2026-04",
     assumptionsNotes: "",
-    co2: { mode: "flat_annual" },
+    co2: { mode: "seasonal_daily", monthlyWeights: defaultSeasonalMonthlyWeightFormStrings() },
     electricity: { mode: "constant", priceEurPerMwh: "80", priceDisplayUnit: "eur_per_mwh" },
     economics: {
       methanePriceEurPerTch4: String(FACTORY_DEFAULT_METHANE_SALES_PRICE_EUR_PER_T_CH4),
@@ -189,7 +190,7 @@ export function defaultCo2Branch(mode: Co2AvailabilityModeForm): Co2FormBranch {
     case "flat_annual":
       return { mode: "flat_annual" };
     case "seasonal_daily":
-      return { mode: "seasonal_daily", monthlyWeights: Array.from({ length: 12 }, () => "1") };
+      return { mode: "seasonal_daily", monthlyWeights: defaultSeasonalMonthlyWeightFormStrings() };
     case "time_series_daily":
       return {
         mode: "time_series_daily",

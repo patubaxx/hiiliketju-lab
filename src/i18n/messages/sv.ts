@@ -52,6 +52,36 @@ export const sv = {
       jumpToOutcome: "Gå till utfall",
       exportGroupLabel: "Exportera",
     },
+    guidance: {
+      simpleSetup:
+        "Här anger du det årliga biogena CO₂ som finns, hur stor del anläggningen använder (utnyttjandegrad) samt elens inköpspris. Det styr den dagliga tillgängliga CO₂-massan och kostnaden för elektrolys. Som standard fördelas CO₂ med ett vintertyngt säsongsutdrag—öppna avancerat om du behöver ändra profil, läge eller andra fält.\n\nDu kan köra en full 365-dagarsberäkning här utan att öppna avancerat.",
+      co2Availability:
+        "Det här avsnittet styr hur din årsmängd blir en daglig tillgänglighetsprofil. Den årliga totalen (kt/år) sätter massan. Utnyttjandegraden är andelen CO₂ processen faktiskt använder. Säsongs- (månadsvis relativ vikt) sprider mängden över dygnen; vikter är relativa och normalisas i motorn så att årsmängden, efter utnyttjande, behålls. I avancerat kan du behålla vintertunga standardvikter, redigera månad för månad eller byta till jämn tidsserie när du har bättre data.",
+      electricityPurchase:
+        "Inköpspriset används mot elkostnaden i vätgasproduktion. Konstant: ett pris hela året. Importerad marknadsdata: en daglig eller timvis EUR/MWh-serie (timmar räknas om till dagsnivå). De förpackade 2025-data för Finland är en start; ersätt med faktiskt upphandlade priser när resultatet ska motsvara ditt fall.",
+      economics:
+        "Metan- och vätefälten här är antagna försäljningspriser, inte spotkurser. De styr intäkter i metanvägen och vätgasalternativet och påverkar vilket spår som ser bäst ut. Formulärets standardvärden är inbyggda startpunkter—kontrollera dem före beslut.",
+      capex:
+        "CAPEX är frivilligt. När det är på fördelas dina siffror med den valda livslängden enligt MVP:s enkla årsfördelning och läggs i kostnaderna. Låt det vara av om du endast vill se rörliga kostnader i den här körningen.",
+      advancedProcess:
+        "Här finns de processantaganden som motorn faktiskt använder. Värdena börjar från litteraturen. Ersätt med projektspecifika, spårbara siffror när du har dem.",
+    },
+  },
+  calendar: {
+    months: {
+      january: "Januari",
+      february: "Februari",
+      march: "Mars",
+      april: "April",
+      may: "Maj",
+      june: "Juni",
+      july: "Juli",
+      august: "Augusti",
+      september: "September",
+      october: "Oktober",
+      november: "November",
+      december: "December",
+    },
   },
   locale: {
     label: "Språk",
@@ -122,7 +152,9 @@ export const sv = {
     mode_time_series_daily: "Tidsserie (daglig kg/dygn, 365 värden)",
     mode_time_series_hourly: "Tidsserie (timvis kg/h, 8760 värden)",
     seasonalHelp:
-      "Tolv relativa vikter (en per kalendermånad). Nollor tillåtna; minst en månad måste vara större än noll. Motorn skalar vikterna till den årliga totalen.",
+      "En relativ vikt per namngiven kalendermånad nedan. Nollor tillåtna, men minst en månad måste vara större än noll. Motorn normaliserar vikterna, bygger dagsfördelning och bevarar ändå ditt årliga värde (kt/år) efter utnyttjandegrad.",
+    seasonalDefaultProfileNote:
+      "Standardkurvan är högre vinterhalvåret (typiskt säsongsjusterad industriell tillgång). Vikter är endast relativa—endast mönstret räknas före normalisering. Byt mot egna siffror när du har dem, eller tidsserieläget om det passar bättre.",
     month: "Månad",
     seriesDailyLabel: "Daglig tillgänglig CO₂ (kg/dygn × 365)",
     seriesDailyHelp:

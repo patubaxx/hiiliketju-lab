@@ -82,6 +82,26 @@ export function FieldHint({ children }: { children: React.ReactNode }) {
   return <p className="text-xs text-muted-foreground leading-snug">{children}</p>;
 }
 
+/** Visible i18n guidance (WP24+); pass a `messageId` handled by the caller’s `t`. */
+export function GuidanceCallout({
+  messageId,
+  t,
+  "data-testid": dataTestId = `guidance-${messageId.replace(/\./g, "-")}`,
+}: {
+  messageId: string;
+  t: (id: string) => string;
+  "data-testid"?: string;
+}) {
+  return (
+    <div
+      className="rounded-lg border border-border/70 bg-muted/25 px-4 py-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty] whitespace-pre-line"
+      data-testid={dataTestId}
+    >
+      {t(messageId)}
+    </div>
+  );
+}
+
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <p className="text-xs text-destructive font-medium">{message}</p>;

@@ -52,6 +52,36 @@ export const fi = {
       jumpToOutcome: "Hyppää tuloksiin",
       exportGroupLabel: "Vienti",
     },
+    guidance: {
+      simpleSetup:
+        "Tässä annetaan biogeenisen CO₂:n vuosimäärä, kuinka suuren osan siitä prosessi käyttää (hyötysuhde) sekä sähkön hankintahinta. Nämä vaikuttavat päivittäiseen saatavissa olevaan CO₂-massaan ja siihen, mitä elektrolyysin sähkö maksaa. Oletuksena CO₂ jakaantuu talvispainotteisella vuodenaikaprofiililla; voit avata lisäasetukset ja muuttaa profiilia, tilaa tai muita arvoja.\n\nKoko 365 päivän laskennan voi ajaa jo tästä katselusta avaamatta lisäasetuksia.",
+      co2Availability:
+        "Määritellään, miten vuotuinen CO₂ kääntyy päivittäiseksi saatavuudeksi. Vuosiluku (kt/v) asettaa koko kauden saatavilla olevan massan. Hyötysuhde on osa, joka todella käytetään prosessiin. Vuodenaikainen tila (kuukausipainot) jakaa massan vuoden päiville; painot ovat suhteellisia ja moottori normalisoi ne niin, että vuosimäärä säilyy hyötysuhteen jälkeen. Lisäasetuksissa voi pitää oletusprofiilia, muokata kuukausipainoja tai valita tasaista tai aikasarjaprofiilia, kun on parempi dataa.",
+      electricityPurchase:
+        "Hankintahintaa käytetään vedyntuotannon sähkökustannuksiin. Vakiohinta: yksi hinta koko vuodelle. Tuodut markkinatiedot: päivittäinen tai tuntinainen EUR/MWh -sarja (tunnit muunnetaan vuorokauden keskiarvoksi). Suomi 2025 -oletusdata on aloituspiste; korvaa oikeilla hankinta- tai sopimushinnoilla, jos haluat tulokset vastaamaan todellista tapaustasi.",
+      economics:
+        "Metaani- ja vetykentät ovat oletettuja myyntihintoja, eivät markkinapörssin reaaliaikahintaa. Ne syöttävät metaanipolun tulot ja vedyn myyntivaihtoehdon, ja vaikuttavat siihen, kumpi polku näyttää houkuttelevammalta. Lomakkeen oletukset ovat tuotepohjaisia aloitusarvoja; tarkista ne ennen päätöskäyttöä.",
+      capex:
+        "CAPEX on vapaaehtoinen. Kun päällä, syöttämäsi investoinnit jaetaan valitun eliniän yli vuositasolla tässä MVP:ssa (yksinkertainen vuosivakiointi) ja lisätään kustannuksiin. Jätä pois, jos haluat vain varhaiskustannukset tähän ajoon.",
+      advancedProcess:
+        "Tässä ovat moottorin tällä hetkellä käyttämät prosessiparametrit. Oletusarvot perustuvat kirjallisuuteen. Korvaa ne projektiin sopivilla, jäljitettävillä luvuilla, kun ne ovat saatavilla.",
+    },
+  },
+  calendar: {
+    months: {
+      january: "Tammikuu",
+      february: "Helmikuu",
+      march: "Maaliskuu",
+      april: "Huhtikuu",
+      may: "Toukokuu",
+      june: "Kesäkuu",
+      july: "Heinäkuu",
+      august: "Elokuu",
+      september: "Syyskuu",
+      october: "Lokakuu",
+      november: "Marraskuu",
+      december: "Joulukuu",
+    },
   },
   locale: {
     label: "Kieli",
@@ -122,7 +152,9 @@ export const fi = {
     mode_time_series_daily: "Aikasarja (päivittäinen kg/päivä, 365 arvoa)",
     mode_time_series_hourly: "Aikasarja (tuntikohtainen kg/h, 8760 arvoa)",
     seasonalHelp:
-      "Kaksitoista suhteellista painotusta (kalenterikuukausittain). Nollat sallittuja; vähintään yhden kuukauden on oltava suurempi kuin nolla. Moottori skaalaa painot vuosimäärään.",
+      "Yksi suhteellinen paino jokaiselle alla nimetylle kuukaudelle. Nollat sallitaan, mutta vähintään yhden kuukauden tulee olla nollaa suurempi. Moottori normalisoi painot, muodostaa päivittäisen saatavuuden ja varmistaa, että hyötysuhteen jälkeen vuosi vastaa silti vuotuista (kt/v) määrääsi.",
+    seasonalDefaultProfileNote:
+      "Oletus käyttää kylmempään vuodenaikaan painottuvaa käyrää (teollisen tuotannon tyypillinen jaksotus). Painot ovat vain suhteellisia—ennen normalisointia merkitsevät vain kuvion muodon. Vaihda omat kuukausittaiset tietosi tilalle tai aikasarjaprofiili, jos se sopii paremmin.",
     month: "Kuukausi",
     seriesDailyLabel: "Päivittäinen saatava CO₂ (kg/päivä × 365)",
     seriesDailyHelp:

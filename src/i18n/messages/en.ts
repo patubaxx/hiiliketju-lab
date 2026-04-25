@@ -52,6 +52,36 @@ export const en = {
       jumpToOutcome: "Jump to outcome",
       exportGroupLabel: "Export downloads",
     },
+    guidance: {
+      simpleSetup:
+        "What to enter: annual biogenic CO₂, how much of it is used in the plant (utilization), and the electricity purchase price. These values drive how much CO₂ is available for conversion each day and what electrolysis power costs. By default, CO₂ is distributed over the year with a winter-weighted seasonal pattern—you can open Advanced to change the profile, mode, or other inputs.\n\nYou can run a full 365-day calculation from this view without opening Advanced.",
+      co2Availability:
+        "What this section controls: how your yearly CO₂ amount is turned into a daily availability profile. The annual total (kt/year) sets the year’s available CO₂ mass. The utilization rate is the share of that CO₂ that your process can actually use. The seasonal (monthly relative weight) mode spreads the year across days; weights are relative and are normalized in the engine so the annual amount is preserved. In Advanced you can keep the default winter-weighted shape, edit monthly weights, or switch to a flat or time-series profile when you have better data.",
+      electricityPurchase:
+        "The electricity purchase (procurement) price is used to work out the cost of power for hydrogen production. Constant mode uses one price for the whole year. Imported market data uses a daily or hourly EUR/MWh series (hourly is averaged to days in the product). The bundled 2025 Finland defaults are a starting point—replace them with your real procurement or contract prices when the results need to match your case.",
+      economics:
+        "Methane and hydrogen prices here are assumed sales prices, not market spot quotes. They feed methane-path revenue and the hydrogen-sales alternative, and strongly affect which pathway looks more attractive. The form defaults are product starting points, not a confirmation that they are right for your project—check them before decision use.",
+      capex:
+        "CAPEX is optional. If you turn it on, the investments you enter are spread evenly over the selected lifetime in the MVP (simple per-year allocation) and added to the cost stack. Leave it off if you only want variable operating costs in this run.",
+      advancedProcess:
+        "This block lists the process assumptions the current calculation engine actually uses. Values begin from literature-based defaults. Replace them with project-specific numbers when you have defensible, traceable data.",
+    },
+  },
+  calendar: {
+    months: {
+      january: "January",
+      february: "February",
+      march: "March",
+      april: "April",
+      may: "May",
+      june: "June",
+      july: "July",
+      august: "August",
+      september: "September",
+      october: "October",
+      november: "November",
+      december: "December",
+    },
   },
   locale: {
     label: "Language",
@@ -123,7 +153,9 @@ export const en = {
     mode_time_series_daily: "Time series (daily kg/day, 365 values)",
     mode_time_series_hourly: "Time series (hourly kg/h, 8760 values)",
     seasonalHelp:
-      "Twelve relative weights (one per calendar month). Zeros allowed; at least one month must be greater than zero. The engine scales them to match the annual total.",
+      "One relative weight per named calendar month below. Zeros are allowed, but at least one month must be greater than zero. The engine normalizes the weights, then builds daily availability so the year still matches your annual total (kt/year) after utilization.",
+    seasonalDefaultProfileNote:
+      "The default weight curve is higher in winter and lower in summer (industrial seasonality). Weights are only relative—only the pattern matters before normalization. Replace them with your own monthly data when you have it, or change CO₂ mode if a time series fits better.",
     month: "Month",
     seriesDailyLabel: "Daily available CO₂ (kg/day × 365)",
     seriesDailyHelp:

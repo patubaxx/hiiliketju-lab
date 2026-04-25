@@ -20,6 +20,7 @@ import {
   electricityPriceInputToEurPerMwh,
   type ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
+import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
 import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 import {
@@ -30,6 +31,7 @@ import {
   FieldError,
   FieldHint,
   FieldLabel,
+  GuidanceCallout,
   Section,
   ShellSetupRegion,
   inputClassName,
@@ -208,11 +210,12 @@ function SeasonalDailyCo2Fields({
   return (
     <>
       <FieldHint>{t("co2.seasonalHelp")}</FieldHint>
+      <GuidanceCallout messageId="co2.seasonalDefaultProfileNote" t={t} data-testid="guidance-co2-seasonal-default" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {branch.monthlyWeights.map((w, i) => (
           <div key={i}>
             <FieldLabel htmlFor={`mw-${i}`}>
-              {t("co2.month")} {i + 1}
+              {t(calendarMonthMessageId(i))}
             </FieldLabel>
             <input
               id={`mw-${i}`}
@@ -768,6 +771,7 @@ export function ScenarioInputApp() {
         title={t("app.setup.simple.title")}
         description={t("app.setup.simple.lead")}
       >
+        <GuidanceCallout messageId="app.guidance.simpleSetup" t={t} data-testid="guidance-simple-setup" />
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <FieldLabel htmlFor="annualKt">{t("co2.annualAmount")}</FieldLabel>
@@ -801,6 +805,11 @@ export function ScenarioInputApp() {
           <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
             {t("sections.electricityIntro")}
           </p>
+          <GuidanceCallout
+            messageId="app.guidance.electricityPurchase"
+            t={t}
+            data-testid="guidance-electricity-purchase"
+          />
           <ElectricityPurchaseBlock
             form={form}
             setForm={setForm}
@@ -864,6 +873,11 @@ export function ScenarioInputApp() {
 
       {/* --- CO₂: mode + seasonal weights or time series --- */}
       <Section title={t("sections.co2")} description={t("sections.co2Intro")}>
+        <GuidanceCallout
+          messageId="app.guidance.co2Availability"
+          t={t}
+          data-testid="guidance-co2-availability"
+        />
         <div>
           <FieldLabel htmlFor="co2mode">{t("co2.mode")}</FieldLabel>
           <select
@@ -990,6 +1004,11 @@ export function ScenarioInputApp() {
 
       {form.electricity.mode === "daily_series" || form.electricity.mode === "hourly_series" ? (
         <Section title={t("sections.electricity")} description={t("sections.electricityIntro")}>
+          <GuidanceCallout
+            messageId="app.guidance.electricityPurchase"
+            t={t}
+            data-testid="guidance-electricity-advanced"
+          />
           <ElectricityPurchaseBlock
             form={form}
             setForm={setForm}
@@ -1005,6 +1024,7 @@ export function ScenarioInputApp() {
 
       {/* --- Economics + optional CAPEX --- */}
       <Section title={t("sections.economics")} description={t("sections.economicsIntro")}>
+        <GuidanceCallout messageId="app.guidance.economics" t={t} data-testid="guidance-economics" />
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <FieldLabel htmlFor="pch4">{t("economics.methanePrice")}</FieldLabel>
@@ -1058,6 +1078,7 @@ export function ScenarioInputApp() {
           />
           <FieldError message={getErrors(errors, "economics.otherOpexEurPerYear", t)} />
         </div>
+        <GuidanceCallout messageId="app.guidance.capex" t={t} data-testid="guidance-capex" />
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <input
@@ -1133,6 +1154,11 @@ export function ScenarioInputApp() {
         description={t("sections.advancedIntro")}
         className="border-dashed border-border/70 bg-muted/30 shadow-none ring-1 ring-border/50 dark:bg-muted/20"
       >
+        <GuidanceCallout
+          messageId="app.guidance.advancedProcess"
+          t={t}
+          data-testid="guidance-advanced-process"
+        />
         <div className="space-y-6">
           {PROCESS_FIELD_ORDER.filter(({ showInAdvancedUi }) => showInAdvancedUi).map(
             ({ key, labelId, unitId }) => {
