@@ -71,6 +71,31 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
   }
   setColumnWidths(inputs, [44, 56]);
 
+  // --- Economic verdict (WP25) ---
+  const ev = wb.addWorksheet("Economic verdict", {
+    views: [{ state: "frozen", ySplit: 1 }],
+  });
+  ev.addRow(["Field", "Value"]);
+  styleHeaderRow(ev.getRow(1));
+  ev.addRow(["Category (qualitative)", model.economicVerdict.category]);
+  ev.addRow(["Title", model.economicVerdict.title]);
+  ev.addRow(["Conclusion", model.economicVerdict.body]);
+  for (const line of model.economicVerdict.details) {
+    ev.addRow(["Detail", line]);
+  }
+  setColumnWidths(ev, [30, 70]);
+
+  // --- Used assumptions (WP25) ---
+  const u = wb.addWorksheet("Used assumptions", {
+    views: [{ state: "frozen", ySplit: 1 }],
+  });
+  u.addRow(["Group", "Field", "Value", "Source", "Status", "Note"]);
+  styleHeaderRow(u.getRow(1));
+  for (const r of model.usedAssumptionsPrint) {
+    u.addRow([r.groupLabel, r.label, r.value, r.source ?? "", r.status ?? "", r.note ?? ""]);
+  }
+  setColumnWidths(u, [20, 28, 36, 18, 18, 32]);
+
   // --- Assumptions ---
   const assumptions = wb.addWorksheet("Assumptions", {
     views: [{ state: "frozen", ySplit: 1 }],

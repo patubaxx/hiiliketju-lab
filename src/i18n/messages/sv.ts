@@ -309,7 +309,7 @@ export const sv = {
     success: "Beräkningen slutfördes utan fel.",
     narrative: {
       outcomeIntro:
-        "Ordning: huvudsiffror, jämförelse mellan alternativ, kompletterande mängder, sedan tidsserier och tabeller för detaljkontroll.",
+        "Först en ekonomisk tolkning och en ögonblicksbild av antagandena, sedan huvudtal, alternativ och tabeller. Inget investeringsråd—bara nuvarande indata.",
     },
     summary: {
       lead: "Alla siffror nedan kommer direkt från beräkningen; gränssnittet räknar inte om dem.",
@@ -331,7 +331,68 @@ export const sv = {
       tablesDetailLead:
         "Exakta siffror för export och kontroll. Årsraderna följer sammanfattningen; månads- och dagsvyer ger mer detalj.",
       assumptions: "Processantaganden (från dina indata)",
+      usedAssumptions: "Antaganden som använts i denna beräkning",
       warnings: "Meddelanden från beräkningen",
+    },
+    verdict: {
+      favorableTitle: "Gynnsamt under gällande antaganden (indikativt)",
+      favorableBody:
+        "Metaniseringsstråket tycks i den här körningen täcka den modellerade totala årskostnaden och stå minst lika bra som försäljning av vätgas. Detta är en riktningsangivelse, ingen garanti för verklig lönsamhet.",
+      mixedTitle: "Motstridig bild — granska antaganden",
+      mixedBody:
+        "Intäkt, kostnad och vätgastalternativet pekar inte åt samma håll. Använd resultatet som grov vägledning och kontrollera priser, CAPEX, CO₂- och elunderlag innan slutsatser dras.",
+      mixedDetail:
+        "En blandad klass kan t.ex. uppstå när intäkten överstiger kostnaden, men vätgastalternativet ändå ser starkare ut i kronor.",
+      unfavorableTitle: "Ogynnsamt under gällande antaganden (indikativt)",
+      unfavorableBody:
+        "Metanintäkterna understiger den modellerade totala kostnaden och stråket ligger också efter försäljning av vätgas i denna jämförelse. Det betyder inte i sig att anläggningen är olönsam ute i verkligheten—bara att dessa antaganden ger en svag bild här.",
+      notComputableTitle: "Ingen hållbar ekonomisk bedömning med dessa siffror",
+      notComputableBody:
+        "Det finns inte tillräcklig metanproduktion eller användbart break-even underlag i resultatet för en tydlig märkning. Justera indata (t.ex. beläggning eller CO₂-profil) och kör igen innan tolkning.",
+      disclaimer:
+        "Indikativ uppskattning, inget råd om investering, skatt eller finansiering. Speglar bara detta scenariopaket—bekräfta med egna fältdata.",
+    },
+    usedAssumptions: {
+      lead: "Översikt över indata och standardvärden som gick in i motorn i den här körningen (samma modell som i export; siffror räknas inte om här).",
+      colLabel: "Post",
+      colValue: "Värde",
+      colMeta: "Härkomst / notering",
+      scenarioName: "Scenarionamn",
+      analysisPeriod: "Analysperiod (dagar i modellen)",
+      assumptionsVersion: "Version av antagandepaketet",
+      annualCo2AvailableFromResult: "Tillgänglig CO₂ per år (ur resultatet, i linje med indata)",
+      seasonalMonthlyWeights: "Relativa månadsvikter (12, före normalisering)",
+      seasonalDefaultFlag: "Fördefinierad säsongsprofil (vintertyngd—inte kundens bekräftade data)",
+      importedSeriesStats: "Serie (antal · medel · min · max, EUR/MWh eller kg enligt rad)",
+      importedDataSource: "Datakälla (inbyggd standard vs egen serie)",
+      capexYes: "Ja — investeringskostnader fördelas in i årsresultatet",
+      capexNo: "Nej — ingen CAPEX-allokering i resultatet (övrig kostnad enligt modellen)",
+      annualCapexInResult: "Modellerad årlig CAPEX-delsumma i detta resultat (avstängd: noll enligt inställning)",
+      group: {
+        scenario: "Scenario / upplägg",
+        co2: "CO₂",
+        electricity: "El",
+        economics: "Ekonomi (försäljningspriser och OPEX)",
+        capex: "Investeringar (CAPEX)",
+        process: "Process (aktiva modellfält)",
+      },
+      unit: {
+        days: "dagar",
+        kg: "kg",
+        percent: "%",
+        eurPerMwh: "EUR/MWh",
+        eurPerTch4: "EUR/t CH₄",
+        eurPerKgH2: "EUR/kg H₂",
+        eurPerYear: "EUR/år",
+        eur: "EUR",
+        years: "år",
+      },
+      kind: {
+        default: "Standard / litteratur",
+        user: "Användar / scenariovärde",
+        derived: "Härlett i modell",
+        imported: "Importerad / inbyggd data",
+      },
     },
     kpi: {
       annualCo2Available: "Tillgänglig CO₂ per år",

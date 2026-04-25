@@ -8,7 +8,8 @@ import type { CalculationResult } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
 import { formatResultEur } from "./format-result-values";
-import { ResultsAssumptions } from "./results-assumptions";
+import { ResultsEconomicVerdictCard } from "./results-economic-verdict-card";
+import { ResultsUsedAssumptions } from "./results-used-assumptions";
 import { ResultsCharts } from "./results-charts";
 import { ResultsKpiHeadline, ResultsKpiSecondary } from "./results-kpi-grid";
 import { ResultsTables } from "./results-tables";
@@ -60,6 +61,9 @@ export function ResultsPanel({
         {t("results.success")}
       </p>
 
+      <ResultsEconomicVerdictCard result={result} t={t} />
+      <ResultsUsedAssumptions result={result} locale={locale} t={t} />
+
       <p className="text-xs leading-relaxed text-muted-foreground">{t("results.narrative.outcomeIntro")}</p>
 
       {/* 2. Headline KPIs */}
@@ -101,9 +105,6 @@ export function ResultsPanel({
 
       {/* 7. Tables (progressive detail) */}
       <ResultsTables result={result} locale={locale} t={t} />
-
-      {/* 8. Assumption transparency */}
-      <ResultsAssumptions process={result.input.process} locale={locale} t={t} />
     </div>
   );
 }

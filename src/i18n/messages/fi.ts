@@ -309,7 +309,7 @@ export const fi = {
     success: "Laskenta valmistui onnistuneesti.",
     narrative: {
       outcomeIntro:
-        "Osat etusijalla: pääluvut, polkuvertailu, täydentävät määrät, sitten kuvaajat ja taulukot tarkempaa tarkistusta varten.",
+        "Aluksi taloudellinen tulkinta ja tähän laskentaan valitut oletukset, sitten pääluvut, polkuvertailu, täydentävät määrät, kuvaajat ja taulukot. Ei sijoitus- tai rahoitusneuvo.",
     },
     summary: {
       lead: "Kaikki alla olevat luvut tulevat suoraan laskennan tuloksesta; käyttöliittymä ei laske niitä uudelleen.",
@@ -331,7 +331,67 @@ export const fi = {
       tablesDetailLead:
         "Tarkat luvut vientiä ja tarkistusta varten. Vuosirivit vastaavat yhteenvetoa; kuukausi- ja päivänäkymät antavat lisätietoa.",
       assumptions: "Prosessioletukset (syötteistäsi)",
+      usedAssumptions: "Tässä laskennassa käytetyt oletukset",
       warnings: "Laskennan huomautukset",
+    },
+    verdict: {
+      favorableTitle: "Myönteinen suunta nykyisillä oletuksilla (suuntaa antavaa)",
+      favorableBody:
+        "Metanointipolku näyttää tämän ajoituksen luvuilla kattavan mallinnetut vuosikustannukset ja vähintään yhtä hyvälle vedyn myynnin vaihtoehtoon verrattuna. Tämä ei ole takeita toteutuvasta kannattavuudesta.",
+      mixedTitle: "Tulos on ristiriitainen — tarkista oletukset",
+      mixedBody:
+        "Metaanituotto, kokonaiskustannus ja vetyvaihtoehto eivät osoita yhtenäistä kuvaa. Käytä tätä suuntaa antavana ja tarkista hinnat, CAPEX-asetukset sekä CO₂- ja sähköprofiilit ennen jatkopäätelmiä.",
+      mixedDetail: "Eri suunnat voivat syntyä esimerkiksi siitä, että tuotto ylittää kustannuksen, mutta vetyreitti näyttää euroissa edullisemmalta.",
+      unfavorableTitle: "Ei-näytä kannattavalle nykyisillä oletuksilla (suuntaa antavaa)",
+      unfavorableBody:
+        "Metaanin tuotot alittavat mallinnetut vuosikustannukset ja jäävät myös vetyvaihtoehtoon verrattuna. Tämä ei yksinään tarkoita, että hanke on kannattamaton oikeassa ympäristössä—vain että näillä oletuksilla kuva on heikko.",
+      notComputableTitle: "Kannattavuutta ei voida arvioida näillä syötteillä",
+      notComputableBody:
+        "Laskennassa ei ole riittävää metaanin tuotosmäärää tai muuten käyttökelpoista kannattavuuspohjaa (esim. tasapainonäkökulma) taloustulkintaan. Säädä syötteitä (käyttö, CO₂, sähkö) ja aja uudelleen.",
+      disclaimer:
+        "Suuntaa antava, ei sijoitus-, rahoitus- tai veroneuvo. Kuvastaa tätä oletussettiä; vahvista omat paikalliset markkina- ja kustannuslukusi.",
+    },
+    usedAssumptions: {
+      lead: "Kooste syötteistä ja oletusarvoista, jotka menivät tähän laskentaan (sama rakenne kuin vienneissä; lukuja ei lasketa uudelleen tässä).",
+      colLabel: "Erä",
+      colValue: "Arvo",
+      colMeta: "Lähde / huomiot",
+      scenarioName: "Skenaarion nimi",
+      analysisPeriod: "Analyysijakso (päivää mallissa)",
+      assumptionsVersion: "Oletuspaketin versionimi",
+      annualCo2AvailableFromResult: "Vuotuinen saatavilla oleva CO₂ (tuloksesta, linjassa syötteen kanssa)",
+      seasonalMonthlyWeights: "Suhteelliset kuukausipainot (12 arvoa, ennen normalisointia)",
+      seasonalDefaultFlag: "Oletusvuodenaikaprofiili (talvipainotettu malli—ei vahvistettu asiakasdataa)",
+      importedSeriesStats: "Sarja (lkm · keskiarvo · min · max, EUR/MWh tai kg riveittäin)",
+      importedDataSource: "Datalähde (mukana toimitettu oletus vs oma sarja)",
+      capexYes: "Kyllä — investointi vuosikustannuksiin jaettu",
+      capexNo: "Ei — vuosikustannuksiin ei lasketa CAPEX-jakoa (muut kustannukset kuten mallissa)",
+      annualCapexInResult: "Mallinnettu vuosittainen CAPEX-kustannus tässä tuloksessa (pois päältä: nolla näillä asetuksilla)",
+      group: {
+        scenario: "Skenaario / asetukset",
+        co2: "CO₂",
+        electricity: "Sähkö",
+        economics: "Talous (myyntihinnat ja OPEX)",
+        capex: "Investoinnit (CAPEX)",
+        process: "Prosessi (moottorissa aktiiviset kentät)",
+      },
+      unit: {
+        days: "päivää",
+        kg: "kg",
+        percent: "%",
+        eurPerMwh: "EUR/MWh",
+        eurPerTch4: "EUR/t CH₄",
+        eurPerKgH2: "EUR/kg H₂",
+        eurPerYear: "EUR/v",
+        eur: "EUR",
+        years: "v",
+      },
+      kind: {
+        default: "Oletus / kirjallisuus",
+        user: "Käyttäjän / skenaarion arvo",
+        derived: "Mallissa johdettu",
+        imported: "Tuotu / mukana toimitettu data",
+      },
     },
     kpi: {
       annualCo2Available: "Vuosittainen saatavilla oleva CO₂",

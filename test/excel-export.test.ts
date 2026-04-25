@@ -58,6 +58,8 @@ describe("Excel export model (WP7)", () => {
     const names = wb.worksheets.map((s) => s.name);
     expect(names).toEqual([
       "Inputs",
+      "Economic verdict",
+      "Used assumptions",
       "Assumptions",
       "CO2 Profile",
       "Electricity purchase price",

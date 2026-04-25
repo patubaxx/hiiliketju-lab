@@ -310,7 +310,7 @@ export const en = {
     success: "Calculation finished successfully.",
     narrative: {
       outcomeIntro:
-        "Order of sections: headline figures, pathway comparison, supporting quantities, then charts and tables for checking details.",
+        "Economic readout and assumption snapshot first, then headline figures, pathway comparison, and supporting series/tables. Not investment advice—only the current inputs.",
     },
     summary: {
       lead: "All numbers below come from the calculation output; the interface does not recompute them.",
@@ -332,7 +332,67 @@ export const en = {
       tablesDetailLead:
         "Exact figures for export and checking. Annual rows match the summary; month and day views add detail.",
       assumptions: "Process assumptions (from your inputs)",
+      usedAssumptions: "Assumptions used in this calculation",
       warnings: "Calculation notices",
+    },
+    verdict: {
+      favorableTitle: "Favorable under current assumptions (indicative)",
+      favorableBody:
+        "The methanation pathway appears, under the inputs in this run, to cover the modeled total annual cost and to do at least as well as the hydrogen-sale alternative. This is directional, not a guarantee of real-world profitability.",
+      mixedTitle: "Mixed signal — check assumptions",
+      mixedBody:
+        "Revenue, total cost, and the hydrogen alternative do not all point the same way. Treat the picture as rough guidance and review prices, CAPEX settings, and CO₂ and electricity profile assumptions before drawing conclusions.",
+      mixedDetail: "A mixed label can occur when, for example, revenue exceeds modeled cost but the hydrogen path still has higher economic appeal in this comparison.",
+      unfavorableTitle: "Unfavorable under current assumptions (indicative)",
+      unfavorableBody:
+        "Methane revenue is below the modeled total annual cost and the pathway is also behind the hydrogen-sale alternative in this comparison. This does not, by itself, mean the project is unviable in reality—only that these assumptions produce a weak picture here.",
+      notComputableTitle: "Economic readout not available for this result",
+      notComputableBody:
+        "There is not enough modeled methane output or a usable break-even price in this result to label pathway economics. Adjust inputs (for example utilization or the CO₂ series) and run again before interpreting profitability.",
+      disclaimer:
+        "Indicative, suuntaa-antava view only. Not investment, financing, or tax advice. It reflects the current scenario assumptions; verify with your own site-specific and market data.",
+    },
+    usedAssumptions: {
+      lead: "Snapshot of the inputs and defaults that entered the engine for this run (same basis as PDF/Excel exports; values are not recalculated here).",
+      colLabel: "Item",
+      colValue: "Value",
+      colMeta: "Provenance / notes",
+      scenarioName: "Scenario name",
+      analysisPeriod: "Analysis period (days in model)",
+      assumptionsVersion: "Assumptions package version",
+      annualCo2AvailableFromResult: "Annual CO₂ available (result, consistent with input)",
+      seasonalMonthlyWeights: "Relative monthly CO₂ shape (12 weights, pre-normalization)",
+      seasonalDefaultFlag: "Default seasonal profile (winter-weighted template)",
+      importedSeriesStats: "Imported / internal series (count · mean · min · max, EUR/MWh or kg units as per row)",
+      importedDataSource: "Data source (bundled default vs your series)",
+      capexYes: "Yes — investment costs spread into the annual result",
+      capexNo: "No — no CAPEX allocation in the annual result (other costs still apply as modeled)",
+      annualCapexInResult: "Modeled annual CAPEX allocation in this result (when CAPEX is off, this is zero by settings)",
+      group: {
+        scenario: "Scenario / setup",
+        co2: "CO₂",
+        electricity: "Electricity",
+        economics: "Economics (sales and OPEX)",
+        capex: "Capital expenditure",
+        process: "Process (active model inputs)",
+      },
+      unit: {
+        days: "days",
+        kg: "kg",
+        percent: "%",
+        eurPerMwh: "EUR/MWh",
+        eurPerTch4: "EUR/t CH₄",
+        eurPerKgH2: "EUR/kg H₂",
+        eurPerYear: "EUR/year",
+        eur: "EUR",
+        years: "years",
+      },
+      kind: {
+        default: "Default / literature",
+        user: "User / scenario",
+        derived: "Derived in model",
+        imported: "Imported / bundled data",
+      },
     },
     kpi: {
       annualCo2Available: "Annual CO₂ available",

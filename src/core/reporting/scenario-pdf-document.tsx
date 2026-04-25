@@ -91,6 +91,14 @@ const styles = StyleSheet.create({
   monthlyTh: { fontFamily: "Helvetica-Bold", fontSize: 7, color: "#374151" },
   monthlyCell: { fontSize: 7, textAlign: "right" },
   monthlyCellFirst: { fontSize: 7, textAlign: "left" },
+  verdictBox: { marginTop: 8, marginBottom: 10, padding: 8, borderWidth: 1, borderRadius: 2 },
+  verdictFavorable: { borderColor: "#16a34a", backgroundColor: "#f0fdf4" },
+  verdictMixed: { borderColor: "#d97706", backgroundColor: "#fffbeb" },
+  verdictUnfavorable: { borderColor: "#dc2626", backgroundColor: "#fef2f2" },
+  verdictNotComputable: { borderColor: "#6b7280", backgroundColor: "#f9fafb" },
+  verdictTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", marginBottom: 4 },
+  verdictBody: { fontSize: 8.5, marginBottom: 3, color: "#1f2937" },
+  verdictDetail: { fontSize: 7.5, color: "#4b5563", marginBottom: 2 },
 });
 
 const PDF_CHART_AXIS_STROKE = "#9ca3af";
@@ -241,6 +249,15 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
   const { overview, excelModel, charts } = model;
   const genDate = model.generatedAtIso.slice(0, 19).replace("T", " ") + " UTC";
   const lastDayIndex = Math.max(0, overview.periodDays - 1);
+  const ev = excelModel.economicVerdict;
+  const evStyle =
+    ev.category === "favorable"
+      ? styles.verdictFavorable
+      : ev.category === "mixed"
+        ? styles.verdictMixed
+        : ev.category === "unfavorable"
+          ? styles.verdictUnfavorable
+          : styles.verdictNotComputable;
 
   return (
     <Document title={`Hiiliketju — ${overview.scenarioName}`} author="Hiiliketju" subject="Scenario report">
@@ -271,6 +288,34 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
           <Text style={styles.kvKey}>Report generated</Text>
           <Text style={styles.kvVal}>{genDate}</Text>
         </View>
+
+        <Text style={styles.sectionTitle}>Economic verdict (indicative)</Text>
+        <View style={[styles.verdictBox, evStyle]}>
+          <Text style={styles.verdictTitle}>{ev.title}</Text>
+          <Text style={styles.verdictBody}>{ev.body}</Text>
+          {ev.details.map((d, i) => (
+            <Text key={i} style={styles.verdictDetail}>
+              {d}
+            </Text>
+          ))}
+        </View>
+
+        <Text style={styles.sectionTitle}>Assumptions used in this calculation (summary)</Text>
+        <View style={styles.tableHeader}>
+          <Text style={[styles.th, { width: "20%" }]}>Group</Text>
+          <Text style={[styles.th, { width: "32%" }]}>Field</Text>
+          <Text style={[styles.th, { width: "48%" }]}>Value</Text>
+        </View>
+        {excelModel.usedAssumptionsPrint.slice(0, 40).map((r, idx) => (
+          <View style={styles.row} key={`ua-${idx}`} wrap={false}>
+            <Text style={[styles.cellLabel, { width: "20%", fontSize: 7.5 }]}>{r.groupLabel}</Text>
+            <Text style={[styles.cellLabel, { width: "32%", fontSize: 7.5 }]}>{r.label}</Text>
+            <Text style={{ width: "48%", fontSize: 7.5, textAlign: "right" }}>{r.value}</Text>
+          </View>
+        ))}
+        {excelModel.usedAssumptionsPrint.length > 40 ? (
+          <Text style={{ fontSize: 7, color: "#6b7280", marginTop: 4 }}>Full list: see Excel &quot;Used assumptions&quot; sheet.</Text>
+        ) : null}
 
         <Text style={styles.sectionTitle}>Path comparison (annual)</Text>
         <View style={styles.tableHeader}>
