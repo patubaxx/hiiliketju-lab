@@ -1,4 +1,5 @@
 import type { ProcessAssumptionsInput } from "@/core/domain/assumptions";
+import { USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS } from "@/core/domain/user-facing-process-assumptions";
 import type { CalculationResult, DailyResult, MonthlySummary, ScenarioSummary } from "@/core/domain/result";
 import type { ScenarioInput } from "@/core/domain/scenario";
 import {
@@ -18,14 +19,12 @@ import {
  * and stringifies: it does not re-harmonize time series, re-aggregate KPIs, or trust any client-supplied totals.
  */
 
-/** Stable export order and English labels (workbook headers; not UI i18n). */
+/**
+ * User-facing process assumption rows in Excel/PDF (WP23). Inactive `plantAvailabilityPct` and
+ * `processEfficiencyPct` stay on the canonical input but are omitted here.
+ */
 export const PROCESS_ASSUMPTION_EXPORT_ORDER: readonly (keyof ProcessAssumptionsInput)[] = [
-  "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
-  "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
-  "electrolyzerSpecificEnergyConsumptionKwhPerKgH2",
-  "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
-  "plantAvailabilityPct",
-  "processEfficiencyPct",
+  ...USER_FACING_EXPORT_PROCESS_ASSUMPTION_KEYS,
 ] as const;
 
 export const PROCESS_ASSUMPTION_EXPORT_LABELS: Record<keyof ProcessAssumptionsInput, string> = {

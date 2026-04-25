@@ -1,5 +1,6 @@
 import type { AssumptionSource, AssumptionStatus } from "@/core/domain/assumptions";
 import { defaultProcessAssumptionsInput } from "@/core/domain/assumptions";
+import { isUserFacingActiveProcessAssumptionKey } from "@/core/domain/user-facing-process-assumptions";
 import type {
   AnnualCo2InputDisplayUnit,
   ElectricityPriceInputDisplayUnit,
@@ -94,7 +95,7 @@ export function isHydrogenPriceAtFactoryDefault(raw: string): boolean {
 
 const DEFAULT_PROCESS_ASSUMPTIONS = defaultProcessAssumptionsInput();
 
-export const PROCESS_FIELD_ORDER: readonly {
+const PROCESS_FIELD_DEFS: readonly {
   key: ProcessSchemaKey;
   labelId:
     | "advanced.field_stoichH2"
@@ -109,45 +110,41 @@ export const PROCESS_FIELD_ORDER: readonly {
     | "advanced.unit_secKwh"
     | "advanced.unit_secMwh"
     | "advanced.unit_pct";
-  showInAdvancedUi: boolean;
 }[] = [
   {
     key: "stoichiometricHydrogenDemandFactorKgH2PerKgCo2",
     labelId: "advanced.field_stoichH2",
     unitId: "advanced.unit_stoichH2",
-    showInAdvancedUi: true,
   },
   {
     key: "stoichiometricMethaneYieldFactorKgCh4PerKgCo2",
     labelId: "advanced.field_stoichCh4",
     unitId: "advanced.unit_stoichCh4",
-    showInAdvancedUi: true,
   },
   {
     key: "electrolyzerSpecificEnergyConsumptionKwhPerKgH2",
     labelId: "advanced.field_secKwh",
     unitId: "advanced.unit_secKwh",
-    showInAdvancedUi: true,
   },
   {
     key: "electrolyzerSpecificEnergyConsumptionMwhPerKgH2",
     labelId: "advanced.field_secMwh",
     unitId: "advanced.unit_secMwh",
-    showInAdvancedUi: false,
   },
-  {
-    key: "plantAvailabilityPct",
-    labelId: "advanced.field_plantAvail",
-    unitId: "advanced.unit_pct",
-    showInAdvancedUi: true,
-  },
-  {
-    key: "processEfficiencyPct",
-    labelId: "advanced.field_processEff",
-    unitId: "advanced.unit_pct",
-    showInAdvancedUi: true,
-  },
+  { key: "plantAvailabilityPct", labelId: "advanced.field_plantAvail", unitId: "advanced.unit_pct" },
+  { key: "processEfficiencyPct", labelId: "advanced.field_processEff", unitId: "advanced.unit_pct" },
 ];
+
+/**
+ * All process fields (form + wire), with `showInAdvancedUi` from WP23 active-assumption policy.
+ * plant/process efficiency: retained in `process` state but not shown. Derived SEC (MWh): not an input row.
+ */
+export const PROCESS_FIELD_ORDER: ReadonlyArray<
+  (typeof PROCESS_FIELD_DEFS)[number] & { showInAdvancedUi: boolean }
+> = PROCESS_FIELD_DEFS.map((row) => ({
+  ...row,
+  showInAdvancedUi: isUserFacingActiveProcessAssumptionKey(row.key),
+}));
 
 const defaultProcessField = (key: ProcessSchemaKey): ProcessFieldFormState => {
   const canonical = DEFAULT_PROCESS_ASSUMPTIONS[key];

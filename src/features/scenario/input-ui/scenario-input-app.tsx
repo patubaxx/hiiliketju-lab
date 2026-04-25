@@ -1127,17 +1127,12 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
-      {/* --- Advanced process assumptions (values + metadata; some not applied in daily engine — see calculation layer) --- */}
+      {/* --- Advanced process assumptions: only fields that affect the current engine (WP23) --- */}
       <Section
         title={t("sections.advanced")}
         description={t("sections.advancedIntro")}
         className="border-dashed border-border/70 bg-muted/30 shadow-none ring-1 ring-border/50 dark:bg-muted/20"
       >
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
-          <p className="font-medium text-amber-900 dark:text-amber-100">{t("advanced.inactiveFactorsTitle")}</p>
-          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{t("advanced.inactiveFactorsBody")}</p>
-        </div>
-
         <div className="space-y-6">
           {PROCESS_FIELD_ORDER.filter(({ showInAdvancedUi }) => showInAdvancedUi).map(
             ({ key, labelId, unitId }) => {
@@ -1155,8 +1150,6 @@ export function ScenarioInputApp() {
                   assumptionNote: canonicalDefault.assumptionMeta.assumptionNote ?? "",
                 };
             const activeValueText = row.override ? (row.value.trim() || "—") : String(canonicalDefault.value);
-            const inactive =
-              key === "plantAvailabilityPct" || key === "processEfficiencyPct" ? true : false;
             return (
               <div
                 key={key}
@@ -1204,11 +1197,6 @@ export function ScenarioInputApp() {
                       {t("advanced.usingCustomValue")}
                     </span>
                   )}
-                  {inactive ? (
-                    <span className="text-[0.65rem] uppercase tracking-wide text-amber-700 dark:text-amber-300">
-                      (MVP)
-                    </span>
-                  ) : null}
                 </div>
                 <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
                   {activeValueText}{" "}

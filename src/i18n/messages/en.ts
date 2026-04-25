@@ -21,7 +21,7 @@ export const en = {
         item3:
           "Stoichiometric process defaults are literature-based estimates — use the Advanced section to override with project-specific values if available.",
         item4:
-          "Plant availability and process efficiency are recorded with assumption metadata but not yet applied by the engine — both currently default to a neutral 100 %.",
+          "Advanced process assumptions are limited to the parameters the current engine uses; override literature-based values when you have project-specific data.",
       },
     },
     setup: {
@@ -187,9 +187,6 @@ export const en = {
   },
   advanced: {
     internalKey: "Parameter id",
-    inactiveFactorsTitle: "Not yet applied in daily formulas",
-    inactiveFactorsBody:
-      "Plant availability and process efficiency are carried with assumption metadata for transparency, but the current MVP daily engine does not multiply outputs by these values (defaults are neutral 100%).",
     usingLiteratureDefault: "Using literature-based default",
     usingCustomValue: "Using custom value",
     override: "Override default",

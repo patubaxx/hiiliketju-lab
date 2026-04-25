@@ -21,7 +21,7 @@ export const fi = {
         item3:
           "Stoikiometriset prosessioletukset ovat kirjallisuuspohjaisia arvioita — korvaa ne Edistyneet oletukset -osiossa, jos sinulla on projektikohtaisia arvoja.",
         item4:
-          "Laitoksen käytettävyys ja prosessin hyötysuhde kirjataan oletusmetatietoineen, mutta laskentamoottori ei vielä käytä niitä — oletusarvo on neutraali 100 %.",
+          "Edistyneissä prosessioletuksissa ovat vain ne parametrit, joita moottori käyttää; korvaa kirjallisuusperusteiset arvot, kun sinulla on projektikohtaisia tietoja.",
       },
     },
     setup: {
@@ -186,9 +186,6 @@ export const fi = {
   },
   advanced: {
     internalKey: "Parametrin tunniste",
-    inactiveFactorsTitle: "Ei vielä päivittäisissä kaavoissa",
-    inactiveFactorsBody:
-      "Laitoksen käytettävyys ja prosessin hyötysuhde kulkevat metatietoineen läpinäkyvyyden vuoksi, mutta nykyinen MVP-päivämoottori ei kerro näillä arvoilla (oletukset ovat neutraalit 100 %).",
     usingLiteratureDefault: "Käytössä kirjallisuuspohjainen oletusarvo",
     usingCustomValue: "Käytössä oma arvo",
     override: "Korvaa oletus",

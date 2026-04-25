@@ -21,7 +21,7 @@ export const sv = {
         item3:
           "Stökiometriska processantaganden är litteraturbaserade uppskattningar — åsidosätt i avsnittet Avancerade antaganden om du har projektspecifika värden.",
         item4:
-          "Anläggningstillgänglighet och processeffektivitet registreras med antagandemetadata men används ännu inte av beräkningsmotorn — båda är för tillfället neutral 100 %.",
+          "I avancerade processantaganden visas bara de parametrar som den aktuella motorn använder; ersätt litteraturbaserade värden när du har projektspecifika siffror.",
       },
     },
     setup: {
@@ -186,9 +186,6 @@ export const sv = {
   },
   advanced: {
     internalKey: "Parameter-id",
-    inactiveFactorsTitle: "Används ännu inte i dagliga formler",
-    inactiveFactorsBody:
-      "Anläggningstillgänglighet och processeffektivitet följer med metadata för transparens, men nuvarande MVP-dagsmotor multiplicerar inte utdata med dessa värden (standard är neutral 100 %).",
     usingLiteratureDefault: "Använder litteraturbaserat standardvärde",
     usingCustomValue: "Använder eget värde",
     override: "Åsidosätt standard",

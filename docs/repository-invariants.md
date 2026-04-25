@@ -58,6 +58,7 @@
 ## Assumptions metadata
 
 - Process assumptions on **`ScenarioInput.process`** carry **`AssumptionValue`** metadata. Exports reflect what is on the domain object; mappers do not invent sources or statuses.
+- **WP23:** User-facing Advanced inputs, on-screen results, and Excel/PDF process-assumption tables list only assumptions the current engine applies, plus the derived SEC (MWh) row in results/exports. **`plantAvailabilityPct`** and **`processEfficiencyPct`** remain on the canonical input for future use but are omitted from those surfaces.
 
 ---
 

@@ -8,9 +8,6 @@ const CHART_W = 230;
 /** SVG height includes space for X tick labels below the plot. */
 const CHART_H = 106;
 
-const PDF_PROCESS_TRANSPARENCY_NOTE =
-  "Plant availability and process efficiency are stored with assumption metadata for traceability. The current MVP daily calculation does not multiply daily outputs by these factors (defaults are neutral 100%).";
-
 const PDF_DAILY_APPENDIX_NOTE =
   "Full daily results (365 rows per metric) and the complete input snapshot are available in the Excel export for this scenario.";
 
@@ -302,7 +299,6 @@ export function ScenarioPdfDocument({ model }: { readonly model: PdfReportModel 
 
       <Page size="A4" style={styles.page}>
         <Text style={styles.sectionTitle}>Process assumptions</Text>
-        <Text style={{ fontSize: 8, color: "#4b5563", marginBottom: 8 }}>{PDF_PROCESS_TRANSPARENCY_NOTE}</Text>
         {excelModel.processAssumptions.map((a) => {
           const lit = a.assumptionSource === "literature_based";
           return (

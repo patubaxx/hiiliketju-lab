@@ -29,7 +29,7 @@ describe("WP17 – advanced assumptions transparency UX", () => {
     );
     await expandAdvanced();
 
-    expect(screen.getAllByText("Literature-based")).toHaveLength(5);
+    expect(screen.getAllByText("Literature-based")).toHaveLength(3);
     expect(screen.getByText("0.1832")).toBeTruthy();
     expect(screen.getByText("0.3645")).toBeTruthy();
     expect(screen.getByText("54")).toBeTruthy();
