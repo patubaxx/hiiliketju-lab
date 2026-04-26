@@ -59,7 +59,7 @@ function HeadlineKpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/90 bg-card px-5 py-4 shadow-sm ring-1 ring-foreground/[0.04]">
+    <div className="rounded-lg border border-border/65 bg-card/85 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:bg-card/45">
       <p className="text-sm font-medium leading-snug text-muted-foreground">{label}</p>
       <p className="mt-2 break-words font-mono text-xl font-semibold tabular-nums tracking-tight text-foreground">
         {value}
@@ -79,7 +79,7 @@ function SecondaryKpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/80 bg-card/80 px-4 py-3 shadow-sm">
+    <div className="rounded-lg border border-border/60 bg-card/65 px-4 py-3 shadow-[var(--shadow-tile)] dark:bg-card/38">
       <p className="text-xs font-medium leading-snug text-muted-foreground">{label}</p>
       <p className="mt-1.5 break-words font-mono text-base font-semibold tabular-nums text-foreground">{value}</p>
       {sub ? <p className="mt-1 text-[0.7rem] leading-relaxed text-muted-foreground">{sub}</p> : null}

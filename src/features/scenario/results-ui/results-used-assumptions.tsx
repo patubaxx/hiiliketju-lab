@@ -62,7 +62,7 @@ export function ResultsUsedAssumptions({
             <h4 className="text-sm font-semibold text-foreground">
               {t(`results.usedAssumptions.group.${gid}`)}
             </h4>
-            <div className="overflow-x-auto rounded-lg border border-border/70">
+            <div className="overflow-x-auto rounded-lg border border-border/60 shadow-[var(--shadow-tile)]">
               <table className="w-full min-w-[32rem] border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-border/70 bg-muted/40 text-left text-xs text-muted-foreground">

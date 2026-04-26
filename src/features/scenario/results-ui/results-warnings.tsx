@@ -11,8 +11,10 @@ export function ResultsWarnings({ result, t }: { result: CalculationResult; t: T
   return (
     <section
       className={cn(
-        "rounded-xl border bg-card shadow-sm",
-        hasItems ? "border-amber-600/25 px-5 py-5" : "border-border/70 px-4 py-3",
+        "rounded-lg border bg-card/85 shadow-[var(--shadow-tile)] dark:bg-card/45",
+        hasItems
+          ? "border-amber-500/40 border-l-[3px] border-l-amber-600/55 px-5 py-5"
+          : "border-border/60 px-4 py-3",
       )}
       aria-labelledby="results-warnings-heading"
     >

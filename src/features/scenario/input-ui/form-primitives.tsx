@@ -2,7 +2,24 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Groups all scenario input sections with a calm page-level frame (layout shell). */
+/** Shared callout / notice surfaces (WP-UX2). */
+export type CalloutVariant = "info" | "assumption" | "warning" | "success";
+
+export function calloutClassName(variant: CalloutVariant = "info"): string {
+  return cn(
+    "rounded-lg border border-l-[3px] px-4 py-3 text-sm leading-relaxed [text-wrap:pretty] whitespace-pre-line",
+    variant === "info" &&
+      "border-consultancy/20 border-l-consultancy/60 bg-consultancy-subtle/75 text-muted-foreground dark:border-consultancy/25 dark:border-l-consultancy/55 dark:bg-consultancy-subtle/35",
+    variant === "assumption" &&
+      "border-amber-500/20 border-l-amber-600/55 bg-amber-500/[0.11] text-muted-foreground dark:border-amber-500/25 dark:bg-amber-950/[0.12]",
+    variant === "warning" &&
+      "border-amber-600/25 border-l-amber-700/65 bg-amber-500/[0.14] text-muted-foreground dark:border-amber-500/30 dark:bg-amber-950/[0.18]",
+    variant === "success" &&
+      "border-teal-600/20 border-l-teal-600/55 bg-emerald-500/[0.11] text-foreground/90 dark:border-emerald-500/25 dark:border-l-teal-500/50 dark:bg-emerald-950/[0.14]",
+  );
+}
+
+/** Task panel header + stacked groups — flat inside the app frame (WP-UX2). */
 export function ShellSetupRegion({
   title,
   lead,
@@ -13,23 +30,35 @@ export function ShellSetupRegion({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-border/75 bg-surface-shell p-4 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.12),0_2px_6px_-2px_rgba(15,23,42,0.05)] ring-2 ring-structural/38 ring-offset-0 sm:p-6">
-      <header className="mb-5 rounded-xl border border-consultancy/18 bg-consultancy-subtle/60 px-4 py-4 sm:px-5 sm:py-4">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{lead}</p>
+    <div className="min-w-0 space-y-8">
+      <header className="max-w-3xl space-y-2 border-b border-border/55 pb-5">
+        <h2 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">{title}</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">{lead}</p>
       </header>
-      <div className="space-y-6 rounded-xl bg-surface-inset p-3 ring-1 ring-border/40 sm:space-y-7 sm:p-4 dark:ring-border/30">
-        {children}
-      </div>
+      <div className="space-y-8 sm:space-y-10">{children}</div>
     </div>
   );
 }
+
+export type SectionVariant = "primary" | "subtle" | "technical" | "results";
+
+const sectionVariantClass: Record<SectionVariant, string> = {
+  primary:
+    "rounded-xl border border-border/60 border-l-4 border-l-structural/50 bg-surface-inset px-6 py-7 shadow-[var(--shadow-panel)] sm:px-7 sm:py-8 dark:border-border/50 dark:border-l-structural/55 dark:bg-surface-inset/50 dark:shadow-[var(--shadow-panel)]",
+  subtle:
+    "rounded-lg border border-border/60 bg-card/45 px-5 py-5 shadow-[var(--shadow-tile)] sm:px-6 sm:py-6 dark:bg-card/28",
+  technical:
+    "rounded-lg border border-border/55 bg-surface-inset/70 px-5 py-5 shadow-[var(--shadow-tile)] sm:px-6 sm:py-6 dark:border-border/45 dark:bg-surface-inset/35",
+  results:
+    "rounded-xl border border-border/65 bg-card px-5 py-5 shadow-[var(--shadow-tile)] sm:px-6 sm:py-6 dark:bg-card/85",
+};
 
 export function Section({
   title,
   description,
   children,
   className,
+  variant = "subtle",
   headingAccent = true,
   "data-testid": dataTestId,
 }: {
@@ -37,29 +66,40 @@ export function Section({
   description?: string;
   children: React.ReactNode;
   className?: string;
-  /** Vertical accent bar beside the heading (setup sections); omit for outcome / plain blocks. */
+  variant?: SectionVariant;
+  /** Vertical accent bar beside the heading; omitted when the section uses a strong border (e.g. primary). */
   headingAccent?: boolean;
   "data-testid"?: string;
 }) {
+  const showBar = headingAccent && variant !== "primary";
+
   return (
     <section
       data-testid={dataTestId}
-      className={cn(
-        "rounded-xl border border-border/90 bg-card px-6 py-6 text-card-foreground shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.04] sm:px-7 sm:py-7 dark:ring-white/[0.06]",
-        className,
-      )}
+      className={cn(sectionVariantClass[variant], className)}
     >
       <header
-        className={cn("mb-6 flex gap-4 sm:gap-5", !headingAccent && "gap-0")}
+        className={cn(
+          "flex gap-3 sm:gap-4",
+          variant === "primary" ? "mb-6 sm:mb-7" : "mb-5 sm:mb-6",
+          !showBar && "gap-0",
+        )}
       >
-        {headingAccent ? (
+        {showBar ? (
           <span
-            className="hidden w-[3px] shrink-0 self-stretch rounded-full bg-consultancy/55 sm:block"
+            className="hidden w-[3px] shrink-0 self-stretch rounded-full bg-consultancy/45 sm:block"
             aria-hidden
           />
         ) : null}
-        <div className="min-w-0 flex-1 space-y-2">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+        <div className={cn("min-w-0 flex-1", variant === "primary" ? "space-y-2.5" : "space-y-2")}>
+          <h2
+            className={cn(
+              "font-semibold tracking-tight text-foreground",
+              variant === "primary" ? "text-[1.0625rem] sm:text-lg" : "text-base sm:text-[1.0625rem]",
+            )}
+          >
+            {title}
+          </h2>
           {description ? (
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
           ) : null}
@@ -82,21 +122,20 @@ export function FieldHint({ children }: { children: React.ReactNode }) {
   return <p className="text-xs text-muted-foreground leading-snug">{children}</p>;
 }
 
-/** Visible i18n guidance (WP24+); pass a `messageId` handled by the caller’s `t`. */
+/** Visible i18n guidance; `variant` distinguishes neutral vs assumption-style notes (WP-UX2). */
 export function GuidanceCallout({
   messageId,
   t,
+  variant = "info",
   "data-testid": dataTestId = `guidance-${messageId.replace(/\./g, "-")}`,
 }: {
   messageId: string;
   t: (id: string) => string;
+  variant?: CalloutVariant;
   "data-testid"?: string;
 }) {
   return (
-    <div
-      className="rounded-lg border border-border/70 bg-muted/25 px-4 py-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty] whitespace-pre-line"
-      data-testid={dataTestId}
-    >
+    <div className={calloutClassName(variant)} data-testid={dataTestId}>
       {t(messageId)}
     </div>
   );
@@ -108,9 +147,9 @@ export function FieldError({ message }: { message?: string }) {
 }
 
 export const inputClassName =
-  "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50";
+  "flex h-10 min-h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-none outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/45 disabled:cursor-not-allowed disabled:opacity-50";
 
 export const selectClassName = inputClassName;
 
 export const textAreaClassName =
-  "min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+  "min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono shadow-none outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/45";

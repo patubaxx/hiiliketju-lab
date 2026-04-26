@@ -59,7 +59,7 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="min-w-0 rounded-lg border border-border/65 bg-card/75 p-4 shadow-[var(--shadow-tile)] dark:bg-card/38 sm:p-5">
       <h4 className="text-sm font-semibold leading-snug text-foreground">{title}</h4>
       <div className="mt-4 w-full min-w-0 overflow-x-auto overscroll-x-contain sm:overflow-x-visible [-webkit-overflow-scrolling:touch]">
         <div

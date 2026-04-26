@@ -98,7 +98,7 @@ export function ResultsTables({
           <h4 className="text-sm font-semibold text-foreground">{t("results.table.annualTitle")}</h4>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t("results.table.annualIntro")}</p>
         </div>
-        <div className="overflow-x-auto rounded-xl border border-border/80 bg-card/30">
+        <div className="overflow-x-auto rounded-lg border border-border/60 bg-card/30 shadow-[var(--shadow-tile)] dark:bg-card/18">
           <table className={tableClass}>
             <thead>
               <tr>
@@ -127,7 +127,7 @@ export function ResultsTables({
           <h4 className="text-sm font-semibold text-foreground">{t("results.table.monthlyTitle")}</h4>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t("results.table.monthlyIntro")}</p>
         </div>
-        <div className="overflow-x-auto rounded-xl border border-border/80 bg-card/30">
+        <div className="overflow-x-auto rounded-lg border border-border/60 bg-card/30 shadow-[var(--shadow-tile)] dark:bg-card/18">
           <table className={`${tableClass} min-w-[720px]`}>
             <thead>
               <tr>

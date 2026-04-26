@@ -30,7 +30,7 @@ export function ResultsEconomicVerdictCard({
   return (
     <section
       data-testid="results-verdict-card"
-      className={`rounded-xl border p-5 shadow-sm sm:p-6 ${cardClass(v.category)}`}
+      className={`rounded-xl border p-5 shadow-[var(--shadow-tile)] sm:p-6 ${cardClass(v.category)}`}
       aria-labelledby="results-verdict-heading"
     >
       <h3 id="results-verdict-heading" className="text-base font-semibold tracking-tight text-foreground">
