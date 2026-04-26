@@ -51,6 +51,7 @@ export const en = {
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
       outcomeLabel: "Scenario outcome",
+      reportSectionTitle: "Report",
       mobileActionsLabel: "Scenario calculation actions",
       toolbarAriaLabel: "Scenario actions",
       jumpToOutcome: "Jump to outcome",
@@ -58,7 +59,7 @@ export const en = {
       flow: {
         stepperAriaLabel: "Analysis phases",
         stepSetup: "Setup",
-        stepRefine: "Refine",
+        stepRefine: "Advanced settings (optional)",
         stepResults: "Results",
         stepReport: "Report",
         enterSetup: "Enter setup values",

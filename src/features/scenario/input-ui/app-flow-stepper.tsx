@@ -86,7 +86,7 @@ export function AppFlowStepper({ activeStep, hasResult, onStepChange, t }: AppFl
                 </span>
                 <span
                   className={cn(
-                    "text-[0.7rem] font-semibold leading-tight sm:text-xs md:text-sm",
+                    "min-w-0 max-w-full hyphens-auto break-words px-0.5 text-[0.7rem] font-semibold leading-tight sm:text-xs md:text-sm",
                     locked && "text-muted-foreground/55",
                   )}
                 >

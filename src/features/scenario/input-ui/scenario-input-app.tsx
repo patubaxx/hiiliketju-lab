@@ -662,9 +662,15 @@ export function ScenarioInputApp() {
     if (flowStep !== "report" || !result) return;
     const el = reportRegionRef.current;
     if (!el) return;
-    requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const id = requestAnimationFrame(() => {
+      // `nearest` often leaves the report block partially off-screen below a tall `ResultsPanel`;
+      // `start` aligns the section heading with the viewport (respects scroll-mt on the target).
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      requestAnimationFrame(() => {
+        el.focus({ preventScroll: true });
+      });
     });
+    return () => cancelAnimationFrame(id);
   }, [flowStep, result]);
 
   React.useLayoutEffect(() => {
@@ -1489,16 +1495,27 @@ export function ScenarioInputApp() {
                       <ResultsPanel result={result} locale={locale} t={t} />
                     )}
                   </Section>
-                  <div
+                  <section
                     ref={reportRegionRef}
                     id="scenario-report"
                     tabIndex={-1}
-                    className={cn(calloutClassName("info"), "mt-6 text-left")}
+                    aria-labelledby="scenario-report-heading"
+                    className={cn(
+                      "mt-8 scroll-mt-24 border-t border-border/55 pt-8 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 xl:scroll-mt-28 xl:pt-9",
+                    )}
                   >
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {t("app.shell.flow.reportHint")}
-                    </p>
-                  </div>
+                    <h2
+                      id="scenario-report-heading"
+                      className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
+                    >
+                      {t("app.shell.reportSectionTitle")}
+                    </h2>
+                    <div className={cn(calloutClassName("info"), "mt-4 text-left")}>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {t("app.shell.flow.reportHint")}
+                      </p>
+                    </div>
+                  </section>
                 </div>
               ) : null}
             </div>

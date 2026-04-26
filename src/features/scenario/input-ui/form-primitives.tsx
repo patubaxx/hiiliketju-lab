@@ -146,10 +146,24 @@ export function FieldError({ message }: { message?: string }) {
   return <p className="text-xs text-destructive font-medium">{message}</p>;
 }
 
-export const inputClassName =
-  "flex h-10 min-h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-none outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/45 disabled:cursor-not-allowed disabled:opacity-50";
+/**
+ * Border, surface, and focus treatment so editable controls read ahead of prose (WP-UX3b).
+ * Composed into `inputClassName` / `selectClassName` / `textAreaClassName`; reuse for custom controls if needed.
+ */
+export const userInputEmphasisClassName = cn(
+  "border-structural/30 bg-card/85 shadow-[var(--shadow-tile)] transition-[color,box-shadow,border-color]",
+  "dark:border-structural/38 dark:bg-card/42",
+  "focus-visible:border-consultancy/50 focus-visible:ring-[3px] focus-visible:ring-consultancy/28",
+);
+
+export const inputClassName = cn(
+  "flex h-10 min-h-10 w-full rounded-md border px-3 py-2 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+  userInputEmphasisClassName,
+);
 
 export const selectClassName = inputClassName;
 
-export const textAreaClassName =
-  "min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono shadow-none outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/45";
+export const textAreaClassName = cn(
+  "min-h-[140px] w-full rounded-md border px-3 py-2 text-sm font-mono outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  userInputEmphasisClassName,
+);

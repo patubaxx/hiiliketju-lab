@@ -52,6 +52,7 @@ export const fi = {
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",
       outcomeLabel: "Skenaarion tulos",
+      reportSectionTitle: "Raportti",
       mobileActionsLabel: "Skenaarion laskentatoiminnot",
       toolbarAriaLabel: "Skenaarion toiminnot",
       jumpToOutcome: "Hyppää tuloksiin",
@@ -59,7 +60,7 @@ export const fi = {
       flow: {
         stepperAriaLabel: "Analyysin vaiheet",
         stepSetup: "Lähtötiedot",
-        stepRefine: "Tarkenna",
+        stepRefine: "Lisäasetukset (valinnainen)",
         stepResults: "Tulokset",
         stepReport: "Raportti",
         enterSetup: "Täytä lähtötiedot",

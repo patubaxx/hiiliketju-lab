@@ -51,6 +51,7 @@ export const sv = {
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",
       outcomeLabel: "Scenarioutfall",
+      reportSectionTitle: "Rapport",
       mobileActionsLabel: "Beräkningsåtgärder för scenario",
       toolbarAriaLabel: "Scenarioåtgärder",
       jumpToOutcome: "Gå till utfall",
@@ -58,7 +59,7 @@ export const sv = {
       flow: {
         stepperAriaLabel: "Faser i analysen",
         stepSetup: "Uppgifter",
-        stepRefine: "Förfina",
+        stepRefine: "Tilläggsinställningar (valfritt)",
         stepResults: "Resultat",
         stepReport: "Rapport",
         enterSetup: "Ange grunduppgifter",
