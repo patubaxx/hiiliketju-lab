@@ -85,7 +85,7 @@ export function ResultsTables({
   ];
 
   return (
-    <section className="space-y-10 border-t border-border/70 pt-10" aria-labelledby="results-tables-heading">
+    <section className="space-y-10 border-t border-border/50 pt-8" aria-labelledby="results-tables-heading">
       <div className="space-y-2">
         <h3 id="results-tables-heading" className="text-base font-semibold tracking-tight text-foreground">
           {t("results.section.tables")}

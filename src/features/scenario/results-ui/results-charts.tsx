@@ -200,7 +200,7 @@ export function ResultsCharts({
   const eurYTick = co2YTick;
 
   return (
-    <section className="space-y-5 border-t border-border/70 pt-10" aria-labelledby="results-charts-heading">
+    <section className="space-y-5 pt-2" aria-labelledby="results-charts-heading">
       <div className="space-y-2">
         <h3 id="results-charts-heading" className="text-base font-semibold tracking-tight text-foreground">
           {t("results.section.charts")}

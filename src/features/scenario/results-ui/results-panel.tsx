@@ -33,7 +33,6 @@ export function ResultsPanel({
 
   return (
     <div className="w-full space-y-10 rounded-xl border border-border/60 bg-surface-inset/75 px-5 py-7 shadow-[var(--shadow-panel)] sm:space-y-12 sm:px-7 sm:py-9 dark:border-border/50 dark:bg-surface-inset/40 dark:shadow-[var(--shadow-panel)]">
-      {/* 1. Outcome + scenario context */}
       <header className="space-y-3 border-b border-border/55 pb-6">
         <h3 className="text-2xl font-semibold tracking-tight text-foreground">{t("results.title")}</h3>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("results.summary.lead")}</p>
@@ -61,33 +60,40 @@ export function ResultsPanel({
         {t("results.success")}
       </p>
 
-      <ResultsEconomicVerdictCard result={result} t={t} />
-      <ResultsUsedAssumptions result={result} locale={locale} t={t} />
+      <div className="space-y-3">
+        <ResultsEconomicVerdictCard result={result} t={t} />
+        <p className="text-xs leading-relaxed text-muted-foreground">{t("results.narrative.outcomeIntro")}</p>
+      </div>
 
-      <p className="text-xs leading-relaxed text-muted-foreground">{t("results.narrative.outcomeIntro")}</p>
+      <div
+        className={cn(
+          "space-y-6 rounded-xl border border-border/60 border-l-4 border-l-structural/45 bg-card/35 p-5 shadow-[var(--shadow-tile)] sm:p-6 dark:border-border/50 dark:bg-card/22",
+        )}
+      >
+        <ResultsKpiHeadline summary={s} locale={locale} t={t} />
+        <ResultsKpiSecondary summary={s} locale={locale} t={t} className="border-border/50 pt-6" />
+      </div>
 
-      {/* 2. Headline KPIs */}
-      <ResultsKpiHeadline summary={s} locale={locale} t={t} />
-
-      {/* 3. Path comparison (revenues only — delta in headline) */}
       <section
-        className="rounded-lg border border-border/60 bg-card/55 p-4 shadow-[var(--shadow-tile)] sm:p-5 dark:bg-card/35"
+        className={cn(
+          "rounded-xl border border-border/60 bg-card/45 p-4 shadow-[var(--shadow-tile)] sm:p-5 dark:border-border/50 dark:bg-card/28",
+        )}
         aria-labelledby="results-path-heading"
       >
         <h3 id="results-path-heading" className="text-base font-semibold tracking-tight text-foreground">
           {t("results.pathComparison.title")}
         </h3>
-        <p className="mt-2 border-b border-border/35 pb-4 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-2 border-b border-border/40 pb-4 text-sm leading-relaxed text-muted-foreground">
           {t("results.pathComparison.help")}
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-md border border-border/55 bg-surface-inset/60 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:bg-surface-inset/30">
+          <div className="rounded-lg border border-border/55 bg-surface-inset/60 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:bg-surface-inset/30">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.methaneRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
               {formatResultEurCompact(s.annualMethaneRevenueEur, locale, t)}
             </p>
           </div>
-          <div className="rounded-md border border-border/55 bg-surface-inset/60 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:bg-surface-inset/30">
+          <div className="rounded-lg border border-border/55 bg-surface-inset/60 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:bg-surface-inset/30">
             <p className="text-xs font-medium text-muted-foreground">{t("results.pathComparison.hydrogenAltRevenue")}</p>
             <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-foreground">
               {formatResultEurCompact(s.hydrogenSalesAlternativeRevenueEur, locale, t)}
@@ -96,17 +102,18 @@ export function ResultsPanel({
         </div>
       </section>
 
-      {/* 4. Supporting KPIs */}
-      <ResultsKpiSecondary summary={s} locale={locale} t={t} />
+      <ResultsUsedAssumptions result={result} locale={locale} t={t} />
 
-      {/* 5. Warnings (trust signal before visual series) */}
       <ResultsWarnings result={result} t={t} />
 
-      {/* 6. Charts */}
-      <ResultsCharts result={result} locale={locale} t={t} />
-
-      {/* 7. Tables (progressive detail) */}
-      <ResultsTables result={result} locale={locale} t={t} />
+      <div
+        className={cn(
+          "space-y-10 rounded-xl border border-border/50 bg-surface-inset/50 p-4 pt-8 shadow-[var(--shadow-tile)] sm:p-6 sm:pt-9 dark:border-border/45 dark:bg-surface-inset/30",
+        )}
+      >
+        <ResultsCharts result={result} locale={locale} t={t} />
+        <ResultsTables result={result} locale={locale} t={t} />
+      </div>
     </div>
   );
 }
