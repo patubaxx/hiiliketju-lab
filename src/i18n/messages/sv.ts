@@ -55,6 +55,10 @@ export const sv = {
       mobileActionsLabel: "Beräkningsåtgärder för scenario",
       toolbarAriaLabel: "Scenarioåtgärder",
       exportGroupLabel: "Exportera",
+      mobileNav: {
+        show: "Visa navigering",
+        hide: "Dölj navigering",
+      },
       flow: {
         stepperAriaLabel: "Faser i analysen",
         stepSetup: "Uppgifter",

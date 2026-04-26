@@ -56,6 +56,10 @@ export const fi = {
       mobileActionsLabel: "Skenaarion laskentatoiminnot",
       toolbarAriaLabel: "Skenaarion toiminnot",
       exportGroupLabel: "Vienti",
+      mobileNav: {
+        show: "Näytä valikko",
+        hide: "Piilota valikko",
+      },
       flow: {
         stepperAriaLabel: "Analyysin vaiheet",
         stepSetup: "Lähtötiedot",

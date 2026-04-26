@@ -55,6 +55,10 @@ export const en = {
       mobileActionsLabel: "Scenario calculation actions",
       toolbarAriaLabel: "Scenario actions",
       exportGroupLabel: "Export downloads",
+      mobileNav: {
+        show: "Show menu",
+        hide: "Hide menu",
+      },
       flow: {
         stepperAriaLabel: "Analysis phases",
         stepSetup: "Setup",
