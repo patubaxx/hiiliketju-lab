@@ -8,7 +8,7 @@
  */
 import * as React from "react";
 
-import { AppFlowStepper, type AppFlowStep } from "./app-flow-stepper";
+import type { AppFlowStep } from "./app-flow-stepper";
 import { ScenarioAppNavbar } from "./scenario-app-navbar";
 
 import { Button } from "@/components/ui/button";
@@ -749,21 +749,16 @@ export function ScenarioInputApp() {
             el.focus({ preventScroll: true });
           });
         }}
+        flow={{
+          activeStep: flowStep,
+          hasResult: result !== null,
+          onStepChange: setFlowStep,
+          hint: showSetupPanel ? t("app.shell.flow.hintBasicEnough") : t("app.shell.resultsReady"),
+        }}
         t={t}
       />
       <div className="mx-auto w-full max-w-[min(94rem,100%)] px-4 py-6 sm:px-6 xl:px-10 xl:py-8">
         <div className="rounded-xl border border-structural/18 bg-surface-shell shadow-[var(--shadow-app-frame)] sm:rounded-2xl dark:border-structural/22">
-          <div className="border-b border-border/50 bg-surface-inset/25 px-4 py-4 sm:px-6 sm:py-5 dark:border-border/40 dark:bg-surface-inset/12">
-            <AppFlowStepper
-              activeStep={flowStep}
-              hasResult={result !== null}
-              onStepChange={setFlowStep}
-              t={t}
-            />
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              {showSetupPanel ? t("app.shell.flow.hintBasicEnough") : t("app.shell.resultsReady")}
-            </p>
-          </div>
           <div className="space-y-8 px-4 py-6 sm:space-y-10 sm:px-6 sm:py-8">
             {showSetupPanel ? (
               <>
