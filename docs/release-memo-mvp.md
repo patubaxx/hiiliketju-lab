@@ -54,7 +54,8 @@ All business numbers come from a single canonical calculation: **`calculateScena
 ### Exports
 
 - **Excel** and **PDF** include material consistent with the **verdict** and **used assumptions** readouts, alongside inputs, series, and summaries.  
-- **Export API:** `POST` with **`{ "scenario": <wire> }`** only; server validates, merges defaults, runs **`calculateScenario`**, builds bytes — **no** authoritative client-sent **`CalculationResult`**.
+- **UX (accepted 2026):** the app uses an **app-like phased flow** with a **sticky stepper** in the navbar (**Setup** → **Advanced settings (optional)** → **Results** → **Report**). **Excel/PDF** download buttons sit in the **Report** section (not the navbar) and stay disabled until a run succeeds. This is **presentation/navigation only**.
+- **Export API:** `POST` with **`{ "scenario": <wire> }`** only; server validates, merges defaults, runs **`calculateScenario`**, builds bytes — **no** authoritative client-sent **`CalculationResult`** (unchanged).
 
 ---
 

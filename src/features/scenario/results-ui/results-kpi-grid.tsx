@@ -1,6 +1,8 @@
 import type { ScenarioSummary } from "@/core/domain/result";
 import type { Locale } from "@/i18n/messages";
 
+import { cn } from "@/lib/utils";
+
 import {
   formatResultEurCompact,
   formatResultEnergyMwhCompact,
@@ -59,9 +61,9 @@ function HeadlineKpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/90 bg-card px-5 py-4 shadow-sm ring-1 ring-foreground/[0.04]">
+    <div className="flex min-h-[5.25rem] flex-col rounded-lg border border-border/60 border-l-[3px] border-l-structural/40 bg-card/90 px-4 py-3.5 shadow-[var(--shadow-tile)] dark:border-structural/35 dark:bg-card/48">
       <p className="text-sm font-medium leading-snug text-muted-foreground">{label}</p>
-      <p className="mt-2 break-words font-mono text-xl font-semibold tabular-nums tracking-tight text-foreground">
+      <p className="mt-auto break-words pt-2 font-mono text-xl font-semibold tabular-nums tracking-tight text-foreground">
         {value}
       </p>
       {sub ? <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{sub}</p> : null}
@@ -79,9 +81,9 @@ function SecondaryKpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/80 bg-card/80 px-4 py-3 shadow-sm">
+    <div className="flex min-h-[4.5rem] flex-col rounded-lg border border-border/55 bg-card/55 px-4 py-3 shadow-[var(--shadow-tile)] dark:bg-card/32">
       <p className="text-xs font-medium leading-snug text-muted-foreground">{label}</p>
-      <p className="mt-1.5 break-words font-mono text-base font-semibold tabular-nums text-foreground">{value}</p>
+      <p className="mt-auto break-words pt-1.5 font-mono text-base font-semibold tabular-nums text-foreground">{value}</p>
       {sub ? <p className="mt-1 text-[0.7rem] leading-relaxed text-muted-foreground">{sub}</p> : null}
     </div>
   );
@@ -217,15 +219,20 @@ export function ResultsKpiSecondary({
   summary,
   locale,
   t,
+  className,
 }: {
   readonly summary: ScenarioSummary;
   readonly locale: Locale;
   readonly t: TFn;
+  readonly className?: string;
 }) {
   const na = t("results.value.na");
 
   return (
-    <section className="space-y-4 border-t border-border/70 pt-8" aria-labelledby="results-kpi-secondary-heading">
+    <section
+      className={cn("space-y-4 border-t border-border/60 pt-6", className)}
+      aria-labelledby="results-kpi-secondary-heading"
+    >
       <div className="space-y-1">
         <h3 id="results-kpi-secondary-heading" className="text-sm font-semibold tracking-tight text-foreground">
           {t("results.section.kpisSecondary")}

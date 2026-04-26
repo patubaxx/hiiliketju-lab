@@ -47,15 +47,30 @@ export const fi = {
     shell: {
       setupTitle: "Skenaarion määritys",
       setupLead:
-        "Aloita perusarvoilla ja avaa lisäasetukset, kun tarvitset koko lomakkeen: CO₂-aikasarjat, myyntihinnat, CAPEXin tai prosessioletukset. Yläpalkista voit suorittaa laskennan, nollata lomakkeen, vaihtaa kieltä, siirtyä tuloksiin ja tehdä viennit.",
+        "Aloita perusarvoilla ja avaa lisäasetukset, kun tarvitset koko lomakkeen: CO₂-aikasarjat, myyntihinnat, CAPEXin tai prosessioletukset. Kiinteä palkki suorittaa ja nollaa laskennan, vaihtaa kieltä ja näyttää vaiheiden ohjaimen; onnistuneen ajon jälkeen Excel- ja PDF-viennit ovat Raportti-vaiheessa.",
       actionsCardTitle: "Laskenta",
       resultsReady: "Alla oleva tulososio näyttää viimeisimmän ajon tulokset.",
       resultsPending: "Suorita laskenta täyttääksesi tulososion.",
       outcomeLabel: "Skenaarion tulos",
+      reportSectionTitle: "Raportti",
       mobileActionsLabel: "Skenaarion laskentatoiminnot",
       toolbarAriaLabel: "Skenaarion toiminnot",
-      jumpToOutcome: "Hyppää tuloksiin",
       exportGroupLabel: "Vienti",
+      flow: {
+        stepperAriaLabel: "Analyysin vaiheet",
+        stepSetup: "Lähtötiedot",
+        stepRefine: "Lisäasetukset (valinnainen)",
+        stepResults: "Tulokset",
+        stepReport: "Raportti",
+        enterSetup: "Täytä lähtötiedot",
+        refineAnalysis: "Tarkenna analyysiä",
+        reviewResults: "Tarkastele tuloksia",
+        exportReport: "Vie raportti",
+        hintBasicEnough: "Perustiedot riittävät ensimmäiseen laskentaan.",
+        hintResultsLocked: "Tulokset avautuvat, kun skenaario on laskettu.",
+        reportHint:
+          "Lataa Excel tai PDF tämän raporttiosion painikkeilla. Viennit käyttävät viimeisimmän onnistuneen laskennan tulosta.",
+      },
     },
     guidance: {
       simpleSetup:
@@ -502,6 +517,8 @@ export const fi = {
     },
     warnings: {
       empty: "Ei laskennan huomautuksia.",
+      literatureBasedProcessDefaults:
+        "Laskennassa käytetään kirjallisuuteen perustuvia arvioituja prosessioletuksia. Vahvista ne tai korvaa ne projektikohtaisilla tiedoilla, jos sellaisia on saatavilla.",
     },
     export: {
       downloadExcel: "Lataa Excel",

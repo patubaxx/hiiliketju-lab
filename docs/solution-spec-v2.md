@@ -255,6 +255,8 @@ At minimum:
 
 ### 7.4 Export functions
 
+**Placement (current product):** Excel and PDF **download actions** are offered in the **Report** section of the outcome panel after a successful run. The **sticky app navbar** hosts the flow stepper and primary run/reset/locale controls only — **not** file export buttons. **Export mechanics are unchanged:** the client still **`POST`s** **`{ "scenario": <wire> }`**; the server validates, runs **`calculateScenario`**, and builds bytes from **that** result.
+
 #### Excel
 Must include:
 - inputs
@@ -445,7 +447,7 @@ The UI must show user-friendly errors, not technical exceptions.
 - quick to use with defaults — **Simple-first** main path; **Advanced** for full control
 - default **Finnish** copy when no locale is stored; **locale** control for EN/SV
 - advanced engine-active assumptions are available without overwhelming the main workflow; guidance callouts explain major sections
-- primary chrome is a **sticky top bar**: run, reset, language, jump to outcome, and Excel/PDF export (exports disabled until a successful run exists); a successful run **scrolls** to the outcome section (`#scenario-outcome`); this is layout/UX only and does not change calculation or export contracts
+- primary chrome is a **sticky app navbar**: **flow stepper** (Setup → Advanced settings (optional) → Results → Report), **run**, **reset**, and **language** (locale); **Excel/PDF** downloads are triggered from the **Report** section after a successful run (export buttons **disabled** until then); **no** visible jump-to-outcome control in the navbar; a successful run **scrolls/focuses** the outcome region; this is layout/UX only and does not change calculation or export contracts
 - **Home hero (WP27):** optional static partner marks (**Business Finland**, **LAB**) from **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (place files in **`public/`**); i18n **alt** text; no visible “Partners” label; not inside a separate card
 
 ### 12.2 Performance
@@ -699,6 +701,7 @@ The labels below describe the **original implementation sequence** for the MVP. 
 - **WP25** — **Economic verdict** + **assumptions used in this calculation** in UI, Excel, and PDF (interpretive; no new KPI math).
 - **WP26** — **Chart / table / PDF** presentation: axis labels, compact units, two-decimal display, PDF robustness; **follow-up:** single X-axis caption per chart; clearer **cost vs. revenue** colours.
 - **WP27** — **Hero** partner marks (**Business Finland**, **LAB**) via static `public/` SVG URLs; **follow-up:** larger logos, no card wrapper, no visible “Partners” line.
+- **App shell / guided flow (accepted 2026)** — **Sticky navbar** with **stepper**, **Run**, **Reset**, and **locale**; **Results** and **Report** via the stepper; **Excel/PDF** actions in the **Report** section. **UX/layout only**; export API and calculation contracts unchanged.
 
 ---
 

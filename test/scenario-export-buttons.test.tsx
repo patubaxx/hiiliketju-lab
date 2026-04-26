@@ -18,7 +18,7 @@ function stubT(id: string): string {
   return map[id] ?? id;
 }
 
-describe("Export toolbar buttons (navbar contract)", () => {
+describe("Export action buttons (Excel/PDF)", () => {
   it("disables Excel export when result is null", () => {
     render(<ResultsExcelExportButton result={null} t={stubT} />);
     const btn = screen.getByRole("button", { name: /Download Excel/ });

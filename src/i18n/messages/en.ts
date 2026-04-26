@@ -46,15 +46,30 @@ export const en = {
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). Use the top bar to run, reset, change language, export, or jump to results.",
+        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). The sticky bar runs and resets the calculation, switches language, and hosts the flow stepper; after a successful run, use the Report step for Excel and PDF exports.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
       outcomeLabel: "Scenario outcome",
+      reportSectionTitle: "Report",
       mobileActionsLabel: "Scenario calculation actions",
       toolbarAriaLabel: "Scenario actions",
-      jumpToOutcome: "Jump to outcome",
       exportGroupLabel: "Export downloads",
+      flow: {
+        stepperAriaLabel: "Analysis phases",
+        stepSetup: "Setup",
+        stepRefine: "Advanced settings (optional)",
+        stepResults: "Results",
+        stepReport: "Report",
+        enterSetup: "Enter setup values",
+        refineAnalysis: "Refine analysis",
+        reviewResults: "Review results",
+        exportReport: "Export report",
+        hintBasicEnough: "The basic inputs are enough for a first calculation.",
+        hintResultsLocked: "Results become available after running a scenario.",
+        reportHint:
+          "Download Excel or PDF from the buttons in this Report section. Exports use the latest successful calculation.",
+      },
     },
     guidance: {
       simpleSetup:
@@ -502,6 +517,8 @@ export const en = {
     },
     warnings: {
       empty: "No calculation notices.",
+      literatureBasedProcessDefaults:
+        "Literature-based estimated process defaults are in use; confirm or replace with project-specific data where applicable.",
     },
     export: {
       downloadExcel: "Download Excel",

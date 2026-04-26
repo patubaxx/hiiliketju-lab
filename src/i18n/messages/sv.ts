@@ -46,15 +46,30 @@ export const sv = {
     shell: {
       setupTitle: "Scenarioinställning",
       setupLead:
-        "Du börjar med grundinställningar. Fäll ut avancerat när hela formuläret behövs (CO₂-tidsserier, försäljningspris, antaganden för CAPEX, process). Fältet överst: kör, återställ, språk, export, gå till resultat.",
+        "Du börjar med grundinställningar. Fäll ut avancerat när hela formuläret behövs (CO₂-tidsserier, försäljningspris, antaganden för CAPEX, process). Det fasta fältet kör och återställer beräkningen, byter språk och visar fasstegen; efter en lyckad körning finns Excel- och PDF-export under Rapport-steget.",
       actionsCardTitle: "Beräkning",
       resultsReady: "Utfallssektionen nedan visar resultat från senaste körningen.",
       resultsPending: "Kör beräkningen för att fylla utfallssektionen.",
       outcomeLabel: "Scenarioutfall",
+      reportSectionTitle: "Rapport",
       mobileActionsLabel: "Beräkningsåtgärder för scenario",
       toolbarAriaLabel: "Scenarioåtgärder",
-      jumpToOutcome: "Gå till utfall",
       exportGroupLabel: "Exportera",
+      flow: {
+        stepperAriaLabel: "Faser i analysen",
+        stepSetup: "Uppgifter",
+        stepRefine: "Tilläggsinställningar (valfritt)",
+        stepResults: "Resultat",
+        stepReport: "Rapport",
+        enterSetup: "Ange grunduppgifter",
+        refineAnalysis: "Förfina analysen",
+        reviewResults: "Granska resultat",
+        exportReport: "Exportera rapport",
+        hintBasicEnough: "Grunduppgifter räcker för en första beräkning.",
+        hintResultsLocked: "Resultaten blir tillgängliga när du kör ett scenario.",
+        reportHint:
+          "Ladda ner Excel eller PDF med knapparna i rapportavsnittet här. Exporter använder den senaste lyckade beräkningen.",
+      },
     },
     guidance: {
       simpleSetup:
@@ -502,6 +517,8 @@ export const sv = {
     },
     warnings: {
       empty: "Inga meddelanden från beräkningen.",
+      literatureBasedProcessDefaults:
+        "Beräkningen använder litteraturbaserade uppskattade processantaganden. Bekräfta dem eller ersätt dem med projektspecifika uppgifter om sådana finns tillgängliga.",
     },
     export: {
       downloadExcel: "Ladda ner Excel",

@@ -3,6 +3,8 @@
 import { buildEconomicVerdict, type EconomicVerdictCategory } from "@/core/reporting/build-economic-verdict";
 import type { CalculationResult } from "@/core/domain/result";
 
+import { cn } from "@/lib/utils";
+
 type TFn = (id: string, vars?: Record<string, string>) => string;
 
 function cardClass(category: EconomicVerdictCategory): string {
@@ -30,7 +32,10 @@ export function ResultsEconomicVerdictCard({
   return (
     <section
       data-testid="results-verdict-card"
-      className={`rounded-xl border p-5 shadow-sm sm:p-6 ${cardClass(v.category)}`}
+      className={cn(
+        "rounded-xl border-2 p-6 shadow-[var(--shadow-panel)] ring-1 ring-structural/12 sm:p-7 dark:ring-structural/18",
+        cardClass(v.category),
+      )}
       aria-labelledby="results-verdict-heading"
     >
       <h3 id="results-verdict-heading" className="text-base font-semibold tracking-tight text-foreground">
