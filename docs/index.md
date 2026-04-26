@@ -13,7 +13,7 @@ Start with the root **[`README.md`](../README.md)** for setup, architecture summ
 
 | Document | Content |
 |----------|---------|
-| [`repository-invariants.md`](repository-invariants.md) | **Maintainer first-line reference:** export boundary, WP22–WP27 accepted product behaviour (default Finnish, Simple-first, seasonal CO₂ default, active-assumption policy, verdict + used assumptions, chart/PDF display formatting, hero logos), “do not regress” checklist, electricity pipeline, MVP limits |
+| [`repository-invariants.md`](repository-invariants.md) | **Maintainer first-line reference:** export boundary, WP22–WP27 accepted product behaviour, **current app-shell UX** (sticky navbar: stepper, run, reset, locale; Excel/PDF in Report section), “do not regress” checklist, electricity pipeline, MVP limits — **source of truth for accepted UI behaviour** alongside the code |
 | [`release-memo-mvp.md`](release-memo-mvp.md) | English handoff memo: current capabilities, caveats, and architecture invariants (updated with WP22–WP27 customer-delivery tranche) |
 
 ## Implementation policy (automation-friendly)

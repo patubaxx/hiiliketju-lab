@@ -16,7 +16,7 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 | Area | Path | Role |
 |------|------|------|
 | App shell & API routes | `src/app/` | Pages, `layout`, **`api/export/excel`**, **`api/export/pdf`** |
-| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, sticky action bar (`scenario-app-navbar.tsx`), charts/tables; optional **display units** (annual CO₂ kt/year; constant electricity EUR/MWh or c/kWh) convert in **`buildScenarioPayload`** to canonical wire; browser **CSV import** for time-series fills the same bulk `seriesText` path as paste; advanced process assumptions show active literature-based defaults with metadata and allow explicit user overrides (see [`docs/repository-invariants.md`](docs/repository-invariants.md)) |
+| Scenario UI | `src/features/scenario/input-ui/`, `results-ui/` | Form state, validation UX, **sticky app navbar** (`scenario-app-navbar.tsx`) with flow **stepper**, **Run**, **Reset**, and **locale**; **Excel/PDF** actions live in the **Report** section of the outcome panel (not the navbar); optional **display units** (annual CO₂ kt/year; constant electricity EUR/MWh or c/kWh) convert in **`buildScenarioPayload`** to canonical wire; browser **CSV import** for time-series fills the same bulk `seriesText` path as paste; advanced process assumptions show active literature-based defaults with metadata and allow explicit user overrides (see [`docs/repository-invariants.md`](docs/repository-invariants.md)) |
 | Wire validation | `src/features/scenario/schemas/` | Zod schemas aligned with `ScenarioInput` |
 | Domain | `src/core/domain/` | Types, units, temporal constants, assumption shapes |
 | Engine | `src/core/calculation/` | Harmonization, daily engine, monthly/annual roll-ups |
@@ -34,13 +34,14 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 1. User edits scenario; on run, the UI maps form state through **`buildScenarioPayload`** (display-unit conversion and series text as applicable), then validates with **`safeParseScenarioInput`** (same schema as exports).
 2. **`mergeProcessAssumptionsInput`** fills omitted process fields with flagged MVP defaults.
 3. **`calculateScenario`** runs: SEC resolution (and warnings) → CO₂/electricity **daily** series (365 points) → optional CAPEX → per-day rows → monthly and annual summaries.
-4. UI renders **`CalculationResult`** (KPIs, series, assumptions, opaque `warnings: string[]`). The **sticky top bar** runs validation + calculation, resets the form, switches locale, links to **`#scenario-outcome`**, and triggers exports (disabled until a result exists); after a successful run the page scrolls to the outcome section.
+4. UI renders **`CalculationResult`** (KPIs, series, assumptions, opaque `warnings: string[]`). The **sticky app navbar** runs validation + calculation, resets the form, switches locale, and hosts the **flow stepper** (Setup → Advanced settings (optional) → Results → Report). **Results** and **Report** stay locked in the stepper until a successful run; after a run, the view scrolls to the outcome region. **Excel/PDF** downloads are triggered from the **Report** section (buttons disabled until a result exists). This is **layout/UX only**; wire and export contracts are unchanged.
 
 Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ hourly → daily **sum**; electricity hourly → daily **arithmetic mean**).
 
 ## Current product surface (WP22–WP27)
 
-- **Default language:** the UI first-paints in **Finnish** when no stored locale exists; **English** and **Swedish** are available via the locale control. A stored `localStorage` preference still wins after the client effect (no hydration skew).
+- **Default language:** the UI first-paints in **Finnish** when no stored locale exists; **English** and **Swedish** are available via the locale control in the **sticky navbar** (grouped separately from Run/Reset on desktop). A stored `localStorage` preference still wins after the client effect (no hydration skew).
+- **App-like flow:** the **sticky navbar** includes a persistent **stepper** for **Setup** → **Advanced settings (optional)** → **Results** → **Report**; **Run** and **Reset** are primary actions in the same bar. **Excel/PDF** export controls sit in the **Report** section after a successful run, not in the navbar.
 - **Simple-first setup:** the main flow shows **Basic inputs** only — **annual CO₂** (`kt/year`), **utilization rate**, and **electricity purchase price** (`constant` or `historical_market_data_imported`). **Scenario name** and full CO₂/economics/process controls live under **Advanced setup**.
 - **Default CO₂ mode:** new scenarios start in **`seasonal_daily`** with a **winter-weighted** default monthly profile (relative weights, normalized in-engine); **`flat_annual`**, **daily / hourly** time-series, and other modes remain in Advanced. Month names are **localized** where shown.
 - **Assumptions policy (WP23+):** user-facing process inputs and “assumptions used” surfaces list only **calculation-active** process parameters (stoichiometric factors, SEC, and derived SEC (MWh) where shown). **`plantAvailabilityPct`** and **`processEfficiencyPct`** stay on the canonical wire for possible future use but are **not** user-facing active inputs and **not** shown in result or export assumption summaries.
@@ -54,7 +55,7 @@ Further detail and regression guardrails: **[`docs/repository-invariants.md`](do
 
 ## Export flow (high level)
 
-1. From the scenario navbar, the client POSTs **`{ "scenario": <wire> }`** to **`/api/export/excel`** or **`/api/export/pdf`** (see `src/app/api/export/parse-export-body.ts`), typically with the same wire as the last successful form run.
+1. From the **Report** section (export buttons in the outcome panel), the client POSTs **`{ "scenario": <wire> }`** to **`/api/export/excel`** or **`/api/export/pdf`** (see `src/app/api/export/parse-export-body.ts`), typically with the same wire as the last successful form run.
 2. Server validates with Zod, merges process defaults, runs **`calculateScenario`**, then builds bytes from that result only.
 3. The API does **not** accept a client-sent `CalculationResult` or KPI snapshot as authoritative. Extra JSON keys are ignored.
 

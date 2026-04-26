@@ -46,7 +46,7 @@ export const en = {
     shell: {
       setupTitle: "Scenario setup",
       setupLead:
-        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). Use the top bar to run, reset, change language, export, or jump to results.",
+        "You begin with basic inputs. Expand advanced setup when you need the full form (CO₂ time profiles, sales prices, CAPEX, process assumptions). The sticky bar runs and resets the calculation, switches language, and hosts the flow stepper; after a successful run, use the Report step for Excel and PDF exports.",
       actionsCardTitle: "Calculation",
       resultsReady: "Outcome section below is populated from the latest run.",
       resultsPending: "Run the calculation to fill the outcome section.",
@@ -54,7 +54,6 @@ export const en = {
       reportSectionTitle: "Report",
       mobileActionsLabel: "Scenario calculation actions",
       toolbarAriaLabel: "Scenario actions",
-      jumpToOutcome: "Jump to outcome",
       exportGroupLabel: "Export downloads",
       flow: {
         stepperAriaLabel: "Analysis phases",
@@ -69,7 +68,7 @@ export const en = {
         hintBasicEnough: "The basic inputs are enough for a first calculation.",
         hintResultsLocked: "Results become available after running a scenario.",
         reportHint:
-          "Download Excel or PDF from the export buttons in the top bar. Exports use the latest successful calculation.",
+          "Download Excel or PDF from the buttons in this Report section. Exports use the latest successful calculation.",
       },
     },
     guidance: {

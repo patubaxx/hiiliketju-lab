@@ -49,6 +49,7 @@ These are **documentation anchors** for behaviour already shipped; they do not r
 - **Results readout (WP25):** **economic verdict** + **assumptions used** — reporting interpretation from existing summary fields, **not** new KPI math; **not** investment advice. Excel/PDF include consistent readout material.
 - **Presentation (WP26):** axis labels, compact units, two-decimal display in typical UI/PDF labels; PDF chart robustness; Excel keeps numeric cells.
 - **Home hero (WP27):** optional partner SVGs from **`/business-finland-logo.svg`**, **`/lab-logo.svg`** (`public/`); i18n alts.
+- **App shell (accepted UX):** **sticky navbar** with **flow stepper** (**Setup** → **Advanced settings (optional)** → **Results** → **Report**), **Run**, **Reset**, and **locale**; **Excel/PDF** download actions live in the **Report** section after a successful run (not duplicated in the navbar). **Export authority unchanged:** server validates **`scenario`**, runs **`calculateScenario`**, builds files.
 
 ---
 
