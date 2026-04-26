@@ -55,6 +55,21 @@ export const en = {
       toolbarAriaLabel: "Scenario actions",
       jumpToOutcome: "Jump to outcome",
       exportGroupLabel: "Export downloads",
+      flow: {
+        stepperAriaLabel: "Analysis phases",
+        stepSetup: "Setup",
+        stepRefine: "Refine",
+        stepResults: "Results",
+        stepReport: "Report",
+        enterSetup: "Enter setup values",
+        refineAnalysis: "Refine analysis",
+        reviewResults: "Review results",
+        exportReport: "Export report",
+        hintBasicEnough: "The basic inputs are enough for a first calculation.",
+        hintResultsLocked: "Results become available after running a scenario.",
+        reportHint:
+          "Download Excel or PDF from the export buttons in the top bar. Exports use the latest successful calculation.",
+      },
     },
     guidance: {
       simpleSetup:

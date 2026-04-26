@@ -56,6 +56,21 @@ export const fi = {
       toolbarAriaLabel: "Skenaarion toiminnot",
       jumpToOutcome: "Hyppää tuloksiin",
       exportGroupLabel: "Vienti",
+      flow: {
+        stepperAriaLabel: "Analyysin vaiheet",
+        stepSetup: "Lähtötiedot",
+        stepRefine: "Tarkenna",
+        stepResults: "Tulokset",
+        stepReport: "Raportti",
+        enterSetup: "Täytä lähtötiedot",
+        refineAnalysis: "Tarkenna analyysiä",
+        reviewResults: "Tarkastele tuloksia",
+        exportReport: "Vie raportti",
+        hintBasicEnough: "Perustiedot riittävät ensimmäiseen laskentaan.",
+        hintResultsLocked: "Tulokset avautuvat, kun skenaario on laskettu.",
+        reportHint:
+          "Lataa Excel- tai PDF-tulos yläpalkin vientipainikkeilla. Viennit käyttävät viimeisimmän onnistuneen laskennan tulosta.",
+      },
     },
     guidance: {
       simpleSetup:

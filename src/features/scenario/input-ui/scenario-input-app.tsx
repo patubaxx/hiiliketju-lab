@@ -8,6 +8,7 @@
  */
 import * as React from "react";
 
+import { AppFlowStepper, type AppFlowStep } from "./app-flow-stepper";
 import { ScenarioAppNavbar } from "./scenario-app-navbar";
 
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import type { Locale } from "@/i18n/messages";
 import { useLocale } from "@/i18n/locale-context";
+import { cn } from "@/lib/utils";
 
 const ASSUMPTION_SOURCES: AssumptionSource[] = [
   "customer_provided",
@@ -627,9 +629,37 @@ export function ScenarioInputApp() {
   const [errors, setErrors] = React.useState<Map<string, string[]>>(new Map());
   const [result, setResult] = React.useState<CalculationResult | null>(null);
   const [advancedSetupExpanded, setAdvancedSetupExpanded] = React.useState(false);
+  const [flowStep, setFlowStep] = React.useState<AppFlowStep>("setup");
   const defaultProcess = React.useMemo(() => defaultProcessAssumptionsInput(), []);
   const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
+  const advancedRegionRef = React.useRef<HTMLDivElement>(null);
+  const reportRegionRef = React.useRef<HTMLDivElement>(null);
   const scrollToOutcomeAfterRunRef = React.useRef(false);
+
+  const showSetupPanel = flowStep === "setup" || flowStep === "advanced";
+  const showResultsPanel = flowStep === "results" || flowStep === "report";
+
+  React.useEffect(() => {
+    if (flowStep !== "advanced") return;
+    setAdvancedSetupExpanded(true);
+  }, [flowStep]);
+
+  React.useEffect(() => {
+    if (flowStep !== "advanced" || !advancedSetupExpanded) return;
+    const id = requestAnimationFrame(() => {
+      advancedRegionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [flowStep, advancedSetupExpanded]);
+
+  React.useLayoutEffect(() => {
+    if (flowStep !== "report" || !result) return;
+    const el = reportRegionRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }, [flowStep, result]);
 
   React.useLayoutEffect(() => {
     if (!scrollToOutcomeAfterRunRef.current || !result) return;
@@ -655,6 +685,7 @@ export function ScenarioInputApp() {
     const built = buildScenarioPayload(form);
     let map = new Map<string, string[]>();
     if (!built.ok) {
+      setFlowStep("setup");
       map = buildIssueMap(built.issues, t);
       setErrors(map);
       return;
@@ -662,6 +693,7 @@ export function ScenarioInputApp() {
 
     const parsed = safeParseScenarioInput(built.payload);
     if (!parsed.success) {
+      setFlowStep("setup");
       const zMap = zodIssuesToMap(parsed.error);
       map = mergeMaps(map, zMap);
       setErrors(map);
@@ -673,6 +705,7 @@ export function ScenarioInputApp() {
       process: mergeProcessAssumptionsInput(parsed.data.process),
     };
     scrollToOutcomeAfterRunRef.current = true;
+    setFlowStep("results");
     setResult(calculateScenario(input));
   };
 
@@ -681,6 +714,7 @@ export function ScenarioInputApp() {
     setErrors(new Map());
     setResult(null);
     setAdvancedSetupExpanded(false);
+    setFlowStep("setup");
   };
 
   const hasErrors = errors.size > 0;
@@ -693,11 +727,36 @@ export function ScenarioInputApp() {
         onRun={onRun}
         onReset={onReset}
         result={result}
+        onJumpToOutcome={() => {
+          if (!result) return;
+          setFlowStep("results");
+          requestAnimationFrame(() => {
+            const el = outcomeSectionRef.current;
+            if (!el) return;
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.focus({ preventScroll: true });
+          });
+        }}
         t={t}
       />
-      <div className="mx-auto w-full max-w-[min(94rem,100%)] space-y-10 px-4 py-8 sm:px-6 xl:space-y-12 xl:px-10">
-      {/* --- Page hero (app `banner` landmark is the sticky navbar) --- */}
-      <div className="mb-10 xl:mb-12">
+      <div className="mx-auto w-full max-w-[min(94rem,100%)] px-4 py-6 sm:px-6 xl:px-10 xl:py-8">
+        <div className="rounded-2xl border border-structural/30 bg-surface-shell shadow-[0_4px_32px_-14px_rgba(15,23,42,0.12)] ring-2 ring-structural/28 ring-offset-0">
+          <div className="border-b border-consultancy/15 bg-surface-inset/30 px-4 py-4 sm:px-6 sm:py-5">
+            <AppFlowStepper
+              activeStep={flowStep}
+              hasResult={result !== null}
+              onStepChange={setFlowStep}
+              t={t}
+            />
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              {showSetupPanel ? t("app.shell.flow.hintBasicEnough") : t("app.shell.resultsReady")}
+            </p>
+          </div>
+          <div className="space-y-8 px-4 py-6 sm:space-y-10 sm:px-6 sm:py-8">
+            {showSetupPanel ? (
+              <>
+                {/* --- Page hero (app `banner` landmark is the sticky navbar) --- */}
+                <div className="mb-2 xl:mb-4">
         <div className="rounded-2xl border border-border/80 bg-surface-hero p-6 shadow-[0_6px_36px_-14px_rgba(15,23,42,0.14),0_2px_6px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/42 ring-offset-0 sm:p-8">
           <p className="font-heading text-xl font-semibold tracking-tight text-foreground">{t("app.title")}</p>
 
@@ -867,7 +926,7 @@ export function ScenarioInputApp() {
       </div>
 
       {advancedSetupExpanded ? (
-        <div className="space-y-6" data-testid="setup-advanced-region">
+        <div ref={advancedRegionRef} className="space-y-6" data-testid="setup-advanced-region">
       <Section title={t("app.setup.advanced.heading")} description={t("app.setup.advanced.lead")}>
         <FieldHint>{t("scenarioForm.periodNote")}</FieldHint>
         <div>
@@ -1384,34 +1443,56 @@ export function ScenarioInputApp() {
       ) : null}
         </ShellSetupRegion>
       </div>
+              </>
+            ) : null}
 
-      {/* --- Outcome: `ResultsPanel` from canonical result only --- */}
-      <div
-        ref={outcomeSectionRef}
-        tabIndex={-1}
-        id="scenario-outcome"
-        role="region"
-        aria-label={t("app.shell.outcomeLabel")}
-        className="scroll-mt-24 pt-10 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 xl:pt-14"
-      >
-        <div className="rounded-2xl border border-structural/38 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/32 ring-offset-0 sm:p-5 xl:p-6 dark:border-structural/45 dark:ring-structural/40">
-          <p className="mb-5 flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
-            <span className="h-px w-10 shrink-0 bg-structural/60" aria-hidden />
-            {t("app.shell.outcomeLabel")}
-          </p>
-          <Section
-            title={t("sections.results")}
-            headingAccent={false}
-            className="border-border/85 bg-card shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08)] ring-1 ring-consultancy/10 dark:ring-consultancy/15"
-          >
-            {!result ? (
-              <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
-            ) : (
-              <ResultsPanel result={result} locale={locale} t={t} />
-            )}
-          </Section>
+            {/* --- Outcome: `ResultsPanel` from canonical result only --- */}
+            <div
+              ref={outcomeSectionRef}
+              tabIndex={-1}
+              id="scenario-outcome"
+              role="region"
+              aria-label={t("app.shell.outcomeLabel")}
+              hidden={!showResultsPanel}
+              className={cn(
+                "outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
+                showResultsPanel
+                  ? "scroll-mt-24 border-t border-structural/25 pt-8 xl:scroll-mt-28 xl:pt-10"
+                  : "",
+              )}
+            >
+              {showResultsPanel ? (
+                <div className="rounded-2xl border border-structural/38 bg-surface-results p-4 shadow-[0_8px_40px_-14px_rgba(15,23,42,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-2 ring-structural/32 ring-offset-0 sm:p-5 xl:p-6 dark:border-structural/45 dark:ring-structural/40">
+                  <p className="mb-5 flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
+                    <span className="h-px w-10 shrink-0 bg-structural/60" aria-hidden />
+                    {t("app.shell.outcomeLabel")}
+                  </p>
+                  <Section
+                    title={t("sections.results")}
+                    headingAccent={false}
+                    className="border-border/85 bg-card shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08)] ring-1 ring-consultancy/10 dark:ring-consultancy/15"
+                  >
+                    {!result ? (
+                      <p className="text-sm leading-relaxed text-muted-foreground">{t("results.empty")}</p>
+                    ) : (
+                      <ResultsPanel result={result} locale={locale} t={t} />
+                    )}
+                  </Section>
+                  <div
+                    ref={reportRegionRef}
+                    id="scenario-report"
+                    tabIndex={-1}
+                    className="mt-6 rounded-lg border border-border/70 bg-surface-inset/50 px-4 py-3 text-left sm:px-5"
+                  >
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {t("app.shell.flow.reportHint")}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

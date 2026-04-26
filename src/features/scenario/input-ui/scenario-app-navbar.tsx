@@ -19,6 +19,8 @@ export type ScenarioAppNavbarProps = {
   readonly onRun: () => void;
   readonly onReset: () => void;
   readonly result: CalculationResult | null;
+  /** When set, replaces the `#scenario-outcome` anchor with an accessible button (WP-UX1). */
+  readonly onJumpToOutcome?: () => void;
   readonly t: TFn;
 };
 
@@ -28,6 +30,7 @@ export function ScenarioAppNavbar({
   onRun,
   onReset,
   result,
+  onJumpToOutcome,
   t,
 }: ScenarioAppNavbarProps) {
   return (
@@ -44,9 +47,23 @@ export function ScenarioAppNavbar({
           <Button type="button" variant="outline" onClick={onReset} className="min-h-9 w-full sm:w-auto">
             {t("scenarioForm.reset")}
           </Button>
-          <Button type="button" variant="outline" asChild className="min-h-9 w-full sm:w-auto">
-            <a href="#scenario-outcome">{t("app.shell.jumpToOutcome")}</a>
-          </Button>
+          {onJumpToOutcome ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!result}
+              onClick={() => {
+                if (result) onJumpToOutcome();
+              }}
+              className="min-h-9 w-full sm:w-auto"
+            >
+              {t("app.shell.jumpToOutcome")}
+            </Button>
+          ) : (
+            <Button type="button" variant="outline" asChild className="min-h-9 w-full sm:w-auto">
+              <a href="#scenario-outcome">{t("app.shell.jumpToOutcome")}</a>
+            </Button>
+          )}
         </div>
 
         <div

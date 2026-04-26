@@ -55,6 +55,21 @@ export const sv = {
       toolbarAriaLabel: "Scenarioåtgärder",
       jumpToOutcome: "Gå till utfall",
       exportGroupLabel: "Exportera",
+      flow: {
+        stepperAriaLabel: "Faser i analysen",
+        stepSetup: "Uppgifter",
+        stepRefine: "Förfina",
+        stepResults: "Resultat",
+        stepReport: "Rapport",
+        enterSetup: "Ange grunduppgifter",
+        refineAnalysis: "Förfina analysen",
+        reviewResults: "Granska resultat",
+        exportReport: "Exportera rapport",
+        hintBasicEnough: "Grunduppgifter räcker för en första beräkning.",
+        hintResultsLocked: "Resultaten blir tillgängliga när du kör ett scenario.",
+        reportHint:
+          "Ladda ner Excel eller PDF via exportknapparna i övre fältet. Exporter använder den senaste lyckade beräkningen.",
+      },
     },
     guidance: {
       simpleSetup:
