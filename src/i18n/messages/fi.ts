@@ -517,6 +517,8 @@ export const fi = {
     },
     warnings: {
       empty: "Ei laskennan huomautuksia.",
+      literatureBasedProcessDefaults:
+        "Laskennassa käytetään kirjallisuuteen perustuvia arvioituja prosessioletuksia. Vahvista ne tai korvaa ne projektikohtaisilla tiedoilla, jos sellaisia on saatavilla.",
     },
     export: {
       downloadExcel: "Lataa Excel",

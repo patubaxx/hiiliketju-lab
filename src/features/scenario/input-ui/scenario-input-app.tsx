@@ -1496,8 +1496,13 @@ export function ScenarioInputApp() {
                     >
                       {t("app.shell.reportSectionTitle")}
                     </h2>
-                    <div className={cn(calloutClassName("info"), "mt-4 text-left")}>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
+                    <div
+                      className={cn(
+                        calloutClassName("info"),
+                        "mt-4 text-left shadow-[var(--shadow-panel)] ring-1 ring-border/35 ring-structural/12 bg-surface-inset/90 dark:ring-border/25 dark:bg-surface-inset/65 sm:px-5 sm:py-4",
+                      )}
+                    >
+                      <p className="text-sm leading-relaxed text-foreground/88">
                         {t("app.shell.flow.reportHint")}
                       </p>
                     </div>

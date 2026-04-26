@@ -517,6 +517,8 @@ export const sv = {
     },
     warnings: {
       empty: "Inga meddelanden från beräkningen.",
+      literatureBasedProcessDefaults:
+        "Beräkningen använder litteraturbaserade uppskattade processantaganden. Bekräfta dem eller ersätt dem med projektspecifika uppgifter om sådana finns tillgängliga.",
     },
     export: {
       downloadExcel: "Ladda ner Excel",

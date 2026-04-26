@@ -55,6 +55,7 @@
 ## Warnings
 
 - **`CalculationResult.warnings`** is **`string[]`** end-to-end (engine, UI, exports). No structured severity or i18n keys in product code unless the contract is explicitly redesigned.
+- **Browser display (WP-UX6):** the results panel may localize **specific known** warning strings at the **presentation layer** only. The accepted case is the literature-based process-default warning: **`results-warnings.tsx`** matches the exact canonical English text emitted by the engine and maps it to i18n copy on screen. **Unknown** warning strings stay **as-is**. This does **not** change the **`string[]`** contract; **Excel/PDF** continue to receive canonical server-side warning strings from recomputed **`calculateScenario`** unless a separate reporting change is scoped.
 
 ---
 

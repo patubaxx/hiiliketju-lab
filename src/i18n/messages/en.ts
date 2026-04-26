@@ -517,6 +517,8 @@ export const en = {
     },
     warnings: {
       empty: "No calculation notices.",
+      literatureBasedProcessDefaults:
+        "Literature-based estimated process defaults are in use; confirm or replace with project-specific data where applicable.",
     },
     export: {
       downloadExcel: "Download Excel",

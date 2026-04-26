@@ -44,21 +44,31 @@ export function ResultsUsedAssumptions({
     <section data-testid="results-used-assumptions" aria-labelledby="results-used-assumptions-heading">
       <details
         className={cn(
-          "group rounded-xl border border-border/55 bg-card/30 shadow-[var(--shadow-tile)] dark:border-border/50 dark:bg-card/18",
+          "group rounded-xl border border-structural/22 border-l-4 border-l-structural/45 bg-consultancy-subtle/50 shadow-[var(--shadow-panel)] transition-[box-shadow,border-color] dark:border-border/50 dark:border-l-structural/50 dark:bg-consultancy-subtle/22",
+          "open:border-structural/30 open:shadow-[var(--shadow-panel)] dark:open:border-structural/35",
         )}
       >
         <summary
           id="results-used-assumptions-heading"
-          className="cursor-pointer list-none px-4 py-3.5 text-base font-semibold tracking-tight text-foreground outline-none marker:content-none [&::-webkit-details-marker]:hidden focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 sm:px-5"
+          className={cn(
+            "cursor-pointer list-none rounded-t-xl px-4 py-3.5 text-base font-semibold tracking-tight text-foreground outline-none marker:content-none [&::-webkit-details-marker]:hidden",
+            "border-b border-transparent transition-colors",
+            "hover:bg-consultancy-subtle/70 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
+            "group-open:border-border/55 group-open:bg-consultancy-subtle/65 dark:hover:bg-consultancy-subtle/30 dark:group-open:bg-consultancy-subtle/28",
+            "sm:px-5 sm:py-4",
+          )}
         >
           <span className="flex items-center justify-between gap-3">
-            <span>{t("results.section.usedAssumptions")}</span>
-            <span className="text-xs font-normal text-muted-foreground" aria-hidden>
+            <span className="text-foreground">{t("results.section.usedAssumptions")}</span>
+            <span
+              className="text-sm font-normal text-structural/75 transition-transform duration-200 group-open:rotate-180 dark:text-structural-muted/90"
+              aria-hidden
+            >
               ▾
             </span>
           </span>
         </summary>
-        <div className="space-y-8 border-t border-border/50 px-4 py-5 sm:px-5">
+        <div className="space-y-8 border-t border-border/50 bg-card/20 px-4 py-5 sm:px-5 dark:bg-card/10">
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("results.usedAssumptions.lead")}</p>
           {GROUP_ORDER.map((gid) => {
             const rows = byGroup.get(gid) ?? [];
