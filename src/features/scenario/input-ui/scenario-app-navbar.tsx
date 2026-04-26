@@ -6,11 +6,19 @@
  */
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/messages";
+import { cn } from "@/lib/utils";
 
 import { AppFlowStepper, type AppFlowStep } from "./app-flow-stepper";
 import { FieldLabel, selectClassName } from "./form-primitives";
 
 type TFn = (id: string, vars?: Record<string, string>) => string;
+
+function activeFlowStepLabel(step: AppFlowStep, t: TFn): string {
+  if (step === "setup") return t("app.shell.flow.stepSetup");
+  if (step === "advanced") return t("app.shell.flow.stepRefine");
+  if (step === "results") return t("app.shell.flow.stepResults");
+  return t("app.shell.flow.stepReport");
+}
 
 export type ScenarioAppNavbarFlowProps = {
   readonly activeStep: AppFlowStep;
@@ -26,6 +34,10 @@ export type ScenarioAppNavbarProps = {
   readonly onReset: () => void;
   readonly flow: ScenarioAppNavbarFlowProps;
   readonly t: TFn;
+  /** UI-only: below `sm`, hides full navbar when true; ignored for layout at `sm+`. */
+  readonly mobileNavCollapsed?: boolean;
+  readonly onMobileNavExpand?: () => void;
+  readonly onMobileNavCollapse?: () => void;
 };
 
 export function ScenarioAppNavbar({
@@ -35,14 +47,56 @@ export function ScenarioAppNavbar({
   onReset,
   flow,
   t,
+  mobileNavCollapsed = false,
+  onMobileNavExpand = () => {},
+  onMobileNavCollapse = () => {},
 }: ScenarioAppNavbarProps) {
+  const stepLabel = activeFlowStepLabel(flow.activeStep, t);
+
   return (
     <header
       role="banner"
       aria-label={t("app.shell.toolbarAriaLabel")}
       className="sticky top-0 z-40 border-b border-border/55 bg-surface-shell/92 shadow-[var(--shadow-tile)] backdrop-blur-md supports-[backdrop-filter]:bg-surface-shell/85 dark:border-border/40"
     >
-      <div className="mx-auto flex w-full max-w-[min(94rem,100%)] flex-col gap-2.5 px-4 py-2 sm:gap-3 sm:px-6 sm:py-2.5 xl:px-10">
+      {mobileNavCollapsed ? (
+        <div className="mx-auto flex w-full max-w-[min(94rem,100%)] items-center justify-between gap-2 px-4 py-2 sm:hidden">
+          <p className="min-w-0 truncate text-sm font-medium leading-snug text-foreground">{stepLabel}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-10 shrink-0 font-medium shadow-sm"
+            onClick={onMobileNavExpand}
+            aria-expanded={false}
+            aria-controls="scenario-app-navbar-main"
+          >
+            {t("app.shell.mobileNav.show")}
+          </Button>
+        </div>
+      ) : null}
+
+      <div
+        id="scenario-app-navbar-main"
+        className={cn(
+          "mx-auto flex w-full max-w-[min(94rem,100%)] flex-col gap-2.5 px-4 py-2 sm:gap-3 sm:px-6 sm:py-2.5 xl:px-10",
+          mobileNavCollapsed ? "hidden sm:flex" : "flex",
+        )}
+      >
+        <div className="flex justify-end sm:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-9 font-medium shadow-sm"
+            onClick={onMobileNavCollapse}
+            aria-expanded={true}
+            aria-controls="scenario-app-navbar-main"
+          >
+            {t("app.shell.mobileNav.hide")}
+          </Button>
+        </div>
+
         <div className="rounded-lg border border-border/50 bg-surface-inset/35 px-2 py-2 shadow-[var(--shadow-tile)] sm:px-3 sm:py-2.5 dark:border-border/45 dark:bg-surface-inset/18">
           <div className="min-w-0 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:thin] sm:overflow-x-visible [&::-webkit-scrollbar]:h-1">
             <AppFlowStepper

@@ -638,6 +638,8 @@ export function ScenarioInputApp() {
   const [result, setResult] = React.useState<CalculationResult | null>(null);
   const [advancedSetupExpanded, setAdvancedSetupExpanded] = React.useState(false);
   const [flowStep, setFlowStep] = React.useState<AppFlowStep>("setup");
+  /** UI-only: on narrow viewports the navbar can minimize; `sm+` layout ignores this for expanded content. */
+  const [mobileNavCollapsed, setMobileNavCollapsed] = React.useState(false);
   const defaultProcess = React.useMemo(() => defaultProcessAssumptionsInput(), []);
   const outcomeSectionRef = React.useRef<HTMLDivElement>(null);
   const advancedRegionRef = React.useRef<HTMLDivElement>(null);
@@ -693,6 +695,7 @@ export function ScenarioInputApp() {
   };
 
   const onRun = () => {
+    setMobileNavCollapsed(true);
     setErrors(new Map());
     setResult(null);
 
@@ -740,6 +743,9 @@ export function ScenarioInputApp() {
         setLocale={setLocale}
         onRun={onRun}
         onReset={onReset}
+        mobileNavCollapsed={mobileNavCollapsed}
+        onMobileNavExpand={() => setMobileNavCollapsed(false)}
+        onMobileNavCollapse={() => setMobileNavCollapsed(true)}
         flow={{
           activeStep: flowStep,
           hasResult: result !== null,
