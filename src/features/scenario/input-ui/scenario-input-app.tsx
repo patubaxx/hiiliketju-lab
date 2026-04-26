@@ -64,6 +64,8 @@ import { SeriesCsvImportControl } from "@/features/scenario/input-ui/series-csv-
 import { translateZodIssueMessage } from "@/features/scenario/input-ui/translate-zod-issue-message";
 import { zodIssuesToMap } from "@/features/scenario/input-ui/zod-issues-to-map";
 import { formatResultNumber } from "@/features/scenario/results-ui/format-result-values";
+import { ResultsExcelExportButton } from "@/features/scenario/results-ui/results-excel-export-button";
+import { ResultsPdfExportButton } from "@/features/scenario/results-ui/results-pdf-export-button";
 import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
 import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import type { Locale } from "@/i18n/messages";
@@ -738,17 +740,6 @@ export function ScenarioInputApp() {
         setLocale={setLocale}
         onRun={onRun}
         onReset={onReset}
-        result={result}
-        onJumpToOutcome={() => {
-          if (!result) return;
-          setFlowStep("results");
-          requestAnimationFrame(() => {
-            const el = outcomeSectionRef.current;
-            if (!el) return;
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
-            el.focus({ preventScroll: true });
-          });
-        }}
         flow={{
           activeStep: flowStep,
           hasResult: result !== null,
@@ -1509,6 +1500,27 @@ export function ScenarioInputApp() {
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         {t("app.shell.flow.reportHint")}
                       </p>
+                    </div>
+                    <div
+                      role="group"
+                      aria-label={t("app.shell.exportGroupLabel")}
+                      className={cn(
+                        "mt-5 grid grid-cols-1 gap-3 rounded-lg border border-border/60 bg-surface-inset/50 p-4 shadow-[var(--shadow-tile)] sm:grid-cols-2 sm:gap-4 sm:p-5 dark:border-border/50 dark:bg-surface-inset/28",
+                      )}
+                      data-testid="scenario-report-export-actions"
+                    >
+                      <ResultsExcelExportButton
+                        result={result}
+                        t={t}
+                        className="w-full sm:items-stretch"
+                        buttonClassName="min-h-12 w-full justify-center gap-2 px-4 text-base font-semibold shadow-[var(--shadow-tile)] sm:min-h-14"
+                      />
+                      <ResultsPdfExportButton
+                        result={result}
+                        t={t}
+                        className="w-full sm:items-stretch"
+                        buttonClassName="min-h-12 w-full justify-center gap-2 px-4 text-base font-semibold shadow-[var(--shadow-tile)] sm:min-h-14"
+                      />
                     </div>
                   </section>
                 </div>

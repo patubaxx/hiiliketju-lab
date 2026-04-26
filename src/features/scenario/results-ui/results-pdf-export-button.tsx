@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CalculationResult } from "@/core/domain/result";
 import { safeExportBasename } from "@/core/reporting/export-filename";
+import { cn } from "@/lib/utils";
 
 import { attachmentFilenameFromHeader } from "./attachment-filename";
 
@@ -14,9 +15,13 @@ type TFn = (id: string, vars?: Record<string, string>) => string;
 export function ResultsPdfExportButton({
   result,
   t,
+  className,
+  buttonClassName,
 }: {
   readonly result: CalculationResult | null;
   readonly t: TFn;
+  readonly className?: string;
+  readonly buttonClassName?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,18 +63,18 @@ export function ResultsPdfExportButton({
     disabled ? `${t("results.export.downloadPdf")} — ${t("results.export.unavailableUntilRun")}` : busy ? t("results.export.pdfExporting") : t("results.export.downloadPdf");
 
   return (
-    <div className="flex flex-col items-stretch gap-1 sm:items-end">
+    <div className={cn("flex flex-col items-stretch gap-1 sm:items-end", className)}>
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size={buttonClassName ? "lg" : "sm"}
         disabled={disabled || busy}
         aria-busy={busy}
         aria-label={ariaLabel}
         onClick={() => void onClick()}
-        className="gap-1.5"
+        className={cn("gap-1.5", buttonClassName)}
       >
-        <FileText className="size-3.5 shrink-0" aria-hidden />
+        <FileText className={cn("shrink-0", buttonClassName ? "size-5" : "size-3.5")} aria-hidden />
         {busy ? t("results.export.pdfExporting") : t("results.export.downloadPdf")}
       </Button>
       <div role="status" aria-live="polite" className="min-h-[1rem]">
