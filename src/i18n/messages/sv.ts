@@ -162,6 +162,9 @@ export const sv = {
     advanced: "Avancerade processantaganden",
     advancedIntro:
       "Ändra litteraturvärden bara när du har projektsiffror. Varje värde följer med källa och status för spårbarhet.",
+    plantCapacity: "Anläggningskapacitet och CO₂-anskaffning",
+    plantCapacityIntro:
+      "Valfria dagliga kapacitetstak för elektrolysören och metaneringsreaktorn samt valfritt inköp av marknads-CO₂. Inköp används bara för att fylla en definierad ändlig anläggningskapacitet när sidoflödets CO₂ inte räcker.",
     results: "Beräkningsresultat",
   },
   co2: {
@@ -238,6 +241,26 @@ export const sv = {
     electrolyzerCapex: "Elektrolysör CAPEX (EUR)",
     methanationCapex: "Metaniserings-CAPEX (EUR)",
     capexLifetime: "CAPEX-livslängd (år)",
+  },
+  plantCapacity: {
+    enable: "Använd anläggningens kapacitetstak",
+    enableHint:
+      "När av: anläggningen är obegränsad och allt sidoflödes-CO₂ som styrs av utnyttjandegraden behandlas dagligen. När på: ange elektrolysörens H₂/dygn och/eller metaneringsreaktorns CH₄/dygn. Stökiometriförhållandena är oförändrade; taket begränsar bara den dagliga processgenomströmningen.",
+    electrolyzerMaxH2: "Elektrolysörens max (kg H₂/dygn)",
+    electrolyzerMaxH2Hint:
+      "Tomt = obegränsat. Sätter dagstaket för väteproduktionen. Används med stökiometrin för att härleda dagstaket för CO₂-genomströmningen.",
+    methanationMaxCh4: "Metaneringsreaktorns max (kg CH₄/dygn)",
+    methanationMaxCh4Hint:
+      "Tomt = obegränsat. Sätter dagstaket för metanproduktionen. Det strängare av de två taken bestämmer dagens CO₂-mängd som anläggningen kan behandla.",
+    unboundedPlaceholder: "obegränsat",
+  },
+  co2MarketPurchase: {
+    enable: "Tillåt CO₂-inköp från marknaden för att fylla på sidoflödet",
+    enableHint:
+      "När PÅ och ett ändligt kapacitetstak är satt fyller inköpt CO₂ dagens gap mellan använt sidoflödes-CO₂ och anläggningens tak. Om inget kapacitetstak är satt används inte marknads-CO₂ i beräkningen. Återvinningsgraden räknar bara sidoflödes-CO₂.",
+    purchasePrice: "CO₂-inköpspris (EUR/t CO₂)",
+    purchasePriceHint:
+      "Marknads- eller avtalspris per ton. Daglig inköpskostnad = inköpta kg / 1000 × pris, läggs till rörlig kostnad.",
   },
   advanced: {
     internalKey: "Parameter-id",
@@ -401,9 +424,13 @@ export const sv = {
       capexYes: "Ja — investeringskostnader fördelas in i årsresultatet",
       capexNo: "Nej — ingen CAPEX-allokering i resultatet (övrig kostnad enligt modellen)",
       annualCapexInResult: "Modellerad årlig CAPEX-delsumma i detta resultat (avstängd: noll enligt inställning)",
+      electrolyzerCapacityLimit: "Elektrolysörens kapacitetsgräns",
+      methanationCapacityLimit: "Metaneringens kapacitetsgräns",
+      marketCo2PurchasePrice: "Inköpspris för marknads-CO₂",
       group: {
         scenario: "Scenario / upplägg",
         co2: "CO₂",
+        plant: "Anläggningskapacitet och CO₂-inköp",
         electricity: "El",
         economics: "Ekonomi (försäljningspriser och OPEX)",
         capex: "Investeringar (CAPEX)",
@@ -416,6 +443,9 @@ export const sv = {
         eurPerMwh: "EUR/MWh",
         eurPerTch4: "EUR/t CH₄",
         eurPerKgH2: "EUR/kg H₂",
+        eurPerTco2: "EUR/t CO₂",
+        kgH2PerDay: "kg H₂/dygn",
+        kgCh4PerDay: "kg CH₄/dygn",
         eurPerYear: "EUR/år",
         eur: "EUR",
         years: "år",
@@ -429,8 +459,11 @@ export const sv = {
     },
     kpi: {
       annualCo2Available: "Tillgänglig CO₂ per år",
-      annualCo2Utilized: "Utnyttjad CO₂ per år",
-      co2RecyclingRate: "CO₂-återvinningsgrad",
+      annualCo2Utilized: "Total CO₂-matning till processen",
+      annualCo2FreeUsed: "Använt sidoflödes-CO₂",
+      annualCo2Purchased: "Inköpt CO₂",
+      annualCo2PurchaseCost: "Årlig CO₂-inköpskostnad",
+      co2RecyclingRate: "Återvinningsgrad för sidoflöde",
       annualMethane: "Årlig metanproduktion",
       annualHydrogen: "Årligt vätebehov",
       annualElectricity: "Årlig elförbrukning",
@@ -443,6 +476,19 @@ export const sv = {
       methanePrice10: "Härlett metanförsäljningspris vid 10 % lönsamhet",
       methanePrice30: "Härlett metanförsäljningspris vid 30 % lönsamhet",
       deltaVsHydrogen: "Skillnad mot vätgasförsäljning",
+      h2BindingDays: "Elektrolysörens flaskhalsdagar",
+      ch4BindingDays: "Metaneringens flaskhalsdagar",
+    },
+    kpiHelp: {
+      annualCo2Utilized: "Total CO₂ som matas till processen: sidoflödes-CO₂ plus eventuell inköpt CO₂.",
+      annualCo2FreeUsed: "Biogent sidoflödes-CO₂ som faktiskt används före marknadsinköp.",
+      annualCo2Purchased: "Marknads-CO₂ inköpt för att fylla ändlig anläggningskapacitet.",
+      annualCo2PurchaseCost: "Kostnaden för inköpt CO₂ ingår i rörlig kostnad.",
+      co2RecyclingRate: "Använt sidoflödes-CO₂ delat med tillgängligt sidoflödes-CO₂; inköpt CO₂ ingår inte.",
+      bindingDays: "Dagar då driftpunkten ligger vid motsvarande ändliga kapacitetstak.",
+    },
+    unit: {
+      days: "dagar",
     },
     kpiSecondary: {
       lead:
@@ -450,22 +496,27 @@ export const sv = {
     },
     pathComparison: {
       title: "Vägintäkter (år)",
-      help: "Årlig intäkt jämförd: metanvägen mot att sälja väte. Skillnaden mot vätealternativet finns i sammanfattningen ovan.",
+      help: "Årlig intäkt jämförd: metanvägen mot att sälja väte. Vätealternativet använder samma H₂-mängd som metanvägen skulle kräva för vald total CO₂-matning till processen, inklusive genomströmning från inköpt CO₂ när den finns.",
       methaneRevenue: "Metanväg (CH₄-försäljning)",
       hydrogenAltRevenue: "Alternativ: vätgasförsäljning",
       delta: "Delta (metan minus H₂-alternativ)",
     },
     chart: {
-      co2Availability: "CO₂-tillgång (daglig serie)",
+      co2Availability: "Sidoflödets CO₂-tillgång (daglig serie)",
       electricityPrice: "Inköpspris för el (daglig serie)",
       methaneProduction: "Metanproduktion (daglig)",
       costVsRevenueDaily: "Daglig total kostnad vs metanintäkt",
+      co2SourceMix: "Processens CO₂-källor per månad",
       axis: {
         dayOfYear: "Dagsindex (0–364)",
         xDate: "Tid (dagsindex)",
+        month: "Månad",
         yKgd: "CO₂ (kg/d)",
         yTpd: "CO₂ (t/d)",
         yKtd: "CO₂ (kt/d)",
+        yKg: "CO₂ (kg)",
+        yT: "CO₂ (t)",
+        yKt: "CO₂ (kt)",
         yEurPerMwh: "Pris (EUR/MWh)",
         yMethaneKgd: "CH₄ (kg/d)",
         yMethaneTpd: "CH₄ (t/d)",
@@ -483,11 +534,13 @@ export const sv = {
         ktPerD: "kt/d",
       },
       series: {
-        availableCo2Kg: "Tillgänglig CO₂ (kg/dag)",
+        availableCo2Kg: "Tillgängligt sidoflödes-CO₂ (kg/dag)",
         electricityPrice: "Inköpspris, el (EUR/MWh)",
         methaneProducedKg: "Producerad CH₄ (kg/dag)",
         totalCostEur: "Total kostnad (EUR/dag)",
         methaneRevenueEur: "Metanintäkt (EUR/dag)",
+        freeCo2UsedKg: "Sidoflödets CO₂ (gratis)",
+        purchasedCo2Kg: "Inköpt CO₂ (marknad)",
       },
     },
     table: {

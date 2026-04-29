@@ -163,6 +163,9 @@ export const fi = {
     advanced: "Edistyneet prosessioletukset",
     advancedIntro:
       "Muuta kirjallisuuspohjaisia prosessioletuksia vain, jos käytettävissäsi on kohdekohtaisia arvoja. Jokaisen arvon yhteyteen tallentuu lähde ja tila.",
+    plantCapacity: "Laitoskapasiteetti ja CO₂:n hankinta",
+    plantCapacityIntro:
+      "Aseta valinnaiset päivätason kapasiteettirajat (elektrolyyseri ja metanointireaktori) sekä valinnainen markkina-CO₂:n osto. Ostoa käytetään vain määritetyn rajallisen laitoskapasiteetin täyttämiseen, jos sivuvirran CO₂ ei riitä.",
     results: "Laskentatulos",
   },
   co2: {
@@ -239,6 +242,26 @@ export const fi = {
     electrolyzerCapex: "Elektrolyyserin CAPEX (EUR)",
     methanationCapex: "Metaanoinnin CAPEX (EUR)",
     capexLifetime: "Investoinnin elinikä (vuotta)",
+  },
+  plantCapacity: {
+    enable: "Käytä laitoskapasiteetin rajoja",
+    enableHint:
+      "Kun pois päältä, laitos on rajoittamaton: kaikki hyödyntämisasteella prosessiin ohjattu sivuvirran CO₂ käsitellään päivittäin. Kun päällä, voit asettaa elektrolyyserin H₂-päiväkapasiteetin ja/tai metanointireaktorin CH₄-päiväkapasiteetin. Stoikiometriset suhteet pysyvät ennallaan; rajat rajoittavat vain päivittäistä prosessin läpimenoa.",
+    electrolyzerMaxH2: "Elektrolyyserin maksimi (kg H₂/päivä)",
+    electrolyzerMaxH2Hint:
+      "Tyhjä = ei rajaa. Mitoittaa päivittäin tuotettavissa olevan vedyn enimmäismäärän. Käytetään myös ns. CO₂-läpimenokaton johtamiseen yhdessä stoikiometrian kanssa.",
+    methanationMaxCh4: "Metanointireaktorin maksimi (kg CH₄/päivä)",
+    methanationMaxCh4Hint:
+      "Tyhjä = ei rajaa. Mitoittaa päivittäin tuotettavan metaanin enimmäismäärän. Tiukin raja H₂- ja CH₄-katon välillä määrää päivän käsiteltävän CO₂-määrän.",
+    unboundedPlaceholder: "ei rajaa",
+  },
+  co2MarketPurchase: {
+    enable: "Salli CO₂:n osto markkinalta sivuvirran täydennyksenä",
+    enableHint:
+      "Kun päällä ja rajallinen laitoskapasiteetti on asetettu, ostettu CO₂ täyttää päivittäisen eron käytetyn sivuvirran CO₂:n ja kapasiteettikaton välillä. Jos kapasiteettirajaa ei ole annettu, CO₂-ostoa ei käytetä laskennassa. Sivuvirran hyödyntämisasteessa lasketaan vain sivuvirran CO₂.",
+    purchasePrice: "CO₂:n ostohinta (EUR/t CO₂)",
+    purchasePriceHint:
+      "Markkinoilta tai sopimuksesta saatava hinta tonnia kohden. Päivittäinen ostokustannus = ostettu kg / 1000 × hinta, ja se lisätään muuttuviin kustannuksiin.",
   },
   advanced: {
     internalKey: "Parametrin tunniste",
@@ -401,9 +424,13 @@ export const fi = {
       capexYes: "Kyllä — investointi jaetaan vuosikustannuksiin",
       capexNo: "Ei — vuosikustannuksiin ei sisällytetä CAPEX-jakoa",
       annualCapexInResult: "Mallinnettu vuosittainen CAPEX-kustannus tässä tuloksessa",
+      electrolyzerCapacityLimit: "Elektrolyyserin kapasiteettiraja",
+      methanationCapacityLimit: "Metanoinnin kapasiteettiraja",
+      marketCo2PurchasePrice: "CO₂:n markkinaostohinta",
       group: {
         scenario: "Skenaario / asetukset",
         co2: "CO₂",
+        plant: "Laitoskapasiteetti ja CO₂:n osto",
         electricity: "Sähkö",
         economics: "Talous (myyntihinnat ja OPEX)",
         capex: "Investoinnit (CAPEX)",
@@ -416,6 +443,9 @@ export const fi = {
         eurPerMwh: "EUR/MWh",
         eurPerTch4: "EUR/t CH₄",
         eurPerKgH2: "EUR/kg H₂",
+        eurPerTco2: "EUR/t CO₂",
+        kgH2PerDay: "kg H₂/päivä",
+        kgCh4PerDay: "kg CH₄/päivä",
         eurPerYear: "EUR/v",
         eur: "EUR",
         years: "v",
@@ -429,8 +459,11 @@ export const fi = {
     },
     kpi: {
       annualCo2Available: "Vuosittainen saatavilla oleva CO₂",
-      annualCo2Utilized: "Vuosittainen hyödynnetty CO₂",
-      co2RecyclingRate: "CO₂-kierrätysaste",
+      annualCo2Utilized: "Prosessin CO₂-syöte yhteensä",
+      annualCo2FreeUsed: "Sivuvirran CO₂ käytetty",
+      annualCo2Purchased: "Ostettu CO₂",
+      annualCo2PurchaseCost: "Vuosittainen CO₂-ostokustannus",
+      co2RecyclingRate: "Sivuvirran hyödyntämisaste",
       annualMethane: "Vuosittainen metaanituotanto",
       annualHydrogen: "Vuosittainen vetytarve",
       annualElectricity: "Vuosittainen sähkönkulutus",
@@ -443,6 +476,19 @@ export const fi = {
       methanePrice10: "Metaanin myyntihinta 10 %:n kannattavuudella",
       methanePrice30: "Metaanin myyntihinta 30 %:n kannattavuudella",
       deltaVsHydrogen: "Ero vedyn myyntivaihtoehtoon",
+      h2BindingDays: "Elektrolyyserin pullonkaulapäivät",
+      ch4BindingDays: "Metanoinnin pullonkaulapäivät",
+    },
+    kpiHelp: {
+      annualCo2Utilized: "Prosessiin syötetty CO₂ yhteensä: sivuvirran CO₂ ja mahdollinen ostettu CO₂.",
+      annualCo2FreeUsed: "Prosessissa käytetty biogeeninen sivuvirran CO₂ ennen markkinaostoa.",
+      annualCo2Purchased: "Markkinalta ostettu CO₂ rajallisen laitoskapasiteetin täyttämiseen.",
+      annualCo2PurchaseCost: "Ostetun CO₂:n kustannus sisältyy muuttuviin kustannuksiin.",
+      co2RecyclingRate: "Käytetty sivuvirran CO₂ jaettuna saatavilla olevalla sivuvirran CO₂:lla; ostettu CO₂ ei sisälly.",
+      bindingDays: "Päivät, joina toimintapiste on vastaavalla rajallisella kapasiteettikatolla.",
+    },
+    unit: {
+      days: "päivää",
     },
     kpiSecondary: {
       lead:
@@ -450,22 +496,27 @@ export const fi = {
     },
     pathComparison: {
       title: "Polkujen tuotot vuositasolla",
-      help: "Vuositason tuotot metaanipolulle ja vedyn myyntivaihtoehdolle rinnakkain. Ero vedyn myyntivaihtoehtoon näkyy yhteenvedossa.",
+      help: "Vuositason tuotot metaanipolulle ja vedyn myyntivaihtoehdolle rinnakkain. Vetyvaihtoehto perustuu samaan vetymäärään, jonka metaanipolku käyttäisi valitulla prosessin CO₂-kokonaissyötteellä, myös ostetun CO₂:n läpimenolle.",
       methaneRevenue: "Metaanipolku (CH₄-myynti)",
       hydrogenAltRevenue: "Vedyn myyntivaihtoehto",
       delta: "Ero (metaani miinus vedyn myyntivaihtoehto)",
     },
     chart: {
-      co2Availability: "CO₂:n saatavuus (päiväsarja)",
+      co2Availability: "Sivuvirran CO₂:n saatavuus (päiväsarja)",
       electricityPrice: "Sähkön hankintahinta (päiväsarja)",
       methaneProduction: "Metaanituotanto (päivittäin)",
       costVsRevenueDaily: "Päivittäinen kokonaiskustannus vs. metaanituotto",
+      co2SourceMix: "Prosessin CO₂-lähteet kuukausittain",
       axis: {
         dayOfYear: "Päiväindeksi (0–364)",
         xDate: "Aika (päiväindeksi)",
+        month: "Kuukausi",
         yKgd: "CO₂ (kg/päivä)",
         yTpd: "CO₂ (t/päivä)",
         yKtd: "CO₂ (kt/päivä)",
+        yKg: "CO₂ (kg)",
+        yT: "CO₂ (t)",
+        yKt: "CO₂ (kt)",
         yEurPerMwh: "Hinta (EUR/MWh)",
         yMethaneKgd: "CH₄ (kg/päivä)",
         yMethaneTpd: "CH₄ (t/päivä)",
@@ -483,11 +534,13 @@ export const fi = {
         ktPerD: "kt/päivä",
       },
       series: {
-        availableCo2Kg: "Saatavilla oleva CO₂ (kg/päivä)",
+        availableCo2Kg: "Saatavilla oleva sivuvirran CO₂ (kg/päivä)",
         electricityPrice: "Hankintahinta, sähkö (EUR/MWh)",
         methaneProducedKg: "Tuotettu CH₄ (kg/päivä)",
         totalCostEur: "Kokonaiskustannus (EUR/päivä)",
         methaneRevenueEur: "Metaanituotto (EUR/päivä)",
+        freeCo2UsedKg: "Sivuvirran CO₂ (vapaa)",
+        purchasedCo2Kg: "Ostettu CO₂ (markkinalta)",
       },
     },
     table: {
@@ -534,4 +587,4 @@ export const fi = {
       unavailableUntilRun: "Ei käytettävissä ennen onnistunutta laskentaa.",
     },
   },
-} satisfies MessageTree;
+} as const satisfies MessageTree;

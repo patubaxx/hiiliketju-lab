@@ -1,15 +1,71 @@
 /**
  * Authoritative Zod schema for `ScenarioInput` wire JSON: same contract for the interactive form and `/api/export/*`.
- * `parseScenarioInput` / `safeParseScenarioInput` return typed data; `mergeProcessAssumptionsInput` fills omitted process fields.
+ * `parseScenarioInput` merges process defaults and plant-cap normalization; `safeParseScenarioInput` returns raw Zod output — use `scenarioWireToScenarioInput` before `calculateScenario` when not using `parseScenarioInput`.
  */
 import * as z from "zod";
 
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import {
+  mergeProcessAssumptionsInput,
+  type PlantCapacityInput,
+  type ScenarioInput,
+} from "@/core/domain/scenario";
 import { SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 
 import { assumptionValueNumberSchema } from "./assumption-schema";
 import { co2AvailabilityInputSchema } from "./co2-availability-schema";
 import { electricityPriceInputSchema } from "./electricity-price-schema";
+
+/**
+ * WP28: optional plant capacity caps. `null` (or absence) means "unbounded" for that
+ * piece of equipment. The whole `plant` block is optional on the wire — pre-WP28
+ * payloads continue to validate.
+ */
+const plantCapacityInputSchema = z
+  .object({
+    electrolyzerMaxH2KgPerDay: z
+      .union([
+        z
+          .number("validation.zod.electrolyzerMaxH2MustBeNumber")
+          .finite("validation.zod.electrolyzerMaxH2MustBeFinite")
+          .positive("validation.zod.electrolyzerMaxH2Positive"),
+        z.null(),
+      ])
+      .optional(),
+    methanationMaxCh4KgPerDay: z
+      .union([
+        z
+          .number("validation.zod.methanationMaxCh4MustBeNumber")
+          .finite("validation.zod.methanationMaxCh4MustBeFinite")
+          .positive("validation.zod.methanationMaxCh4Positive"),
+        z.null(),
+      ])
+      .optional(),
+  })
+  .strict();
+
+function normalizePlantCapacityWire(parsed: z.infer<typeof plantCapacityInputSchema>): PlantCapacityInput {
+  return {
+    electrolyzerMaxH2KgPerDay: parsed.electrolyzerMaxH2KgPerDay ?? null,
+    methanationMaxCh4KgPerDay: parsed.methanationMaxCh4KgPerDay ?? null,
+  };
+}
+
+/**
+ * WP28: optional CO₂ market purchase top-up. When `mode === "enabled"`,
+ * `purchasePriceEurPerTco2` is required and non-negative.
+ */
+const co2MarketPurchaseSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("disabled") }).strict(),
+  z
+    .object({
+      mode: z.literal("enabled"),
+      purchasePriceEurPerTco2: z
+        .number("validation.zod.co2PurchasePriceMustBeNumber")
+        .finite("validation.zod.co2PurchasePriceMustBeFinite")
+        .min(0, "validation.zod.co2PurchasePriceNonNegative"),
+    })
+    .strict(),
+]);
 
 const processAssumptionsPartialSchema = z
   .object({
@@ -37,6 +93,7 @@ export const scenarioInputSchema = z
         .min(0, "validation.zod.utilizationOutOfRange")
         .max(100, "validation.zod.utilizationOutOfRange"),
       availability: co2AvailabilityInputSchema,
+      marketPurchase: co2MarketPurchaseSchema.optional(),
     }),
     electricity: electricityPriceInputSchema,
     economics: z
@@ -100,17 +157,26 @@ export const scenarioInputSchema = z
       assumptionsVersion: z.string().trim().min(1, "validation.zod.assumptionsVersionRequired"),
       notes: z.string().optional(),
     }),
+    plant: plantCapacityInputSchema.optional(),
   })
   .strict();
 
 export type ScenarioInputParsed = z.infer<typeof scenarioInputSchema>;
 
-export function parseScenarioInput(data: unknown): ScenarioInput {
-  const parsed = scenarioInputSchema.parse(data);
+/**
+ * Maps authoritative Zod output to canonical {@link ScenarioInput}: merges process defaults,
+ * and expands optional plant-cap keys (omit / `undefined` ⇒ unbounded `null`).
+ */
+export function scenarioWireToScenarioInput(parsed: ScenarioInputParsed): ScenarioInput {
   return {
     ...parsed,
+    plant: parsed.plant === undefined ? undefined : normalizePlantCapacityWire(parsed.plant),
     process: mergeProcessAssumptionsInput(parsed.process),
   };
+}
+
+export function parseScenarioInput(data: unknown): ScenarioInput {
+  return scenarioWireToScenarioInput(scenarioInputSchema.parse(data));
 }
 
 export function safeParseScenarioInput(data: unknown) {

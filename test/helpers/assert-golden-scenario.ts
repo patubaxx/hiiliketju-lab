@@ -19,6 +19,9 @@ export const CALCULATION_RESULT_TOP_LEVEL_KEYS = [
 export const SCENARIO_SUMMARY_KEYS: (keyof ScenarioSummary)[] = [
   "annualCO2AvailableKg",
   "annualCO2UtilizedKg",
+  "annualFreeCo2UsedKg",
+  "annualPurchasedCo2Kg",
+  "annualCo2PurchaseCostEur",
   "co2RecyclingRatePct",
   "annualMethaneProducedTons",
   "annualHydrogenNeededKg",
@@ -32,6 +35,8 @@ export const SCENARIO_SUMMARY_KEYS: (keyof ScenarioSummary)[] = [
   "methanePriceAt10PctProfitabilityEurPerTon",
   "methanePriceAt30PctProfitabilityEurPerTon",
   "deltaVsHydrogenSaleEur",
+  "h2CapacityBindingDays",
+  "ch4CapacityBindingDays",
 ];
 
 export function assertCalculationResultShape(result: CalculationResult): void {

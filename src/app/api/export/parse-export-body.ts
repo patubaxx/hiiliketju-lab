@@ -3,8 +3,11 @@
  * merges default process assumptions, and returns a `ScenarioInput` suitable for `calculateScenario`.
  * Extra JSON keys (e.g. a spoofed calculation result) are ignored — the server always recomputes.
  */
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { type ScenarioInput } from "@/core/domain/scenario";
+import {
+  safeParseScenarioInput,
+  scenarioWireToScenarioInput,
+} from "@/features/scenario/schemas/scenario-schema";
 
 export type ExportErrorPayload = {
   readonly code: string;
@@ -59,10 +62,7 @@ export function parseExportScenarioPostBody(rawText: string): ParseExportScenari
     };
   }
 
-  const input: ScenarioInput = {
-    ...parsed.data,
-    process: mergeProcessAssumptionsInput(parsed.data.process),
-  };
+  const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
 
   return { ok: true, input };
 }

@@ -8,7 +8,7 @@
 - **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** — Calculation contracts, units, formulas.
 - **[`docs/repository-invariants.md`](docs/repository-invariants.md)** — Current export boundary and regression checklist (consolidated from former milestone handoffs).
 - **[`docs/internal-memo-fi.md`](docs/internal-memo-fi.md)** — Finnish memo of project Hiiliketju general functionalities intended for human use; not to be used as source or guidance for agents.
-- **[`docs/release-memo-mvp.md`](docs/release-memo-mvp.md)** — English handoff memo (updated with **WP22–WP27**); human-facing; not an automation spec.
+- **[`docs/release-memo-mvp.md`](docs/release-memo-mvp.md)** — English handoff memo (updated with **WP22–WP28**); human-facing; not an automation spec.
 - **[`.cursor/rules.md`](.cursor/rules.md)** — Cursor workspace copy of core policy (keep for tool discoverability).
 - **[`cursor_agents/README.md`](cursor_agents/README.md)** — Optional legacy prompts; not required for runtime.
 
@@ -32,7 +32,7 @@ Do not collapse these layers together.
 
 ---
 
-## Accepted input UX (WP1–WP3 and WP22–WP27, current product)
+## Accepted input UX (WP1–WP3 and WP22–WP28, current product)
 
 These are **documentation anchors** for behaviour already shipped; they do not relax calculation or wire contracts. **Source of detail:** [`docs/repository-invariants.md`](docs/repository-invariants.md).
 
@@ -50,6 +50,7 @@ These are **documentation anchors** for behaviour already shipped; they do not r
 - **Presentation (WP26):** axis labels, compact units, two-decimal display in typical UI/PDF labels; PDF chart robustness; Excel keeps numeric cells.
 - **Home hero (WP27):** optional partner SVGs from **`/business-finland-logo.svg`**, **`/lab-logo.svg`** (`public/`); i18n alts.
 - **App shell (accepted UX):** **sticky navbar** with **flow stepper** (**Setup** → **Advanced settings (optional)** → **Results** → **Report**), **Run**, **Reset**, and **locale**; **Excel/PDF** download actions live in the **Report** section after a successful run (not duplicated in the navbar). **Export authority unchanged:** server validates **`scenario`**, runs **`calculateScenario`**, builds files.
+- **WP28 capacity / market CO₂:** optional daily plant caps are **`plant.electrolyzerMaxH2KgPerDay`** (`kg H₂/day`) and **`plant.methanationMaxCh4KgPerDay`** (`kg CH₄/day`); missing / `null` means unbounded. Optional **`co2.marketPurchase`** buys market CO₂ only to fill a finite plant capacity when side-stream CO₂ is insufficient. Results and exports must keep **total process CO₂ feed** separate from **side-stream CO₂ used** and **purchased CO₂**. **Side-stream recycling rate excludes purchased CO₂.** This is not dispatch optimization, storage, equipment sizing economics, or CAPEX logic.
 
 ---
 

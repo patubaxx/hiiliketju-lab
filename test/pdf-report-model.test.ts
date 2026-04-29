@@ -27,6 +27,23 @@ function minimalScenarioRaw() {
   };
 }
 
+function wp28ScenarioRaw() {
+  return {
+    ...minimalScenarioRaw(),
+    scenarioName: "PDF WP28 export test",
+    co2: {
+      annualAmountKtPerYear: 0.365,
+      utilizationRatePct: 100,
+      availability: { mode: "flat_annual" as const },
+      marketPurchase: { mode: "enabled" as const, purchasePriceEurPerTco2: 80 },
+    },
+    plant: {
+      electrolyzerMaxH2KgPerDay: null,
+      methanationMaxCh4KgPerDay: 1000,
+    },
+  };
+}
+
 describe("PDF report model (WP7)", () => {
   it("embeds the same excel export model mapping", () => {
     const result = calculateScenario(parseScenarioInput(minimalScenarioRaw()));
@@ -84,5 +101,20 @@ describe("PDF report model (WP7)", () => {
 
     expect(overridden?.assumptionSource).toBe("customer_provided");
     expect(untouched?.assumptionSource).toBe("literature_based");
+  });
+
+  it("includes WP28 summary and active input readout through the shared PDF model", () => {
+    const result = calculateScenario(parseScenarioInput(wp28ScenarioRaw()));
+    const pdfModel = buildScenarioPdfReportModel(result);
+    const annualMap = new Map(pdfModel.excelModel.annualMetrics.map((row) => [row.metricKey, row]));
+    const usedAssumptions = pdfModel.excelModel.usedAssumptionsPrint;
+
+    expect(annualMap.get("annualCO2UtilizedKg")?.label).toBe("Total process CO₂ feed");
+    expect(annualMap.get("annualPurchasedCo2Kg")?.value).toBeGreaterThan(0);
+    expect(annualMap.get("annualCo2PurchaseCostEur")?.value).toBeGreaterThan(0);
+    expect(annualMap.get("ch4CapacityBindingDays")?.value).toBeGreaterThan(0);
+    expect(usedAssumptions.some((row) => row.label === "Methanation capacity limit")).toBe(true);
+    expect(usedAssumptions.some((row) => row.label === "Market CO₂ purchase price")).toBe(true);
+    expect(usedAssumptions.some((row) => row.label === "Electrolyzer capacity limit")).toBe(false);
   });
 });

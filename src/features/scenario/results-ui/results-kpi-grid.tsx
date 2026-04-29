@@ -16,6 +16,9 @@ type TFn = (id: string, vars?: Record<string, string>) => string;
 type KpiKey =
   | "annualCo2Available"
   | "annualCo2Utilized"
+  | "annualCo2FreeUsed"
+  | "annualCo2Purchased"
+  | "annualCo2PurchaseCost"
   | "co2RecyclingRate"
   | "annualMethane"
   | "annualHydrogen"
@@ -28,7 +31,9 @@ type KpiKey =
   | "breakEvenMethanePrice"
   | "methanePrice10"
   | "methanePrice30"
-  | "deltaVsHydrogen";
+  | "deltaVsHydrogen"
+  | "h2BindingDays"
+  | "ch4BindingDays";
 
 /**
  * Executive summary — avoids duplicating path revenues shown in path comparison.
@@ -106,12 +111,14 @@ function kpiContent(
       return {
         label: t("results.kpi.annualCo2Utilized"),
         value: formatResultMassKgCompact(summary.annualCO2UtilizedKg, locale, t),
+        sub: t("results.kpiHelp.annualCo2Utilized"),
       };
     case "co2RecyclingRate":
       return {
         label: t("results.kpi.co2RecyclingRate"),
         value:
           summary.co2RecyclingRatePct === null ? na : formatResultPercent(summary.co2RecyclingRatePct, locale),
+        sub: t("results.kpiHelp.co2RecyclingRate"),
       };
     case "annualMethane":
       return {
@@ -182,12 +189,69 @@ function kpiContent(
         label: t("results.kpi.deltaVsHydrogen"),
         value: formatResultEurCompact(summary.deltaVsHydrogenSaleEur, locale, t),
       };
+    case "annualCo2FreeUsed":
+      return {
+        label: t("results.kpi.annualCo2FreeUsed"),
+        value: formatResultMassKgCompact(summary.annualFreeCo2UsedKg, locale, t),
+        sub: t("results.kpiHelp.annualCo2FreeUsed"),
+      };
+    case "annualCo2Purchased":
+      return {
+        label: t("results.kpi.annualCo2Purchased"),
+        value: formatResultMassKgCompact(summary.annualPurchasedCo2Kg, locale, t),
+        sub: t("results.kpiHelp.annualCo2Purchased"),
+      };
+    case "annualCo2PurchaseCost":
+      return {
+        label: t("results.kpi.annualCo2PurchaseCost"),
+        value: formatResultEurCompact(summary.annualCo2PurchaseCostEur, locale, t),
+        sub: t("results.kpiHelp.annualCo2PurchaseCost"),
+      };
+    case "h2BindingDays":
+      return {
+        label: t("results.kpi.h2BindingDays"),
+        value: `${formatResultNumberDisplay(summary.h2CapacityBindingDays, locale)} ${t("results.unit.days")}`,
+        sub: t("results.kpiHelp.bindingDays"),
+      };
+    case "ch4BindingDays":
+      return {
+        label: t("results.kpi.ch4BindingDays"),
+        value: `${formatResultNumberDisplay(summary.ch4CapacityBindingDays, locale)} ${t("results.unit.days")}`,
+        sub: t("results.kpiHelp.bindingDays"),
+      };
     default: {
       const _x: never = key;
       return _x;
     }
   }
 }
+
+/**
+ * WP28: extra KPIs that are only meaningful when caps and/or purchase are active.
+ * Surface them only when at least one is non-trivial; otherwise the headline grid stays uncluttered.
+ */
+function shouldRenderWp28Kpi(key: KpiKey, summary: ScenarioSummary): boolean {
+  switch (key) {
+    case "annualCo2FreeUsed":
+    case "annualCo2Purchased":
+    case "annualCo2PurchaseCost":
+      return summary.annualPurchasedCo2Kg > 0 || summary.annualCo2PurchaseCostEur > 0;
+    case "h2BindingDays":
+      return summary.h2CapacityBindingDays > 0;
+    case "ch4BindingDays":
+      return summary.ch4CapacityBindingDays > 0;
+    default:
+      return false;
+  }
+}
+
+const WP28_OPTIONAL_KEYS: readonly KpiKey[] = [
+  "annualCo2FreeUsed",
+  "annualCo2Purchased",
+  "annualCo2PurchaseCost",
+  "h2BindingDays",
+  "ch4BindingDays",
+];
 
 export function ResultsKpiHeadline({
   summary,
@@ -241,6 +305,10 @@ export function ResultsKpiSecondary({
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {SECONDARY_KEYS.map((key) => {
+          const { label, value, sub } = kpiContent(key, summary, locale, t, na);
+          return <SecondaryKpiCard key={key} label={label} value={value} sub={sub} />;
+        })}
+        {WP28_OPTIONAL_KEYS.filter((k) => shouldRenderWp28Kpi(k, summary)).map((key) => {
           const { label, value, sub } = kpiContent(key, summary, locale, t, na);
           return <SecondaryKpiCard key={key} label={label} value={value} sub={sub} />;
         })}

@@ -18,6 +18,7 @@
 
 - **Electricity** is framed as **purchase / procurement price** where relevant (constant, series, and historical import paths).
 - **Methane and hydrogen economics** are framed as **assumed sales prices** (inputs), distinct from **derived** profitability indicators (e.g. break-even methane price) that come from the canonical **`CalculationResult`**.
+- **WP28 CO₂ terminology:** **total process CO₂ feed** means `freeCo2UsedKg + purchasedCo2Kg` (annual: `annualCO2UtilizedKg`). **Side-stream CO₂ used** means the biogenic/free stream actually processed. **Side-stream recycling rate** is `annualFreeCo2UsedKg / annualCO2AvailableKg`; purchased CO₂ is not recycled side-stream CO₂.
 - **Wire / domain field names** were not renamed for this wording pass; copy and validation messages align with the above intent.
 
 ---
@@ -28,6 +29,7 @@
 - **Default CO₂ availability (WP24):** new scenarios start in **`seasonal_daily`** with a shared **winter-weighted** default monthly relative profile (`DEFAULT_SEASONAL_CO2_RELATIVE_WEIGHTS` in `src/core/domain/seasonal-co2-default-weights.ts`). **Default relative monthly weights (Jan–Dec):** 1.35, 1.30, 1.15, 1.00, 0.80, 0.60, 0.50, 0.60, 0.80, 1.00, 1.25, 1.35 — **relative** only; the seasonal path normalizes to the user’s annual total. These are product defaults, not customer data. **`flat_annual`**, **daily / hourly time-series** modes remain available in Advanced. Month labels in seasonal inputs and the monthly results table are **localized** (`calendar.months.*`). **Guidance callouts (WP24)** in the form explain Simple setup, CO₂, electricity, economics, optional CAPEX, and active process assumptions.
 - **Retained internal contracts:** schema / domain / engine / export paths still support `daily_series` and `hourly_series`; domain conversion helpers for annual CO₂ `kg/year` remain internal only.
 - **Export authority:** exports still accept validated `scenario` input and recompute with fresh `calculateScenario`; they do not trust client-posted result objects.
+- **WP28 plant capacity and market CO₂:** optional `plant.electrolyzerMaxH2KgPerDay` (`kg H₂/day`) and `plant.methanationMaxCh4KgPerDay` (`kg CH₄/day`) cap daily throughput. Missing / `null` means unbounded. Optional market CO₂ purchase with `purchasePriceEurPerTco2` fills only a **finite** plant capacity when side-stream CO₂ used is below that capacity; if no finite cap exists, purchase remains zero. This is not dispatch optimization, storage, equipment sizing economics, or CAPEX logic.
 
 ---
 
@@ -46,9 +48,10 @@
 ## Reporting layer (mappers)
 
 1. **`build-export-model.ts`** (and dependents) **map and format** from `CalculationResult` / `ScenarioInput`; they do **not** re-harmonize temporal inputs or re-derive annual KPIs.
-2. **WP25 (readout layer):** The results surface shows a color-coded, qualitative **economic verdict** (favourable / mixed / unfavourable / not computable) from `buildEconomicVerdict(annualSummary)` and an **“Assumptions used in this calculation”** block from `buildUsedAssumptionsModel` / `usedAssumptionsToPrintable` (interpretive; **no duplicate KPI math**; not an investment recommendation). **Excel** and **PDF** include dedicated verdict / used-assumptions material consistent with the same readout layer. The same DTOs feed exports. **Used assumptions** are grouped (scenario, CO₂, electricity, economics, CAPEX, process). **Only engine-active** process fields appear, consistent with **WP23**; plant availability and process efficiency are excluded from user-facing used-assumption lists.
+2. **WP25/WP28 (readout layer):** The results surface shows a color-coded, qualitative **economic verdict** (favourable / mixed / unfavourable / not computable) from `buildEconomicVerdict(annualSummary)` and an **“Assumptions used in this calculation”** block from `buildUsedAssumptionsModel` / `usedAssumptionsToPrintable` (interpretive; **no duplicate KPI math**; not an investment recommendation). **Excel** and **PDF** include dedicated verdict / used-assumptions material consistent with the same readout layer. The same DTOs feed exports. **Used assumptions** are grouped (scenario, CO₂, plant capacity / CO₂ purchase, electricity, economics, CAPEX, process). **Only engine-active** process fields appear, consistent with **WP23**; plant availability and process efficiency are excluded from user-facing used-assumption lists. Active WP28 capacity and market purchase price inputs appear with explicit units when provided/enabled.
 3. **`assertCalculationResultExportable`** and **`assertExcelModelReady`** are **throw-only** structural checks (lengths, `warnings` as `string[]`); they must not mutate results or substitute business defaults.
 4. **WP26 (display formatting):** Result charts, tables, and PDF use presentation-only scaling (e.g. kEUR, MEUR, compact mass/energy units), **axis labels with units**, and at most two decimal places in visible labels where applicable. The duplicate X-axis label inside the SVG was removed (**WP26 follow-up**); the **lower caption** under each browser chart remains. The **cost vs. revenue** chart uses more distinct line colours. PDF charts: improved margins, y-domain padding, clamped plot coordinates, compact ticks, larger tick/title fonts. **`CalculationResult` numeric values are unchanged**; **Excel** data sheets keep **numeric** cells (number formats for display, not pre-rounded strings, on display-oriented columns where used).
+5. **WP28 reporting:** Annual, monthly, and daily export models include total process CO₂ feed, side-stream CO₂ used, purchased CO₂, CO₂ purchase cost, and H₂/CH₄ bottleneck days from canonical `CalculationResult`. Export mappers must map these fields; they must not recalculate them.
 
 ---
 
@@ -69,6 +72,9 @@
 ## Do not regress (short checklist)
 
 - [ ] No business formulas in React components, export mappers, or layout-only helpers.
+- [ ] Do not count purchased CO₂ as recycled side-stream CO₂.
+- [ ] Do not label total process CO₂ feed as plain “CO₂ utilized” without context.
+- [ ] Do not make market CO₂ purchase active without a finite plant capacity unless product semantics are explicitly redesigned.
 - [ ] No **`calculationResult`** (or similar) as authoritative input on export APIs.
 - [ ] No UI-side KPI or export authority: exports must remain **server-validated `scenario` → `calculateScenario` → bytes**.
 - [ ] No change of **`warnings`** from opaque **`string[]`** without an explicit product contract.
@@ -96,6 +102,7 @@
 - No strict body-size policy beyond platform limits; very large pasted or imported series may be impractical.
 - **CSV time-series import** is **browser-side only**; it does not add a server ingest mode or a new `ScenarioInput` shape—only fills **`seriesText`** for the existing daily/hourly bulk paths. Supported layouts and error cases are those implemented by **`parse-time-series-csv`** (not arbitrary spreadsheet dialects).
 - **Display-unit switching** applies only to **constant electricity purchase price** in the form (`EUR/MWh` ↔ `c/kWh`); **annual CO₂** is fixed to `kt/year` (no unit selector visible). **Time-series** bulk entry and **exports** stay on **canonical** wire units (`kt/year`, `EUR/MWh`, and series semantics as today).
+- **WP28 capacity limits** are daily throughput caps only. They do not add dispatch/load optimization, storage dynamics, a native hourly internal engine, equipment sizing economics, or NPV/IRR/payback. CAPEX remains a separate optional user input.
 - **Default electricity data** includes Finnish VAT (25.5 % in 2025) because the source (porssisahko.net) provides consumer-facing prices. Industrial procurement prices are typically ex-VAT; users should override with their actual contract price. The scenario form surfaces a **visible** contextual note (not tooltip-only) on the imported market-data path alongside inline summary stats for the active series.
 - ASCII **`filename=`** in `Content-Disposition` only (no RFC 5987 `filename*`).
 - Optional: extra HTTP route tests for every `parseExportScenarioPostBody` error code (parser is already unit-tested).
@@ -110,4 +117,4 @@
 
 ## Consolidation note
 
-This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference. The April 2026 pass records **WP22–WP27** accepted behaviour: default **Finnish** locale, **Simple-first** flow, **seasonal** default CO₂ profile, **verdict + used assumptions** in UI and exports, **presentation** formatting for charts/tables/PDF, **hero** partner static assets, and the **active-only** process-assumption policy — without changing calculation formulas or the canonical wire contract. A subsequent **app-shell / stepper** UX pass locks the **sticky navbar** (stepper, Run, Reset, locale) and **Report-section** Excel/PDF actions; **calculation and export contracts stay unchanged**.
+This file incorporates the substance of former per-milestone docs (`wp8` polish, `wp9` export hardening + post-check, `wp10` release readiness) into one current-state reference. The April 2026 pass records **WP22–WP28** accepted behaviour: default **Finnish** locale, **Simple-first** flow, **seasonal** default CO₂ profile, **verdict + used assumptions** in UI and exports, **presentation** formatting for charts/tables/PDF, **hero** partner static assets, the **active-only** process-assumption policy, and **WP28** optional plant capacity / market CO₂ purchase semantics — without changing the daily-first architecture or export authority.

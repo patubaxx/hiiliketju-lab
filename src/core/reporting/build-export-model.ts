@@ -75,6 +75,12 @@ export type MonthlyExportRow = {
   readonly monthIndex: number;
   readonly firstDayIndex: number;
   readonly lastDayIndex: number;
+  readonly usableCO2Kg: number;
+  readonly freeCo2UsedKg: number;
+  readonly purchasedCo2Kg: number;
+  readonly co2PurchaseCostEur: number;
+  readonly h2CapacityBindingDays: number;
+  readonly ch4CapacityBindingDays: number;
   readonly methaneProducedKg: number;
   readonly electricityConsumedMwh: number;
   readonly totalCostEur: number;
@@ -155,6 +161,30 @@ function serializeScenarioInputSnapshot(input: ScenarioInput): readonly InputSna
   } else if (av.mode === CO2_MODE_TIME_SERIES_HOURLY) {
     pushKv(rows, "availability.hourlyAvailableCo2Kg.length", String(av.hourlyAvailableCo2Kg.length));
   }
+  pushKv(rows, "marketPurchase.mode", input.co2.marketPurchase?.mode ?? "disabled");
+  if (input.co2.marketPurchase?.mode === "enabled") {
+    pushKv(
+      rows,
+      "marketPurchase.purchasePriceEurPerTco2",
+      String(input.co2.marketPurchase.purchasePriceEurPerTco2),
+    );
+  }
+
+  pushSection(rows, "Plant capacity input");
+  pushKv(
+    rows,
+    "electrolyzerMaxH2KgPerDay",
+    input.plant?.electrolyzerMaxH2KgPerDay == null
+      ? "unbounded"
+      : String(input.plant.electrolyzerMaxH2KgPerDay),
+  );
+  pushKv(
+    rows,
+    "methanationMaxCh4KgPerDay",
+    input.plant?.methanationMaxCh4KgPerDay == null
+      ? "unbounded"
+      : String(input.plant.methanationMaxCh4KgPerDay),
+  );
 
   pushSection(rows, "Electricity purchase price input");
   const el = input.electricity;
@@ -202,23 +232,61 @@ function buildProcessAssumptionRows(process: ProcessAssumptionsInput): readonly 
 
 function buildAnnualMetricRows(summary: ScenarioSummary): readonly AnnualMetricExportRow[] {
   return [
-    { metricKey: "annualCO2AvailableKg", label: "Annual CO₂ available", value: summary.annualCO2AvailableKg, unit: "kg" },
-    { metricKey: "annualCO2UtilizedKg", label: "Annual CO₂ utilized", value: summary.annualCO2UtilizedKg, unit: "kg" },
-    { metricKey: "co2RecyclingRatePct", label: "CO₂ recycling rate", value: summary.co2RecyclingRatePct, unit: "%" },
+    {
+      metricKey: "annualCO2AvailableKg",
+      label: "Annual CO₂ available",
+      value: summary.annualCO2AvailableKg,
+      unit: "kg",
+    },
+    {
+      metricKey: "annualCO2UtilizedKg",
+      label: "Total process CO₂ feed",
+      value: summary.annualCO2UtilizedKg,
+      unit: "kg",
+    },
+    {
+      metricKey: "annualFreeCo2UsedKg",
+      label: "Side-stream CO₂ used",
+      value: summary.annualFreeCo2UsedKg,
+      unit: "kg",
+    },
+    { metricKey: "annualPurchasedCo2Kg", label: "Purchased CO₂", value: summary.annualPurchasedCo2Kg, unit: "kg" },
+    {
+      metricKey: "annualCo2PurchaseCostEur",
+      label: "Annual CO₂ purchase cost",
+      value: summary.annualCo2PurchaseCostEur,
+      unit: "EUR",
+    },
+    {
+      metricKey: "co2RecyclingRatePct",
+      label: "Side-stream recycling rate",
+      value: summary.co2RecyclingRatePct,
+      unit: "%",
+    },
     {
       metricKey: "annualMethaneProducedTons",
       label: "Annual methane produced",
       value: summary.annualMethaneProducedTons,
       unit: "t CH₄",
     },
-    { metricKey: "annualHydrogenNeededKg", label: "Annual hydrogen needed", value: summary.annualHydrogenNeededKg, unit: "kg H₂" },
+    {
+      metricKey: "annualHydrogenNeededKg",
+      label: "Annual hydrogen needed",
+      value: summary.annualHydrogenNeededKg,
+      unit: "kg H₂",
+    },
     {
       metricKey: "annualElectricityConsumedMwh",
       label: "Annual electricity consumed",
       value: summary.annualElectricityConsumedMwh,
       unit: "MWh",
     },
-    { metricKey: "annualVariableCostEur", label: "Annual variable cost", value: summary.annualVariableCostEur, unit: "EUR" },
+    {
+      metricKey: "annualVariableCostEur",
+      label: "Annual variable cost",
+      value: summary.annualVariableCostEur,
+      unit: "EUR",
+    },
     { metricKey: "annualCapexCostEur", label: "Annual CAPEX allocation", value: summary.annualCapexCostEur, unit: "EUR" },
     { metricKey: "annualTotalCostEur", label: "Annual total cost", value: summary.annualTotalCostEur, unit: "EUR" },
     { metricKey: "annualMethaneRevenueEur", label: "Annual methane revenue", value: summary.annualMethaneRevenueEur, unit: "EUR" },
@@ -246,7 +314,24 @@ function buildAnnualMetricRows(summary: ScenarioSummary): readonly AnnualMetricE
       value: summary.methanePriceAt30PctProfitabilityEurPerTon,
       unit: "EUR/t CH₄",
     },
-    { metricKey: "deltaVsHydrogenSaleEur", label: "Delta vs hydrogen sale", value: summary.deltaVsHydrogenSaleEur, unit: "EUR" },
+    {
+      metricKey: "deltaVsHydrogenSaleEur",
+      label: "Delta vs hydrogen sale",
+      value: summary.deltaVsHydrogenSaleEur,
+      unit: "EUR",
+    },
+    {
+      metricKey: "h2CapacityBindingDays",
+      label: "Electrolyzer bottleneck days",
+      value: summary.h2CapacityBindingDays,
+      unit: "days",
+    },
+    {
+      metricKey: "ch4CapacityBindingDays",
+      label: "Methanation bottleneck days",
+      value: summary.ch4CapacityBindingDays,
+      unit: "days",
+    },
   ];
 }
 
@@ -255,6 +340,12 @@ function buildMonthlyRows(monthly: readonly MonthlySummary[]): readonly MonthlyE
     monthIndex: m.monthIndex,
     firstDayIndex: m.firstDayIndex,
     lastDayIndex: m.lastDayIndex,
+    usableCO2Kg: m.sums.usableCO2Kg,
+    freeCo2UsedKg: m.sums.freeCo2UsedKg,
+    purchasedCo2Kg: m.sums.purchasedCo2Kg,
+    co2PurchaseCostEur: m.sums.co2PurchaseCostEur,
+    h2CapacityBindingDays: m.h2CapacityBindingDays,
+    ch4CapacityBindingDays: m.ch4CapacityBindingDays,
     methaneProducedKg: m.sums.methaneProducedKg,
     electricityConsumedMwh: m.sums.electricityConsumedMwh,
     totalCostEur: m.sums.totalCostEur,
@@ -269,6 +360,11 @@ function dailyResultToRow(d: DailyResult): Record<string, string | number> {
     dateLabel: d.dateLabel,
     availableCO2Kg: d.availableCO2Kg,
     usableCO2Kg: d.usableCO2Kg,
+    freeCo2UsedKg: d.freeCo2UsedKg,
+    purchasedCo2Kg: d.purchasedCo2Kg,
+    co2PurchaseCostEur: d.co2PurchaseCostEur,
+    h2CapacityBinding: d.h2CapacityBinding ? 1 : 0,
+    ch4CapacityBinding: d.ch4CapacityBinding ? 1 : 0,
     hydrogenNeededKg: d.hydrogenNeededKg,
     methaneProducedKg: d.methaneProducedKg,
     electricityConsumedMwh: d.electricityConsumedMwh,
@@ -294,6 +390,11 @@ export function buildScenarioExcelExportModel(result: CalculationResult): Scenar
     "dateLabel",
     "availableCO2Kg",
     "usableCO2Kg",
+    "freeCo2UsedKg",
+    "purchasedCo2Kg",
+    "co2PurchaseCostEur",
+    "h2CapacityBinding",
+    "ch4CapacityBinding",
     "hydrogenNeededKg",
     "methaneProducedKg",
     "electricityConsumedMwh",
@@ -341,7 +442,10 @@ export function buildScenarioExcelExportModel(result: CalculationResult): Scenar
     monthlyRows: buildMonthlyRows(result.monthlySummary),
     comparison: [
       { label: "Annual revenue — methane path", valueEur: result.annualSummary.annualMethaneRevenueEur },
-      { label: "Annual revenue — hydrogen sales alternative", valueEur: result.annualSummary.hydrogenSalesAlternativeRevenueEur },
+      {
+        label: "Annual revenue — hydrogen alternative (same H₂ as methane path)",
+        valueEur: result.annualSummary.hydrogenSalesAlternativeRevenueEur,
+      },
       { label: "Difference (methane minus hydrogen alternative)", valueEur: result.annualSummary.deltaVsHydrogenSaleEur },
     ],
     warnings: [...result.warnings],

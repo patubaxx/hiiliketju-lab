@@ -63,6 +63,7 @@ Any new code must respect these modes.
 - **Display units** in the scenario form: annual CO₂ is **`kt/year` only** (no selector); **constant** electricity purchase price may use **`EUR/MWh` or `c/kWh`**, converted in **`buildScenarioPayload`**. **Time-series** bulk entry does not add alternate display units in MVP.
 - **Browser CSV import** for CO₂ / electricity time-series fills the same bulk text path as manual entry; it is **not** a new `ScenarioInput` mode or server ingest contract.
 - **`plantAvailabilityPct` / `processEfficiencyPct`:** on the wire for future work; **not** user-facing active inputs in the current product (see [`docs/repository-invariants.md`](../docs/repository-invariants.md)).
+- **WP28 capacity / market CO₂:** optional daily plant caps are `plant.electrolyzerMaxH2KgPerDay` (`kg H₂/day`) and `plant.methanationMaxCh4KgPerDay` (`kg CH₄/day`); missing / `null` means unbounded. Market CO₂ purchase fills only finite capacity when side-stream CO₂ is insufficient. Keep total process CO₂ feed, side-stream CO₂ used, and purchased CO₂ separate; side-stream recycling rate excludes purchased CO₂.
 
 ---
 

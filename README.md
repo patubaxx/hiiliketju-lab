@@ -38,7 +38,7 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 
 Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ hourly → daily **sum**; electricity hourly → daily **arithmetic mean**).
 
-## Current product surface (WP22–WP27)
+## Current product surface (WP22–WP28)
 
 - **Default language:** the UI first-paints in **Finnish** when no stored locale exists; **English** and **Swedish** are available via the locale control in the **sticky navbar** (grouped separately from Run/Reset on desktop). A stored `localStorage` preference still wins after the client effect (no hydration skew).
 - **App-like flow:** the **sticky navbar** includes a persistent **stepper** for **Setup** → **Advanced settings (optional)** → **Results** → **Report**; **Run** and **Reset** are primary actions in the same bar. **Excel/PDF** export controls sit in the **Report** section after a successful run, not in the navbar.
@@ -48,8 +48,11 @@ Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ ho
 - **Results (WP25):** a qualitative **economic verdict** and an **assumptions used in this calculation** block (grouped: scenario, CO₂, electricity, economics, CAPEX, process) appear on screen; the same readouts are reflected in **Excel** and **PDF** exports, alongside existing KPI/series content.
 - **Presentation (WP26):** browser charts use axis labels and units, compact display units, and at most two decimal places in typical labels/tooltips; PDF charts use improved margins/domain padding. **Excel** data sheets keep numeric cells (number formats for display where used).
 - **Home hero (WP27):** partner marks **Business Finland** and **LAB** load from static URLs **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (place files in **`public/`**); they sit in the hero’s right column without a separate card, with alt text from i18n.
+- **Plant capacity and market CO₂ (WP28):** Advanced setup can optionally constrain daily plant throughput with **electrolyzer max H₂ kg/day** and **methanation max CH₄ kg/day**. Missing or `null` capacity means unbounded. Optional market CO₂ purchase can fill a **finite** plant capacity when side-stream CO₂ is insufficient; it is not used when no finite capacity exists. Results distinguish **total process CO₂ feed** (`free side-stream CO₂ + purchased CO₂`) from **side-stream CO₂ used**, and the **side-stream recycling rate** excludes purchased CO₂.
 
 The visible electricity selector still offers only `constant` and `historical_market_data_imported`; retained internal support for `daily_series` and `hourly_series` still exists in schema, domain, engine, and export paths. Imported market defaults use deterministic repository-local **Finland 2025** datasets (VAT in source; see invariants / release memo). The setup UI initializes methane and hydrogen assumed sales prices to **`1200 EUR/t_CH4`** and **`4 EUR/kg_H2`**.
+
+WP28 is still a daily-first scenario model: it does **not** add dispatch optimization, storage dynamics, a native hourly internal engine, equipment sizing economics, or NPV/IRR/payback. CAPEX remains a separate optional user-provided cost input.
 
 Further detail and regression guardrails: **[`docs/repository-invariants.md`](docs/repository-invariants.md)**.
 
@@ -58,6 +61,7 @@ Further detail and regression guardrails: **[`docs/repository-invariants.md`](do
 1. From the **Report** section (export buttons in the outcome panel), the client POSTs **`{ "scenario": <wire> }`** to **`/api/export/excel`** or **`/api/export/pdf`** (see `src/app/api/export/parse-export-body.ts`), typically with the same wire as the last successful form run.
 2. Server validates with Zod, merges process defaults, runs **`calculateScenario`**, then builds bytes from that result only.
 3. The API does **not** accept a client-sent `CalculationResult` or KPI snapshot as authoritative. Extra JSON keys are ignored.
+4. Excel/PDF reporting maps WP28 fields from the canonical result: total process CO₂ feed, side-stream CO₂ used, purchased CO₂, CO₂ purchase cost, bottleneck days, and active plant / market CO₂ inputs where applicable.
 
 Details and regression checklist: **[`docs/repository-invariants.md`](docs/repository-invariants.md)**.
 

@@ -32,6 +32,7 @@ import {
 export type UsedAssumptionGroupId =
   | "scenario"
   | "co2"
+  | "plant"
   | "electricity"
   | "economics"
   | "capex"
@@ -247,6 +248,38 @@ export function buildUsedAssumptionsModel(result: CalculationResult): readonly U
       value: st
         ? `${st.count} · min ${st.min.toFixed(4)} · max ${st.max.toFixed(4)}`
         : "—",
+    });
+  }
+
+  const plant = input.plant;
+  if (plant?.electrolyzerMaxH2KgPerDay !== null && plant?.electrolyzerMaxH2KgPerDay !== undefined) {
+    rows.push({
+      id: "plant.electrolyzerMaxH2KgPerDay",
+      groupId: "plant",
+      labelKey: "results.usedAssumptions.electrolyzerCapacityLimit",
+      value: plant.electrolyzerMaxH2KgPerDay,
+      unitKey: "results.usedAssumptions.unit.kgH2PerDay",
+      kind: "user_input",
+    });
+  }
+  if (plant?.methanationMaxCh4KgPerDay !== null && plant?.methanationMaxCh4KgPerDay !== undefined) {
+    rows.push({
+      id: "plant.methanationMaxCh4KgPerDay",
+      groupId: "plant",
+      labelKey: "results.usedAssumptions.methanationCapacityLimit",
+      value: plant.methanationMaxCh4KgPerDay,
+      unitKey: "results.usedAssumptions.unit.kgCh4PerDay",
+      kind: "user_input",
+    });
+  }
+  if (input.co2.marketPurchase?.mode === "enabled") {
+    rows.push({
+      id: "co2.marketPurchase.purchasePriceEurPerTco2",
+      groupId: "plant",
+      labelKey: "results.usedAssumptions.marketCo2PurchasePrice",
+      value: input.co2.marketPurchase.purchasePriceEurPerTco2,
+      unitKey: "results.usedAssumptions.unit.eurPerTco2",
+      kind: "user_input",
     });
   }
 

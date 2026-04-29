@@ -148,6 +148,7 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
   daily.addRow([...model.dailyResults.headers]);
   styleHeaderRow(daily.getRow(1));
   const eurDailyCols = new Set([
+    "co2PurchaseCostEur",
     "electricityCostEur",
     "variableCostEur",
     "allocatedCapexCostEur",
@@ -158,6 +159,8 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
   const twoDecCols = new Set([
     "availableCO2Kg",
     "usableCO2Kg",
+    "freeCo2UsedKg",
+    "purchasedCo2Kg",
     "hydrogenNeededKg",
     "methaneProducedKg",
     "electricityConsumedMwh",
@@ -174,7 +177,7 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
       }
     });
   }
-  setColumnWidths(daily, [9, 12, 14, 14, 14, 16, 18, 16, 16, 18, 16, 16, 20]);
+  setColumnWidths(daily, model.dailyResults.headers.map((h) => (h === "dateLabel" ? 12 : h.endsWith("Eur") ? 18 : 15)));
 
   // --- Annual Summary (includes monthly block) ---
   const annual = wb.addWorksheet("Annual Summary", {
@@ -198,6 +201,12 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     "monthIndex",
     "firstDayIndex",
     "lastDayIndex",
+    "usableCO2Kg",
+    "freeCo2UsedKg",
+    "purchasedCo2Kg",
+    "co2PurchaseCostEur",
+    "h2CapacityBindingDays",
+    "ch4CapacityBindingDays",
     "methaneProducedKg",
     "electricityConsumedMwh",
     "totalCostEur",
@@ -210,6 +219,12 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
       m.monthIndex,
       m.firstDayIndex,
       m.lastDayIndex,
+      m.usableCO2Kg,
+      m.freeCo2UsedKg,
+      m.purchasedCo2Kg,
+      m.co2PurchaseCostEur,
+      m.h2CapacityBindingDays,
+      m.ch4CapacityBindingDays,
       m.methaneProducedKg,
       m.electricityConsumedMwh,
       m.totalCostEur,
@@ -218,11 +233,15 @@ export function buildScenarioExcelWorkbook(model: ScenarioExcelExportModel): Exc
     ]);
     r.getCell(4).numFmt = "0.00";
     r.getCell(5).numFmt = "0.00";
-    r.getCell(6).numFmt = EUR_NUMFMT;
+    r.getCell(6).numFmt = "0.00";
     r.getCell(7).numFmt = EUR_NUMFMT;
-    r.getCell(8).numFmt = EUR_NUMFMT;
+    r.getCell(10).numFmt = "0.00";
+    r.getCell(11).numFmt = "0.00";
+    r.getCell(12).numFmt = EUR_NUMFMT;
+    r.getCell(13).numFmt = EUR_NUMFMT;
+    r.getCell(14).numFmt = EUR_NUMFMT;
   }
-  setColumnWidths(annual, [40, 22, 14]);
+  setColumnWidths(annual, [40, 22, 14, 16, 16, 16, 18, 16, 18, 16, 18, 18, 18, 22]);
 
   // --- Comparison ---
   const cmp = wb.addWorksheet("Comparison", {

@@ -56,4 +56,24 @@ describe("parseExportScenarioPostBody", () => {
       expect(r.input.economics.methanePriceEurPerTch4).toBe(scenario.economics.methanePriceEurPerTch4);
     }
   });
+
+  it("accepts WP28 wire (plant caps + co2.marketPurchase) same as UI / parseScenarioInput", () => {
+    const scenario = {
+      ...minimalExportScenarioWire(),
+      plant: {
+        electrolyzerMaxH2KgPerDay: 1000,
+        methanationMaxCh4KgPerDay: null as null,
+      },
+      co2: {
+        ...minimalExportScenarioWire().co2,
+        marketPurchase: { mode: "enabled" as const, purchasePriceEurPerTco2: 80 },
+      },
+    };
+    const r = parseExportScenarioPostBody(JSON.stringify({ scenario }));
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.input.plant?.electrolyzerMaxH2KgPerDay).toBe(1000);
+      expect(r.input.co2.marketPurchase).toEqual({ mode: "enabled", purchasePriceEurPerTco2: 80 });
+    }
+  });
 });

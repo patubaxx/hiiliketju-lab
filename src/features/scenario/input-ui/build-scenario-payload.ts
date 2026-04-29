@@ -55,6 +55,18 @@ export function buildScenarioPayload(
     return { ok: false, issues };
   }
 
+  // WP28: optional market CO₂ purchase (CO₂ supply concern → goes on `co2.marketPurchase`).
+  const marketPurchase = buildCo2MarketPurchase(state, issues);
+  if (issues.some((i) => i.path.startsWith("co2.marketPurchase"))) {
+    return { ok: false, issues };
+  }
+
+  // WP28: optional plant capacity caps. Top-level `plant` block; omitted when not enabled.
+  const plant = buildPlantCapacity(state, issues);
+  if (issues.some((i) => i.path.startsWith("plant."))) {
+    return { ok: false, issues };
+  }
+
   const payload = {
     scenarioName: state.scenarioName.trim(),
     periodDays: SCENARIO_PERIOD_DAYS,
@@ -62,6 +74,7 @@ export function buildScenarioPayload(
       annualAmountKtPerYear: annualAmountKtPerYear ?? Number.NaN,
       utilizationRatePct: utilizationRatePct ?? Number.NaN,
       availability: availabilityResult,
+      ...(marketPurchase ? { marketPurchase } : {}),
     },
     electricity: electricityResult,
     economics: economicsResult,
@@ -70,9 +83,51 @@ export function buildScenarioPayload(
       assumptionsVersion: state.assumptionsVersion.trim(),
       ...(state.assumptionsNotes.trim() ? { notes: state.assumptionsNotes.trim() } : {}),
     },
+    ...(plant ? { plant } : {}),
   };
 
   return { ok: true, payload };
+}
+
+function buildCo2MarketPurchase(
+  state: ScenarioFormState,
+  issues: BuildPayloadIssue[],
+): { mode: "enabled"; purchasePriceEurPerTco2: number } | { mode: "disabled" } | undefined {
+  const mp = state.co2MarketPurchase;
+  if (!mp.enabled) return undefined; // omit entirely from payload
+  const price = parseFiniteNumber(mp.purchasePriceEurPerTco2);
+  if (price === undefined || price < 0) {
+    issues.push({ path: "co2.marketPurchase.purchasePriceEurPerTco2", message: "invalid" });
+    return undefined;
+  }
+  return { mode: "enabled", purchasePriceEurPerTco2: price };
+}
+
+function buildPlantCapacity(
+  state: ScenarioFormState,
+  issues: BuildPayloadIssue[],
+):
+  | { electrolyzerMaxH2KgPerDay: number | null; methanationMaxCh4KgPerDay: number | null }
+  | undefined {
+  const p = state.plant;
+  if (!p.enabled) return undefined; // omit entirely from payload (= unbounded)
+  const ezRaw = p.electrolyzerMaxH2KgPerDay.trim();
+  const meRaw = p.methanationMaxCh4KgPerDay.trim();
+  const ez = ezRaw === "" ? null : parseFiniteNumber(ezRaw);
+  const me = meRaw === "" ? null : parseFiniteNumber(meRaw);
+  if (ez !== null && (ez === undefined || ez <= 0)) {
+    issues.push({ path: "plant.electrolyzerMaxH2KgPerDay", message: "invalid" });
+    return undefined;
+  }
+  if (me !== null && (me === undefined || me <= 0)) {
+    issues.push({ path: "plant.methanationMaxCh4KgPerDay", message: "invalid" });
+    return undefined;
+  }
+  if (ez === null && me === null) {
+    // Both empty: same as disabled. Omit so the payload stays clean.
+    return undefined;
+  }
+  return { electrolyzerMaxH2KgPerDay: ez, methanationMaxCh4KgPerDay: me };
 }
 
 function buildAvailability(
