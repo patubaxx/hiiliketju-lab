@@ -84,6 +84,20 @@ describe("WP28: H₂ capacity cap binds and reduces methane output", () => {
     expect(day0.purchasedCo2Kg).toBe(0);
     expect(r.annualSummary.h2CapacityBindingDays).toBe(365);
   });
+
+  it("same clipping when methanation cap is omitted (implicit unbounded) instead of explicit null", () => {
+    const wire = baseWire({
+      plant: {
+        electrolyzerMaxH2KgPerDay: 1000,
+      },
+    });
+    const r = calculateScenario(parseScenarioInput(wire));
+    const day0 = r.dailyResults[0]!;
+    const expectedCo2 = 1000 / STOICH_H2;
+    expect(day0.usableCO2Kg).toBeCloseTo(expectedCo2, 6);
+    expect(day0.h2CapacityBinding).toBe(true);
+    expect(day0.ch4CapacityBinding).toBe(false);
+  });
 });
 
 describe("WP28: CH₄ capacity cap binds and reduces hydrogen demand", () => {
@@ -101,6 +115,21 @@ describe("WP28: CH₄ capacity cap binds and reduces hydrogen demand", () => {
     expect(day0.usableCO2Kg).toBeCloseTo(expectedCo2, 6);
     expect(day0.methaneProducedKg).toBeCloseTo(1000, 6);
     expect(day0.hydrogenNeededKg).toBeCloseTo(expectedCo2 * STOICH_H2, 6);
+    expect(day0.ch4CapacityBinding).toBe(true);
+    expect(day0.h2CapacityBinding).toBe(false);
+    expect(r.annualSummary.ch4CapacityBindingDays).toBe(365);
+  });
+
+  it("same clipping when electrolyzer cap is omitted (implicit unbounded) instead of explicit null", () => {
+    const wire = baseWire({
+      plant: {
+        methanationMaxCh4KgPerDay: 1000,
+      },
+    });
+    const r = calculateScenario(parseScenarioInput(wire));
+    const day0 = r.dailyResults[0]!;
+    const expectedCo2 = 1000 / STOICH_CH4;
+    expect(day0.usableCO2Kg).toBeCloseTo(expectedCo2, 6);
     expect(day0.ch4CapacityBinding).toBe(true);
     expect(day0.h2CapacityBinding).toBe(false);
     expect(r.annualSummary.ch4CapacityBindingDays).toBe(365);

@@ -3,11 +3,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { type ScenarioInput } from "@/core/domain/scenario";
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import { createInitialFormState } from "@/features/scenario/input-ui/form-state";
 import { ResultsCharts } from "@/features/scenario/results-ui/results-charts";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { safeParseScenarioInput, scenarioWireToScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { translate } from "@/i18n/messages";
 import { LocaleProvider, useLocale } from "@/i18n/locale-context";
 
@@ -19,10 +19,7 @@ function runFromInitialState() {
   if (!built.ok) throw new Error("payload");
   const parsed = safeParseScenarioInput(built.payload);
   if (!parsed.success) throw new Error("parse");
-  const input: ScenarioInput = {
-    ...parsed.data,
-    process: mergeProcessAssumptionsInput(parsed.data.process),
-  };
+  const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
   return calculateScenario(input);
 }
 

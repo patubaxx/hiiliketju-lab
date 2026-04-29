@@ -3,11 +3,11 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { type ScenarioInput } from "@/core/domain/scenario";
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import { createInitialFormState, defaultElectricityBranch } from "@/features/scenario/input-ui/form-state";
 import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-app";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { safeParseScenarioInput, scenarioWireToScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { LocaleProvider } from "@/i18n/locale-context";
 
 import { waitForStoredLocaleEnApplied } from "./wait-for-stored-locale";
@@ -71,10 +71,7 @@ describe("WP22 – simple setup shell", () => {
     const parsed = safeParseScenarioInput(built.payload);
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
-    const input: ScenarioInput = {
-      ...parsed.data,
-      process: mergeProcessAssumptionsInput(parsed.data.process),
-    };
+    const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
     const r = calculateScenario(input);
     expect(r.input.scenarioName).toBe("New scenario");
   });
@@ -85,10 +82,7 @@ describe("WP22 – simple setup shell", () => {
     if (!built.ok) throw new Error("payload");
     const parsed = safeParseScenarioInput(built.payload);
     if (!parsed.success) throw new Error("parse");
-    const input: ScenarioInput = {
-      ...parsed.data,
-      process: mergeProcessAssumptionsInput(parsed.data.process),
-    };
+    const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
     const r = calculateScenario(input);
     expect(r.annualSummary.annualMethaneRevenueEur).toBeDefined();
   });
@@ -145,7 +139,7 @@ describe("WP22 – electricity in simple (visible modes)", () => {
     if (!built.ok) throw new Error("fail");
     const parsed = safeParseScenarioInput(built.payload);
     if (!parsed.success) throw new Error("zod");
-    const r = calculateScenario({ ...parsed.data, process: mergeProcessAssumptionsInput(parsed.data.process) });
+    const r = calculateScenario(scenarioWireToScenarioInput(parsed.data));
     expect(r.input.electricity.mode).toBe("constant");
   });
 
@@ -160,7 +154,7 @@ describe("WP22 – electricity in simple (visible modes)", () => {
     const parsed = safeParseScenarioInput(built.payload);
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
-    const r = calculateScenario({ ...parsed.data, process: mergeProcessAssumptionsInput(parsed.data.process) });
+    const r = calculateScenario(scenarioWireToScenarioInput(parsed.data));
     expect(r.input.electricity.mode).toBe("historical_market_data_imported");
   });
 });

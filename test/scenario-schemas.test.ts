@@ -480,6 +480,30 @@ describe("scenarioInputSchema", () => {
     expect(parsed.plant?.methanationMaxCh4KgPerDay).toBeNull();
   });
 
+  it("accepts plant with only one cap field (other omitted → unbounded)", () => {
+    const onlyH2 = parseScenarioInput(
+      baseScenario({
+        plant: { electrolyzerMaxH2KgPerDay: 1000 },
+      }),
+    );
+    expect(onlyH2.plant?.electrolyzerMaxH2KgPerDay).toBe(1000);
+    expect(onlyH2.plant?.methanationMaxCh4KgPerDay).toBeNull();
+
+    const onlyCh4 = parseScenarioInput(
+      baseScenario({
+        plant: { methanationMaxCh4KgPerDay: 900 },
+      }),
+    );
+    expect(onlyCh4.plant?.electrolyzerMaxH2KgPerDay).toBeNull();
+    expect(onlyCh4.plant?.methanationMaxCh4KgPerDay).toBe(900);
+  });
+
+  it("accepts empty plant object (both caps unbounded)", () => {
+    const parsed = parseScenarioInput(baseScenario({ plant: {} }));
+    expect(parsed.plant?.electrolyzerMaxH2KgPerDay).toBeNull();
+    expect(parsed.plant?.methanationMaxCh4KgPerDay).toBeNull();
+  });
+
   it("rejects plant cap zero on either side", () => {
     expect(
       safeParseScenarioInput(

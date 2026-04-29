@@ -3,7 +3,7 @@
 /**
  * Scenario shell: form state → validation → canonical `calculateScenario` → results presentation.
  * Run pipeline: `buildScenarioPayload` (parses text/series for UX feedback) → `safeParseScenarioInput` (authoritative Zod)
- * → `mergeProcessAssumptionsInput` (literature defaults for omitted process fields) → `calculateScenario`.
+ * → `scenarioWireToScenarioInput` (merged process defaults + plant capacity normalization) → `calculateScenario`.
  * Do not recompute KPIs or time series here; render from `CalculationResult` only.
  */
 import * as React from "react";
@@ -22,7 +22,7 @@ import {
   type ElectricityPriceInputDisplayUnit,
 } from "@/core/domain/input-display-unit-conversions";
 import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { type ScenarioInput } from "@/core/domain/scenario";
 import { SCENARIO_HOURLY_SLOTS, SCENARIO_PERIOD_DAYS } from "@/core/domain/temporal";
 import {
   type BuildPayloadIssue,
@@ -67,7 +67,7 @@ import { formatResultNumber } from "@/features/scenario/results-ui/format-result
 import { ResultsExcelExportButton } from "@/features/scenario/results-ui/results-excel-export-button";
 import { ResultsPdfExportButton } from "@/features/scenario/results-ui/results-pdf-export-button";
 import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { safeParseScenarioInput, scenarioWireToScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import type { Locale } from "@/i18n/messages";
 import { useLocale } from "@/i18n/locale-context";
 import { cn } from "@/lib/utils";
@@ -717,10 +717,7 @@ export function ScenarioInputApp() {
       return;
     }
 
-    const input: ScenarioInput = {
-      ...parsed.data,
-      process: mergeProcessAssumptionsInput(parsed.data.process),
-    };
+    const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
     scrollToOutcomeAfterRunRef.current = true;
     setFlowStep("results");
     setResult(calculateScenario(input));

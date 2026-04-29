@@ -3,11 +3,11 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { type ScenarioInput } from "@/core/domain/scenario";
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import { createInitialFormState } from "@/features/scenario/input-ui/form-state";
 import { ResultsPanel } from "@/features/scenario/results-ui/results-panel";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { safeParseScenarioInput, scenarioWireToScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { buildUsedAssumptionsModel } from "@/core/reporting/build-used-assumptions-model";
 import { buildScenarioExcelExportModel } from "@/core/reporting/build-export-model";
 import { useLocale, LocaleProvider } from "@/i18n/locale-context";
@@ -29,10 +29,7 @@ function runFromInitialState(): ReturnType<typeof calculateScenario> {
   if (!built.ok) throw new Error("payload");
   const parsed = safeParseScenarioInput(built.payload);
   if (!parsed.success) throw new Error("parse");
-  const input: ScenarioInput = {
-    ...parsed.data,
-    process: mergeProcessAssumptionsInput(parsed.data.process),
-  };
+  const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
   return calculateScenario(input);
 }
 
@@ -118,7 +115,7 @@ describe("WP25 – Advanced-edited value reflected in used assumptions", () => {
     if (!built.ok) throw new Error("x");
     const p = safeParseScenarioInput(built.payload);
     if (!p.success) throw new Error("p");
-    const input: ScenarioInput = { ...p.data, process: mergeProcessAssumptionsInput(p.data.process) };
+    const input: ScenarioInput = scenarioWireToScenarioInput(p.data);
     const r = calculateScenario(input);
     const m = buildUsedAssumptionsModel(r);
     const priceRow = m.find((x) => x.id === "economics.methane");

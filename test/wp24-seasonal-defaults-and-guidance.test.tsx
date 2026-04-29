@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { calculateScenario } from "@/core/calculation/calculate-scenario";
 import { DEFAULT_SEASONAL_CO2_RELATIVE_WEIGHTS } from "@/core/domain/seasonal-co2-default-weights";
-import { mergeProcessAssumptionsInput, type ScenarioInput } from "@/core/domain/scenario";
+import { type ScenarioInput } from "@/core/domain/scenario";
 import { buildScenarioPayload } from "@/features/scenario/input-ui/build-scenario-payload";
 import {
   createInitialFormState,
@@ -12,7 +12,7 @@ import {
 } from "@/features/scenario/input-ui/form-state";
 import { ScenarioInputApp } from "@/features/scenario/input-ui/scenario-input-app";
 import { ResultsTables } from "@/features/scenario/results-ui/results-tables";
-import { safeParseScenarioInput } from "@/features/scenario/schemas/scenario-schema";
+import { safeParseScenarioInput, scenarioWireToScenarioInput } from "@/features/scenario/schemas/scenario-schema";
 import { translate } from "@/i18n/messages";
 import { LocaleProvider, useLocale } from "@/i18n/locale-context";
 
@@ -26,10 +26,7 @@ function runFromInitialState(): ReturnType<typeof calculateScenario> {
   if (!built.ok) throw new Error("payload");
   const parsed = safeParseScenarioInput(built.payload);
   if (!parsed.success) throw new Error("parse");
-  const input: ScenarioInput = {
-    ...parsed.data,
-    process: mergeProcessAssumptionsInput(parsed.data.process),
-  };
+  const input: ScenarioInput = scenarioWireToScenarioInput(parsed.data);
   return calculateScenario(input);
 }
 
@@ -83,7 +80,7 @@ describe("WP24 – payload and annual reconciliation (seasonal default)", () => 
     const p = safeParseScenarioInput(built.payload);
     expect(p.success).toBe(true);
     if (!p.success) return;
-    const input: ScenarioInput = { ...p.data, process: mergeProcessAssumptionsInput(p.data.process) };
+    const input: ScenarioInput = scenarioWireToScenarioInput(p.data);
     const r = calculateScenario(input);
     expect(r.annualSummary.annualCO2AvailableKg).toBeCloseTo(1_000_000, 0);
   });
