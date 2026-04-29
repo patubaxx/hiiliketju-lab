@@ -56,6 +56,22 @@ export type ProcessFieldFormState = {
   assumptionNote: string;
 };
 
+/**
+ * WP28: optional plant capacity caps (electrolyzer kg H₂/day, methanation kg CH₄/day).
+ * Empty strings mean "unbounded" (legacy behavior, payload omits the field).
+ */
+export type PlantCapacityFormState = {
+  enabled: boolean;
+  electrolyzerMaxH2KgPerDay: string;
+  methanationMaxCh4KgPerDay: string;
+};
+
+/** WP28: optional market CO₂ top-up. When `enabled === true`, `purchasePriceEurPerTco2` is required. */
+export type Co2MarketPurchaseFormState = {
+  enabled: boolean;
+  purchasePriceEurPerTco2: string;
+};
+
 export type ScenarioFormState = {
   scenarioName: string;
   /** Annual CO₂ numeric string in `annualCo2DisplayUnit` (wire remains kt/year after payload build). */
@@ -65,6 +81,8 @@ export type ScenarioFormState = {
   assumptionsVersion: string;
   assumptionsNotes: string;
   co2: Co2FormBranch;
+  /** WP28: optional market CO₂ purchase (top-up to plant capacity). */
+  co2MarketPurchase: Co2MarketPurchaseFormState;
   electricity: ElectricityFormBranch;
   economics: {
     methanePriceEurPerTch4: string;
@@ -75,6 +93,8 @@ export type ScenarioFormState = {
     methanationCapexEur: string;
     capexLifetimeYears: string;
   };
+  /** WP28: optional plant capacity caps. */
+  plant: PlantCapacityFormState;
   process: Record<ProcessSchemaKey, ProcessFieldFormState>;
 };
 
@@ -180,6 +200,15 @@ export function createInitialFormState(): ScenarioFormState {
       electrolyzerCapexEur: "",
       methanationCapexEur: "",
       capexLifetimeYears: "20",
+    },
+    plant: {
+      enabled: false,
+      electrolyzerMaxH2KgPerDay: "",
+      methanationMaxCh4KgPerDay: "",
+    },
+    co2MarketPurchase: {
+      enabled: false,
+      purchasePriceEurPerTco2: "80",
     },
     process,
   };

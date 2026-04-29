@@ -121,6 +121,7 @@ describe("parseTimeSeriesCsv", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.code).toBe("incomplete_series");
+    if (r.error.code !== "incomplete_series") return;
     expect(r.error.missingCount).toBe(1);
   });
 

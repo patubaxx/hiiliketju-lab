@@ -69,6 +69,8 @@ Example note:
 - temporal electricity price resolution
 - stoichiometric methane pathway
 - hydrogen alternative revenue comparison
+- optional plant capacity caps (`kg H₂/day`, `kg CH₄/day`) and CO₂ source split
+- optional market CO₂ purchase cost
 - optional simple CAPEX allocation
 - annual KPI generation
 
@@ -140,8 +142,14 @@ Example note:
 | electrolyzerCapexEur | Electrolyzer CAPEX | EUR | conditional | user |
 | methanationCapexEur | Methanation CAPEX | EUR | conditional | user |
 | capexLifetimeYears | CAPEX lifetime | years | conditional | user/customer |
+| plant.electrolyzerMaxH2KgPerDay | Electrolyzer daily H₂ capacity cap; `null` / missing = unbounded | kg_H2/day | no | user/customer |
+| plant.methanationMaxCh4KgPerDay | Methanation daily CH₄ capacity cap; `null` / missing = unbounded | kg_CH4/day | no | user/customer |
+| co2.marketPurchase.mode | Market CO₂ purchase mode | `disabled` / `enabled` | no | user/customer |
+| co2.marketPurchase.purchasePriceEurPerTco2 | Market CO₂ purchase price; required when market purchase is enabled | EUR/t_CO2 | conditional | user/customer |
 
 Parameters in this table describe the **validated wire** `ScenarioInput`. UI-only display alternatives for **annual CO₂** and **constant electricity purchase price** are normalized to these units before validation.
+
+WP28 plant capacity values are daily throughput caps only. They do not introduce dispatch optimization, storage dynamics, equipment sizing economics, or CAPEX calculations. CAPEX remains the separate user-provided cost input above.
 
 ### 6.2 CO₂ temporal input contract
 
@@ -213,7 +221,12 @@ Current setup UI defaults for these editable commercial inputs are `1200 EUR/t_C
 |---|---|---|
 | dateLabel | ISO date string | Daily label |
 | availableCO2Kg | kg/day | CO₂ available for that day |
-| usableCO2Kg | kg/day | CO₂ utilized after utilization rate |
+| usableCO2Kg | kg/day | Total process CO₂ feed (`freeCo2UsedKg + purchasedCo2Kg`) |
+| freeCo2UsedKg | kg/day | Side-stream / free CO₂ used in the process |
+| purchasedCo2Kg | kg/day | Market CO₂ purchased to fill finite plant capacity |
+| co2PurchaseCostEur | EUR/day | Purchased CO₂ cost |
+| h2CapacityBinding | boolean | Operating point is at the finite electrolyzer-derived cap (within tolerance) |
+| ch4CapacityBinding | boolean | Operating point is at the finite methanation-derived cap (within tolerance) |
 | hydrogenNeededKg | kg/day | H₂ required for methane path |
 | methaneProducedKg | kg/day | CH₄ produced |
 | electricityConsumedMWh | MWh/day | Electricity consumed |
@@ -229,8 +242,11 @@ Current setup UI defaults for these editable commercial inputs are `1200 EUR/t_C
 | Parameter | Unit | Description |
 |---|---|---|
 | annualCO2AvailableKg | kg/year | Annual CO₂ available |
-| annualCO2UtilizedKg | kg/year | Annual CO₂ utilized |
-| co2RecyclingRatePct | % | Utilized vs available CO₂ |
+| annualCO2UtilizedKg | kg/year | Annual total process CO₂ feed; may exceed available side-stream CO₂ when market CO₂ is purchased |
+| annualFreeCo2UsedKg | kg/year | Annual side-stream / free CO₂ used |
+| annualPurchasedCo2Kg | kg/year | Annual purchased CO₂ |
+| annualCo2PurchaseCostEur | EUR/year | Annual purchased CO₂ cost |
+| co2RecyclingRatePct | % | Side-stream recycling rate (`annualFreeCo2UsedKg / annualCO2AvailableKg * 100`); purchased CO₂ excluded |
 | annualMethaneProducedTons | t/year | Annual methane output |
 | annualHydrogenNeededKg | kg/year | Annual hydrogen demand |
 | annualElectricityConsumedMWh | MWh/year | Annual electricity use |
@@ -243,6 +259,8 @@ Current setup UI defaults for these editable commercial inputs are `1200 EUR/t_C
 | methanePriceAt10PctProfitabilityEurPerTon | EUR/t_CH4 | Price at 10% markup on cost |
 | methanePriceAt30PctProfitabilityEurPerTon | EUR/t_CH4 | Price at 30% markup on cost |
 | deltaVsHydrogenSaleEur | EUR/year | Difference vs hydrogen alternative |
+| h2CapacityBindingDays | days/year | Days at the finite electrolyzer-derived cap |
+| ch4CapacityBindingDays | days/year | Days at the finite methanation-derived cap |
 
 ---
 
@@ -272,8 +290,40 @@ Before calculation begins, the engine must operate on:
 ### F-001 Annual CO₂ conversion
 `annualCO2Kg = annualCO2KtPerYear * 1000000`
 
-### F-002 Utilized CO₂ per day
-`usableCO2Kg_day = availableCO2Kg_day * (utilizationRatePct / 100)`
+### F-002 Side-stream CO₂ demand per day
+`freeCo2DemandKg_day = availableCO2Kg_day * (utilizationRatePct / 100)`
+
+### F-002A Capacity-derived CO₂ throughput caps (WP28)
+
+If the corresponding capacity is `null` or missing, ignore that cap.
+
+`h2DerivedCo2CapKg_day = electrolyzerMaxH2KgPerDay / stoichiometricHydrogenDemandFactor`
+
+`ch4DerivedCo2CapKg_day = methanationMaxCh4KgPerDay / stoichiometricMethaneYieldFactor`
+
+`effectiveCo2CapKg_day = min(defined finite caps)`
+
+If no finite cap exists, `effectiveCo2CapKg_day = Infinity`.
+
+### F-002B Side-stream CO₂ used (WP28)
+
+`freeCo2UsedKg_day = min(freeCo2DemandKg_day, effectiveCo2CapKg_day)`
+
+### F-002C Purchased CO₂ (WP28)
+
+If market purchase is enabled **and** a finite capacity exists:
+
+`purchasedCo2Kg_day = max(0, effectiveCo2CapKg_day - freeCo2UsedKg_day)`
+
+Otherwise:
+
+`purchasedCo2Kg_day = 0`
+
+### F-002D Total process CO₂ feed (WP28)
+
+`usableCO2Kg_day = freeCo2UsedKg_day + purchasedCo2Kg_day`
+
+Legacy scenarios without finite capacity or market purchase collapse to pre-WP28 behaviour: `usableCO2Kg_day = availableCO2Kg_day * utilizationRatePct / 100`.
 
 ### F-003 Stoichiometric hydrogen demand
 `hydrogenNeededKg_day = usableCO2Kg_day * stoichiometricHydrogenDemandFactor`
@@ -288,10 +338,13 @@ Before calculation begins, the engine must operate on:
 `electricityCostEur_day = electricityConsumedMWh_day * electricityPriceEurPerMWh_day`
 
 ### F-007 Variable cost
-`variableCostEur_day = electricityCostEur_day + otherOpexAllocatedEur_day`
+`variableCostEur_day = electricityCostEur_day + otherOpexAllocatedEur_day + co2PurchaseCostEur_day`
 
 Where:
 `otherOpexAllocatedEur_day = otherOpexEurPerYear / 365`
+
+and:
+`co2PurchaseCostEur_day = (purchasedCo2Kg_day / 1000) * purchasePriceEurPerTco2`
 
 ### F-008 Optional annual CAPEX allocation
 If `includeCapex = true`:
@@ -312,11 +365,19 @@ Else:
 ### F-012 Hydrogen alternative revenue
 `hydrogenAlternativeRevenueEur_day = hydrogenNeededKg_day * hydrogenPriceEurPerKg`
 
+Current WP28 semantics: `hydrogenNeededKg_day` is based on **total process CO₂ feed**, including purchased-CO₂ throughput when present.
+
 ### F-013 Annual methane output in tons
 `annualMethaneProducedTons = sum(methaneProducedKg_day) / 1000`
 
-### F-014 CO₂ recycling rate
-`co2RecyclingRatePct = annualCO2UtilizedKg / annualCO2AvailableKg * 100`
+### F-014 Side-stream CO₂ recycling rate
+`co2RecyclingRatePct = annualFreeCo2UsedKg / annualCO2AvailableKg * 100`
+
+Purchased CO₂ does **not** count as recycled side-stream CO₂. If `annualCO2AvailableKg = 0`, the result is `null`.
+
+### F-014A Bottleneck days (WP28)
+
+For each daily row, the H₂ / CH₄ binding flags indicate operation at the corresponding finite cap within calculation tolerance. Annual and monthly bottleneck day counts are sums of those booleans.
 
 ### F-015 Break-even methane price
 `breakEvenMethanePriceEurPerTon = annualTotalCostEur / annualMethaneProducedTons`
@@ -341,6 +402,8 @@ Else:
 - hydrogen price must be >= 0
 - CAPEX values must be >= 0
 - CAPEX lifetime must be > 0 if CAPEX included
+- plant capacity caps, when provided, must be > 0; `null` / missing means unbounded
+- enabled market CO₂ purchase requires a finite, non-negative `purchasePriceEurPerTco2`
 - no negative timestep values in temporal series
 - hourly series must align to full days when hourly harmonization is used
 
@@ -361,6 +424,10 @@ Else:
 | utilizationRatePct = 0 | no methane production |
 | annualMethaneProducedTons = 0 | profitability price KPIs must return null or explicit not-computable state |
 | includeCapex = true and lifetime missing | validation error |
+| no plant capacity caps | plant throughput is unbounded; market CO₂ purchase, if enabled, has no finite fill target and remains zero |
+| plant capacity cap is null/missing | that cap is ignored |
+| market purchase disabled/missing | purchased CO₂ and CO₂ purchase cost are zero |
+| purchased CO₂ used | total process CO₂ feed may exceed annual available side-stream CO₂; side-stream recycling rate still excludes purchased CO₂ |
 | all seasonal weights zero | validation error |
 | hourly series not divisible into days | validation error |
 | missing electricity price timestep after harmonization | validation error or controlled fill strategy with warning |
@@ -398,6 +465,11 @@ HTTP Excel/PDF export in the shipped app builds file bytes only after server-sid
 - hourly electricity aggregation by arithmetic mean
 - CAPEX inclusion and exclusion
 - break-even and profitability price formulas
+- capacity-derived CO₂ caps
+- free vs purchased CO₂ split
+- CO₂ purchase cost inclusion in variable and total cost
+- side-stream-only recycling rate
+- bottleneck day counts
 - explicit literature flag presence on locked defaults
 
 ### Golden scenarios

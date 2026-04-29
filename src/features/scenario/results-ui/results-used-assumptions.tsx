@@ -12,6 +12,7 @@ type TFn = (id: string, vars?: Record<string, string>) => string;
 const GROUP_ORDER: readonly UsedAssumptionGroupId[] = [
   "scenario",
   "co2",
+  "plant",
   "electricity",
   "economics",
   "capex",

@@ -51,6 +51,8 @@ Jos halutaan tarkempi analyysi:
 - investointikustannukset
 - sähkön hintavaihtelu vuoden aikana
 - CO₂:n kausivaihtelu
+- mahdolliset laitoskapasiteetin päivittäiset rajat
+- mahdollinen CO₂:n markkinaosto, jos sivuvirta ei riitä määritettyyn kapasiteettiin
 
 ---
 
@@ -77,6 +79,7 @@ Mukana voi olla:
 - sähkökustannus
 - muut käyttökulut
 - investointikulut
+- mahdollinen ostetun CO₂:n kustannus
 
 ### Vaihe 5: Laskee tuotannon ja kannattavuuden
 
@@ -86,6 +89,9 @@ Tuloksena saadaan esimerkiksi:
 - paljonko se maksaa tuottaa
 - mikä olisi kannattava myyntihinta
 - onko metaani parempi vaihtoehto kuin vedyn myynti
+- paljonko CO₂:sta tuli omasta sivuvirrasta ja paljonko mahdollisesti ostettiin markkinalta
+
+Ostettu CO₂ pidetään tuloksissa erillään yrityksen omasta sivuvirran CO₂:sta. Sivuvirran hyödyntämisaste kuvaa vain sitä, kuinka suuri osa saatavilla olevasta sivuvirrasta käytettiin prosessissa.
 
 ---
 

@@ -7,6 +7,9 @@ function s(p: Partial<ScenarioSummary>): ScenarioSummary {
   return {
     annualCO2AvailableKg: 0,
     annualCO2UtilizedKg: 0,
+    annualFreeCo2UsedKg: 0,
+    annualPurchasedCo2Kg: 0,
+    annualCo2PurchaseCostEur: 0,
     co2RecyclingRatePct: null,
     annualMethaneProducedTons: 0,
     annualHydrogenNeededKg: 0,
@@ -20,6 +23,8 @@ function s(p: Partial<ScenarioSummary>): ScenarioSummary {
     methanePriceAt10PctProfitabilityEurPerTon: null,
     methanePriceAt30PctProfitabilityEurPerTon: null,
     deltaVsHydrogenSaleEur: 0,
+    h2CapacityBindingDays: 0,
+    ch4CapacityBindingDays: 0,
     ...p,
   };
 }

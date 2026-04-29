@@ -463,6 +463,75 @@ describe("scenarioInputSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("accepts legacy wire without plant and without co2.marketPurchase", () => {
+    const parsed = parseScenarioInput(baseScenario());
+    expect(parsed.plant).toBeUndefined();
+    expect(parsed.co2.marketPurchase).toBeUndefined();
+  });
+
+  it("accepts optional plant with positive and null caps", () => {
+    const parsed = parseScenarioInput(
+      baseScenario({
+        plant: { electrolyzerMaxH2KgPerDay: 500, methanationMaxCh4KgPerDay: null },
+      }),
+    );
+    expect(parsed.plant?.electrolyzerMaxH2KgPerDay).toBe(500);
+    expect(parsed.plant?.methanationMaxCh4KgPerDay).toBeNull();
+  });
+
+  it("rejects plant cap zero on either side", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          plant: { electrolyzerMaxH2KgPerDay: 0, methanationMaxCh4KgPerDay: null },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("accepts co2.marketPurchase disabled without price", () => {
+    const parsed = parseScenarioInput(
+      baseScenario({
+        co2: {
+          annualAmountKtPerYear: 1,
+          utilizationRatePct: 50,
+          availability: { mode: "flat_annual" },
+          marketPurchase: { mode: "disabled" as const },
+        },
+      }),
+    );
+    expect(parsed.co2.marketPurchase?.mode).toBe("disabled");
+  });
+
+  it("requires purchasePriceEurPerTco2 when marketPurchase mode is enabled", () => {
+    expect(
+      safeParseScenarioInput(
+        baseScenario({
+          co2: {
+            annualAmountKtPerYear: 1,
+            utilizationRatePct: 50,
+            availability: { mode: "flat_annual" },
+            marketPurchase: { mode: "enabled" as const },
+          },
+        }),
+      ).success,
+    ).toBe(false);
+  });
+
+  it("accepts enabled marketPurchase with non-negative price", () => {
+    const parsed = parseScenarioInput(
+      baseScenario({
+        co2: {
+          annualAmountKtPerYear: 1,
+          utilizationRatePct: 50,
+          availability: { mode: "flat_annual" },
+          marketPurchase: { mode: "enabled" as const, purchasePriceEurPerTco2: 0 },
+        },
+      }),
+    );
+    expect(parsed.co2.marketPurchase).toEqual({ mode: "enabled", purchasePriceEurPerTco2: 0 });
+  });
 });
 
 describe("buildSeasonalDailyCo2ProfileKg", () => {

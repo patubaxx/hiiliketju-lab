@@ -73,6 +73,8 @@ export function calculateScenario(input: ScenarioInput): CalculationResult {
     electrolyzerSecMwhPerKgH2: sec.electrolyzerSecMwhPerKgH2,
     dailyAllocatedCapexEur: capex.dailyAllocatedCapexEur,
     utilizationRatePct: input.co2.utilizationRatePct,
+    plantCapacity: input.plant,
+    marketPurchase: input.co2.marketPurchase,
   });
 
   const monthlySummary = aggregateMonthlyFromDaily(dailyResults);

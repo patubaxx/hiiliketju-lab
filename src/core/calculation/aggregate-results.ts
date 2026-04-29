@@ -14,6 +14,9 @@ function emptyMonthSums() {
   return {
     availableCO2Kg: 0,
     usableCO2Kg: 0,
+    freeCo2UsedKg: 0,
+    purchasedCo2Kg: 0,
+    co2PurchaseCostEur: 0,
     hydrogenNeededKg: 0,
     methaneProducedKg: 0,
     electricityConsumedMwh: 0,
@@ -26,9 +29,14 @@ function emptyMonthSums() {
   };
 }
 
-function addDailyToSums(sums: ReturnType<typeof emptyMonthSums>, row: DailyResult): void {
+type MutableSums = ReturnType<typeof emptyMonthSums>;
+
+function addDailyToSums(sums: MutableSums, row: DailyResult): void {
   sums.availableCO2Kg += row.availableCO2Kg;
   sums.usableCO2Kg += row.usableCO2Kg;
+  sums.freeCo2UsedKg += row.freeCo2UsedKg;
+  sums.purchasedCo2Kg += row.purchasedCo2Kg;
+  sums.co2PurchaseCostEur += row.co2PurchaseCostEur;
   sums.hydrogenNeededKg += row.hydrogenNeededKg;
   sums.methaneProducedKg += row.methaneProducedKg;
   sums.electricityConsumedMwh += row.electricityConsumedMwh;
@@ -48,11 +56,15 @@ export function aggregateMonthlyFromDaily(dailyResults: readonly DailyResult[]):
     throw new RangeError(`Expected ${SCENARIO_PERIOD_DAYS} daily rows`);
   }
 
-  const buckets: ReturnType<typeof emptyMonthSums>[] = Array.from({ length: 12 }, () => emptyMonthSums());
+  const buckets: MutableSums[] = Array.from({ length: 12 }, () => emptyMonthSums());
+  const h2BindingDays = Array.from({ length: 12 }, () => 0);
+  const ch4BindingDays = Array.from({ length: 12 }, () => 0);
 
   for (const row of dailyResults) {
     const m = monthIndexForDayIndex(row.dayIndex);
     addDailyToSums(buckets[m]!, row);
+    if (row.h2CapacityBinding) h2BindingDays[m]!++;
+    if (row.ch4CapacityBinding) ch4BindingDays[m]!++;
   }
 
   const out: MonthlySummary[] = [];
@@ -64,34 +76,49 @@ export function aggregateMonthlyFromDaily(dailyResults: readonly DailyResult[]):
       firstDayIndex,
       lastDayIndex,
       sums: buckets[m]!,
+      h2CapacityBindingDays: h2BindingDays[m]!,
+      ch4CapacityBindingDays: ch4BindingDays[m]!,
     });
   }
   return out;
 }
 
-function sumDailyResults(dailyResults: readonly DailyResult[]): ReturnType<typeof emptyMonthSums> {
+function sumDailyResults(dailyResults: readonly DailyResult[]): {
+  readonly sums: MutableSums;
+  readonly h2BindingDays: number;
+  readonly ch4BindingDays: number;
+} {
   const totals = emptyMonthSums();
+  let h2BindingDays = 0;
+  let ch4BindingDays = 0;
   for (const row of dailyResults) {
     addDailyToSums(totals, row);
+    if (row.h2CapacityBinding) h2BindingDays++;
+    if (row.ch4CapacityBinding) ch4BindingDays++;
   }
-  return totals;
+  return { sums: totals, h2BindingDays, ch4BindingDays };
 }
 
 /**
  * Annual KPIs from daily rows: sums mass and energy, then derives business metrics.
  *
  * Null semantics (avoid misleading infinities or undefined ratios):
- * - `co2RecyclingRatePct`: null when no CO₂ was available (utilized/available undefined).
+ * - `co2RecyclingRatePct`: null when no CO₂ was available (utilized/available undefined). Reflects only
+ *   the biogenic free-stream pathway: `annualFreeCo2UsedKg / annualCo2AvailableKg × 100`. Purchased CO₂
+ *   is *not* counted toward biogenic recycling.
  * - `breakEvenMethanePriceEurPerTon`, profitability methane prices: null when no methane was produced (EUR/t would diverge).
  * `deltaVsHydrogenSaleEur` is always a number (can be negative) from summed daily revenues.
  */
 export function aggregateAnnualFromDaily(dailyResults: readonly DailyResult[]): ScenarioSummary {
-  const t = sumDailyResults(dailyResults);
+  const { sums: t, h2BindingDays, ch4BindingDays } = sumDailyResults(dailyResults);
   const annualMethaneProducedTons = t.methaneProducedKg / 1000;
   const annualCO2AvailableKg = t.availableCO2Kg;
   const annualCO2UtilizedKg = t.usableCO2Kg;
+  const annualFreeCo2UsedKg = t.freeCo2UsedKg;
+  const annualPurchasedCo2Kg = t.purchasedCo2Kg;
+  const annualCo2PurchaseCostEur = t.co2PurchaseCostEur;
   const co2RecyclingRatePct =
-    annualCO2AvailableKg > 0 ? (annualCO2UtilizedKg / annualCO2AvailableKg) * 100 : null;
+    annualCO2AvailableKg > 0 ? (annualFreeCo2UsedKg / annualCO2AvailableKg) * 100 : null;
 
   const annualTotalCostEur = t.totalCostEur;
   const breakEvenMethanePriceEurPerTon =
@@ -104,6 +131,9 @@ export function aggregateAnnualFromDaily(dailyResults: readonly DailyResult[]): 
   return {
     annualCO2AvailableKg,
     annualCO2UtilizedKg,
+    annualFreeCo2UsedKg,
+    annualPurchasedCo2Kg,
+    annualCo2PurchaseCostEur,
     co2RecyclingRatePct,
     annualMethaneProducedTons,
     annualHydrogenNeededKg: t.hydrogenNeededKg,
@@ -117,5 +147,7 @@ export function aggregateAnnualFromDaily(dailyResults: readonly DailyResult[]): 
     methanePriceAt10PctProfitabilityEurPerTon,
     methanePriceAt30PctProfitabilityEurPerTon,
     deltaVsHydrogenSaleEur: t.methaneRevenueEur - t.hydrogenAlternativeRevenueEur,
+    h2CapacityBindingDays: h2BindingDays,
+    ch4CapacityBindingDays: ch4BindingDays,
   };
 }

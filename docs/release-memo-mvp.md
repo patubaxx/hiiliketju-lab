@@ -1,7 +1,7 @@
 # Hiiliketju — MVP Release Memo
 
 **Date:** April 2026  
-**Scope:** Accepted product after **WP22–WP27** customer-delivery tranche (on top of earlier MVP foundations)  
+**Scope:** Accepted product after **WP22–WP28** customer-delivery / alignment tranche (on top of earlier MVP foundations)  
 **Audience:** Internal team and customer handoff
 
 ---
@@ -33,13 +33,16 @@ All business numbers come from a single canonical calculation: **`calculateScena
 | Electricity | **Purchase** price: **constant** (`EUR/MWh` or `c/kWh` in the form → canonical `EUR/MWh`) or **imported market data** (Finland 2025 bundled defaults; user can paste/import own series). |
 | Economics | Methane and hydrogen **assumed sales** prices (defaults **1 200 EUR/t CH₄**, **4 EUR/kg H₂** — verify for your case), other OPEX |
 | CAPEX | Optional; simple linear allocation over the selected lifetime |
+| Plant capacity / market CO₂ (WP28) | Optional daily capacity limits: electrolyzer max H₂ (`kg H₂/day`) and methanation max CH₄ (`kg CH₄/day`). Missing limits mean unbounded. Optional market CO₂ purchase can fill finite capacity when side-stream CO₂ is insufficient; purchase price is `EUR/t CO₂`. |
 | Advanced process | **Engine-active** parameters only (**WP23**): stoichiometric H₂ demand, stoichiometric CH₄ yield, electrolyzer SEC (+ derived MWh where shown). **`plantAvailabilityPct`** and **`processEfficiencyPct`** exist on the wire for **future** use; they are **not** user-facing active inputs and **not** shown in “assumptions used” or export assumption summaries. |
 
 ### Outputs and readouts
 
 - **KPIs, charts, tables** as before (annual, monthly, daily preview; time series charts).
+- **WP28 CO₂ split:** results distinguish **total process CO₂ feed** from **side-stream CO₂ used** and **purchased CO₂**. `annualCO2UtilizedKg` is total process feed and may exceed available side-stream CO₂ when market CO₂ is purchased. **Side-stream recycling rate** excludes purchased CO₂.
+- **WP28 cost / constraints:** CO₂ purchase cost is included in variable and total cost. Results show H₂/electrolyzer and CH₄/methanation bottleneck days where capacity caps bind.
 - **Economic verdict (WP25):** small, color-coded band (favourable / mixed / unfavourable / not computable) — **interpretive only**, from existing annual summary fields; **not** an investment recommendation.
-- **Assumptions used in this calculation (WP25):** grouped list (scenario, CO₂, electricity, economics, CAPEX, process), including Simple defaults. Excludes internal future-only fields not surfaced as active (e.g. plant availability / process efficiency in user-facing lists).
+- **Assumptions used in this calculation (WP25/WP28):** grouped list (scenario, CO₂, plant capacity / CO₂ purchase, electricity, economics, CAPEX, process), including Simple defaults. Excludes internal future-only fields not surfaced as active (e.g. plant availability / process efficiency in user-facing lists).
 
 ### Presentation (WP26)
 
@@ -54,6 +57,7 @@ All business numbers come from a single canonical calculation: **`calculateScena
 ### Exports
 
 - **Excel** and **PDF** include material consistent with the **verdict** and **used assumptions** readouts, alongside inputs, series, and summaries.  
+- WP28 export/reporting fields are included where relevant: total process CO₂ feed, side-stream CO₂ used, purchased CO₂, CO₂ purchase cost, bottleneck days, and active capacity / purchase-price inputs.
 - **UX (accepted 2026):** the app uses an **app-like phased flow** with a **sticky stepper** in the navbar (**Setup** → **Advanced settings (optional)** → **Results** → **Report**). **Excel/PDF** download buttons sit in the **Report** section (not the navbar) and stay disabled until a run succeeds. This is **presentation/navigation only**.
 - **Export API:** `POST` with **`{ "scenario": <wire> }`** only; server validates, merges defaults, runs **`calculateScenario`**, builds bytes — **no** authoritative client-sent **`CalculationResult`** (unchanged).
 
@@ -105,7 +109,11 @@ As before.
 
 ### 3.11 Non-goals (unchanged)
 
-No dispatch optimization, storage dynamics, **NPV/IRR/payback**, or full investment suite in MVP.
+No dispatch optimization, storage dynamics, native hourly internal engine, plant design / equipment sizing economics, **NPV/IRR/payback**, or full investment suite in MVP. WP28 capacity limits are daily throughput caps only; CAPEX remains a separate user-provided cost input.
+
+### 3.12 Market CO₂ purchase semantics
+
+Market CO₂ purchase is used only when it is enabled **and** a finite plant capacity exists. If no finite capacity limit is set, there is no fill target and purchased CO₂ remains zero. Purchased CO₂ is not counted as recycled side-stream CO₂.
 
 ---
 
@@ -116,7 +124,8 @@ No dispatch optimization, storage dynamics, **NPV/IRR/payback**, or full investm
 3. **CO₂ and utilization** — Match plant/data reality.  
 4. **Stoichiometric / SEC** — Replace literature defaults if you have better data.  
 5. **CAPEX** — If included, check amounts and lifetime.  
-6. **Plant availability / process efficiency** — **Not** applied in the engine today; do not treat UI/export as if they were active levers.
+6. **Plant capacity / market CO₂ purchase (WP28)** — If used, verify H₂/day and CH₄/day capacity caps and market CO₂ purchase price.  
+7. **Plant availability / process efficiency** — **Not** applied in the engine today; do not treat UI/export as if they were active levers.
 
 ---
 
@@ -125,6 +134,7 @@ No dispatch optimization, storage dynamics, **NPV/IRR/payback**, or full investm
 - **`calculateScenario` → `CalculationResult`** is the **only** source of business numbers for UI and exports.  
 - **Export routes** accept **`{ "scenario": <wire> }`**, Zod-validate, **`mergeProcessAssumptionsInput`**, recompute, then build — **no** client result object as authority.  
 - **Hidden wire modes** (`daily_series` / `hourly_series` for electricity, etc.) stay valid in schema/engine/exports where applicable; visible selector remains narrower.  
+- **WP28 fields** are mapped from canonical `CalculationResult` / validated `ScenarioInput`; export mappers must not recompute CO₂ source split, purchase cost, or bottleneck days.  
 - Full checklist: **[`docs/repository-invariants.md`](repository-invariants.md)**.
 
 ---
@@ -138,8 +148,8 @@ The following items appeared in an **earlier** internal memo (WP15–WP18 era) a
 - Optional future: engine activation of **plant availability / process efficiency** after agreed semantics  
 - Broader: multi-market defaults, side-by-side scenarios, structured warning severities
 
-For the **original WP1–WP10 build sequence** and the **separate WP22–WP27 list**, see **[`docs/solution-spec-v2.md`](solution-spec-v2.md) §16**.
+For the **original WP1–WP10 build sequence**, **WP22–WP27 list**, and **WP28 alignment note**, see **[`docs/solution-spec-v2.md`](solution-spec-v2.md) §16**.
 
 ---
 
-*This memo reflects the **April 2026** accepted state after **WP22–WP27**. For formulas and contracts see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope see [`docs/solution-spec-v2.md`](solution-spec-v2.md). Not a source file for automated agents — see [`AGENTS.md`](../AGENTS.md).*
+*This memo reflects the **April 2026** accepted state after **WP22–WP28**. For formulas and contracts see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope see [`docs/solution-spec-v2.md`](solution-spec-v2.md). Not a source file for automated agents — see [`AGENTS.md`](../AGENTS.md).*

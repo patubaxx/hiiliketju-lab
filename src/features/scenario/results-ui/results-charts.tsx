@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
   Legend,
   Line,
@@ -13,6 +15,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 
+import { calendarMonthMessageId } from "@/core/domain/calendar-month-order";
 import type { CalculationResult } from "@/core/domain/result";
 import { pickEurPerDayYScaleFromMaxAbsEur, pickMassPerDayYScaleFromMaxAbsKg } from "@/core/presentation/chart-daily-scales";
 import { formatDisplayNumber } from "@/core/presentation/format-scaled-number";
@@ -403,7 +406,112 @@ export function ResultsCharts({
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
+
+        {/* WP28: monthly CO₂ source mix (free side stream vs purchased market CO₂) — only when purchase is non-zero. */}
+        <Co2SourceMixBarChart result={result} locale={locale} t={t} />
       </div>
     </section>
+  );
+}
+
+/**
+ * WP28 stacked bar chart: per calendar month, breaks down total CO₂ used in the process
+ * into free (biogenic side-stream) and purchased (market) components. Renders only when
+ * the year has any purchased CO₂ — otherwise it would be a single-series chart that
+ * duplicates the CO₂ availability line above.
+ *
+ * Aggregation source: `result.monthlySummary[*].sums.{freeCo2UsedKg, purchasedCo2Kg}`,
+ * which the canonical aggregator sums from per-day rows. The chart performs no math.
+ */
+function Co2SourceMixBarChart({
+  result,
+  locale,
+  t,
+}: {
+  result: CalculationResult;
+  locale: Locale;
+  t: TFn;
+}) {
+  const monthly = result.monthlySummary;
+  const totalPurchased = result.annualSummary.annualPurchasedCo2Kg;
+  if (!totalPurchased || totalPurchased <= 0) return null;
+
+  // Pick a mass scale (kg / t / kt) based on the largest monthly stack so labels stay readable.
+  const monthlyTotalsKg = monthly.map((m) => m.sums.freeCo2UsedKg + m.sums.purchasedCo2Kg);
+  const maxAbsKg = maxAbsOf(monthlyTotalsKg);
+  const yScale = pickMassPerDayYScaleFromMaxAbsKg(maxAbsKg);
+  const yLabel =
+    yScale.unitId === "kt"
+      ? t("results.chart.axis.yKt")
+      : yScale.unitId === "t"
+        ? t("results.chart.axis.yT")
+        : t("results.chart.axis.yKg");
+  const yTick = (v: number): string => fmt2(v, locale);
+
+  const data = monthly.map((m) => ({
+    monthIndex: m.monthIndex,
+    monthLabel: t(calendarMonthMessageId(m.monthIndex)),
+    free: m.sums.freeCo2UsedKg / yScale.divisor,
+    purchased: m.sums.purchasedCo2Kg / yScale.divisor,
+  }));
+
+  const co2MixTooltipFormatter: NonNullable<TooltipProps["formatter"]> = (value, name) => {
+    const label = name == null ? "" : String(name);
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      return [value === undefined ? "" : String(value), label];
+    }
+    return [`${fmt2(value, locale)} ${yScale.unitId}`, label];
+  };
+
+  return (
+    <ChartCard
+      title={t("results.chart.co2SourceMix")}
+      xAxisCaption={t("results.chart.axis.month")}
+    >
+      <ResponsiveContainer {...responsiveChartProps}>
+        <BarChart data={data} margin={chartMarginWithLegend}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis
+            dataKey="monthLabel"
+            tick={tickStyle}
+            tickMargin={8}
+            interval={0}
+            angle={-30}
+            textAnchor="end"
+            height={56}
+          />
+          <YAxis
+            tick={tickStyle}
+            width={64}
+            tickFormatter={yTick}
+            label={{ value: yLabel, angle: -90, position: "insideLeft", style: axisLabelStyle }}
+          />
+          <Tooltip
+            formatter={co2MixTooltipFormatter}
+            contentStyle={{
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "8px",
+              fontSize: "13px",
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
+          <Bar
+            dataKey="free"
+            name={t("results.chart.series.freeCo2UsedKg")}
+            stackId="co2"
+            fill="var(--chart-2)"
+            isAnimationActive={false}
+          />
+          <Bar
+            dataKey="purchased"
+            name={t("results.chart.series.purchasedCo2Kg")}
+            stackId="co2"
+            fill="var(--chart-3)"
+            isAnimationActive={false}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartCard>
   );
 }

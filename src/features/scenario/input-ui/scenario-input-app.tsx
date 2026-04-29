@@ -1250,6 +1250,122 @@ export function ScenarioInputApp() {
         ) : null}
       </Section>
 
+      {/* --- WP28: optional plant capacity caps (electrolyzer + methanation reactor) --- */}
+      <Section
+        title={t("sections.plantCapacity")}
+        description={t("sections.plantCapacityIntro")}
+        variant="subtle"
+      >
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <input
+              id="plantCapEnabled"
+              type="checkbox"
+              className="size-4 rounded border-input"
+              data-testid="plant-capacity-enabled"
+              checked={form.plant.enabled}
+              onChange={(e) =>
+                setForm((s) => ({
+                  ...s,
+                  plant: { ...s.plant, enabled: e.target.checked },
+                }))
+              }
+            />
+            <FieldLabel htmlFor="plantCapEnabled">{t("plantCapacity.enable")}</FieldLabel>
+          </div>
+          <FieldHint>{t("plantCapacity.enableHint")}</FieldHint>
+        </div>
+        {form.plant.enabled ? (
+          <div className="grid gap-4 sm:grid-cols-2 border-t border-border pt-4">
+            <div>
+              <FieldLabel htmlFor="plantH2Cap">{t("plantCapacity.electrolyzerMaxH2")}</FieldLabel>
+              <FieldHint>{t("plantCapacity.electrolyzerMaxH2Hint")}</FieldHint>
+              <input
+                id="plantH2Cap"
+                className={inputClassName}
+                inputMode="decimal"
+                placeholder={t("plantCapacity.unboundedPlaceholder")}
+                data-testid="plant-electrolyzer-max-h2"
+                value={form.plant.electrolyzerMaxH2KgPerDay}
+                onChange={(e) =>
+                  setForm((s) => ({
+                    ...s,
+                    plant: { ...s.plant, electrolyzerMaxH2KgPerDay: e.target.value },
+                  }))
+                }
+              />
+              <FieldError message={getErrors(errors, "plant.electrolyzerMaxH2KgPerDay", t)} />
+            </div>
+            <div>
+              <FieldLabel htmlFor="plantCh4Cap">{t("plantCapacity.methanationMaxCh4")}</FieldLabel>
+              <FieldHint>{t("plantCapacity.methanationMaxCh4Hint")}</FieldHint>
+              <input
+                id="plantCh4Cap"
+                className={inputClassName}
+                inputMode="decimal"
+                placeholder={t("plantCapacity.unboundedPlaceholder")}
+                data-testid="plant-methanation-max-ch4"
+                value={form.plant.methanationMaxCh4KgPerDay}
+                onChange={(e) =>
+                  setForm((s) => ({
+                    ...s,
+                    plant: { ...s.plant, methanationMaxCh4KgPerDay: e.target.value },
+                  }))
+                }
+              />
+              <FieldError message={getErrors(errors, "plant.methanationMaxCh4KgPerDay", t)} />
+            </div>
+          </div>
+        ) : null}
+
+        <div className="space-y-1 border-t border-border pt-4">
+          <div className="flex items-center gap-2">
+            <input
+              id="co2PurchaseEnabled"
+              type="checkbox"
+              className="size-4 rounded border-input"
+              data-testid="co2-purchase-enabled"
+              checked={form.co2MarketPurchase.enabled}
+              onChange={(e) =>
+                setForm((s) => ({
+                  ...s,
+                  co2MarketPurchase: { ...s.co2MarketPurchase, enabled: e.target.checked },
+                }))
+              }
+            />
+            <FieldLabel htmlFor="co2PurchaseEnabled">{t("co2MarketPurchase.enable")}</FieldLabel>
+          </div>
+          <FieldHint>{t("co2MarketPurchase.enableHint")}</FieldHint>
+        </div>
+        {form.co2MarketPurchase.enabled ? (
+          <div>
+            <FieldLabel htmlFor="co2PurchasePrice">
+              {t("co2MarketPurchase.purchasePrice")}
+            </FieldLabel>
+            <FieldHint>{t("co2MarketPurchase.purchasePriceHint")}</FieldHint>
+            <input
+              id="co2PurchasePrice"
+              className={inputClassName}
+              inputMode="decimal"
+              data-testid="co2-purchase-price"
+              value={form.co2MarketPurchase.purchasePriceEurPerTco2}
+              onChange={(e) =>
+                setForm((s) => ({
+                  ...s,
+                  co2MarketPurchase: {
+                    ...s.co2MarketPurchase,
+                    purchasePriceEurPerTco2: e.target.value,
+                  },
+                }))
+              }
+            />
+            <FieldError
+              message={getErrors(errors, "co2.marketPurchase.purchasePriceEurPerTco2", t)}
+            />
+          </div>
+        ) : null}
+      </Section>
+
       {/* --- Advanced process assumptions: only fields that affect the current engine (WP23) --- */}
       <Section title={t("sections.advanced")} description={t("sections.advancedIntro")} variant="technical">
         <GuidanceCallout

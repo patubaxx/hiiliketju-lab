@@ -51,12 +51,44 @@ export type Co2AvailabilityInput =
       readonly hourlyAvailableCo2Kg: readonly number[];
     };
 
+/**
+ * Optional market CO₂ purchase top-up. When `mode === "enabled"`, the engine fills
+ * remaining plant capacity (after biogenic free stream × utilization%) with purchased
+ * CO₂ at `purchasePriceEurPerTco2`. Only meaningful when at least one plant capacity
+ * cap (electrolyzer or methanation) is finite — otherwise "fill to what" is undefined
+ * and the engine will not purchase any CO₂.
+ */
+export type Co2MarketPurchaseInput =
+  | { readonly mode: "disabled" }
+  | {
+      readonly mode: "enabled";
+      /** Market purchase price (EUR per metric tonne of CO₂). */
+      readonly purchasePriceEurPerTco2: number;
+    };
+
 /** User-facing annual CO₂ + utilization + temporal availability contract. */
 export type Co2Input = {
   /** kt/year (locked MVP UI default). */
   readonly annualAmountKtPerYear: number;
   readonly utilizationRatePct: number;
   readonly availability: Co2AvailabilityInput;
+  /**
+   * Optional market CO₂ purchase top-up. Omitted = disabled. Backward-compatible
+   * with pre-WP28 wire payloads.
+   */
+  readonly marketPurchase?: Co2MarketPurchaseInput;
+};
+
+/**
+ * Optional plant capacity caps. `null` (or omitted block) = unbounded for that piece of
+ * equipment. Both caps are physical equipment limits in canonical kg/day; they leave the
+ * stoichiometric formulas untouched (caps the *quantity* of CO₂ processed, not the ratios).
+ */
+export type PlantCapacityInput = {
+  /** Max H₂ producible per day (electrolyzer ceiling), kg H₂/day. `null` = unbounded. */
+  readonly electrolyzerMaxH2KgPerDay: number | null;
+  /** Max CH₄ producible per day (methanation reactor ceiling), kg CH₄/day. `null` = unbounded. */
+  readonly methanationMaxCh4KgPerDay: number | null;
 };
 
 export const ELECTRICITY_MODE_CONSTANT = "constant" as const;
@@ -123,7 +155,25 @@ export type ScenarioInput = {
   readonly economics: EconomicsInput;
   readonly process: ProcessAssumptionsInput;
   readonly assumptionsMeta: AssumptionsMeta;
+  /**
+   * Optional plant capacity caps (WP28). When omitted, plant is treated as unbounded.
+   * Backward-compatible with pre-WP28 wire payloads.
+   */
+  readonly plant?: PlantCapacityInput;
 };
+
+/** Helper: a fully unbounded plant capacity block. */
+export function unboundedPlantCapacity(): PlantCapacityInput {
+  return {
+    electrolyzerMaxH2KgPerDay: null,
+    methanationMaxCh4KgPerDay: null,
+  };
+}
+
+/** Helper: market purchase disabled. */
+export function disabledCo2MarketPurchase(): Co2MarketPurchaseInput {
+  return { mode: "disabled" };
+}
 
 /** Merge partial process overrides with literature-based MVP defaults. */
 export function mergeProcessAssumptionsInput(

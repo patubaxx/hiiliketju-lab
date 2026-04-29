@@ -55,6 +55,8 @@ The MVP must produce, at minimum:
 - stoichiometric methane path calculation
 - hydrogen alternative path comparison
 - optional simple CAPEX module
+- optional daily plant capacity limits (electrolyzer max H₂ kg/day, methanation max CH₄ kg/day)
+- optional market CO₂ purchase to fill finite plant capacity when side-stream CO₂ is insufficient
 - KPI summary
 - charts
 - Excel export
@@ -70,6 +72,7 @@ The MVP must produce, at minimum:
 - persistent saved scenarios (browser state only; no server-side scenario store in MVP)
 - multi-path process editor
 - advanced process simulation beyond stoichiometric core + assumption modifiers
+- plant design / equipment sizing economics remain out of scope even when WP28 plant capacity inputs are used
 
 ---
 
@@ -206,7 +209,9 @@ The following defaults are locked for MVP and must be flagged as `literature_bas
 
 **Advanced** adds: scenario metadata, full **CO₂ availability** mode and profiles (default new scenario: **`seasonal_daily`** with winter-weighted monthly relative weights — see invariants for numeric defaults), **economics**, optional **CAPEX**, and **process** overrides. Optional browser **CSV import** fills the same bulk **`seriesText`** path as paste for supported time-series modes.
 
-All of the following still exist on the wire where applicable: scenario name, annual CO₂, utilization, CO₂ mode and data, electricity mode and values, methane/hydrogen assumed sales prices, other OPEX, optional CAPEX, process assumption fields (see §7.2).
+All of the following still exist on the wire where applicable: scenario name, annual CO₂, utilization, CO₂ mode and data, optional market CO₂ purchase, optional plant capacity limits, electricity mode and values, methane/hydrogen assumed sales prices, other OPEX, optional CAPEX, process assumption fields (see §7.2).
+
+**WP28 capacity / market CO₂ inputs:** Advanced setup may include `plant.electrolyzerMaxH2KgPerDay` (`kg H₂/day`) and `plant.methanationMaxCh4KgPerDay` (`kg CH₄/day`). Missing or `null` values mean unbounded / not limiting. Optional `co2.marketPurchase` can be enabled with `purchasePriceEurPerTco2`; purchase occurs only when a finite plant capacity exists and side-stream CO₂ used is below that capacity.
 
 ### 7.2 Advanced assumptions (user-facing, engine-active only)
 The **visible** Advanced process block lists **only** parameters the **shipped engine** uses: **stoichiometric H₂ demand**, **stoichiometric CH₄ yield**, **electrolyzer SEC** (kWh/kg H₂), plus **derived SEC (MWh)** where shown. **`plantAvailabilityPct`** and **`processEfficiencyPct`** are **not** included in this user-facing list (retained internally on the wire for future work).
@@ -218,8 +223,12 @@ All non-customer-provided values among the **shown** fields must display their s
 #### KPI summary
 At minimum:
 - annual CO₂ available
-- annual CO₂ utilized
-- CO₂ recycling rate
+- total process CO₂ feed (`annualCO2UtilizedKg`; side-stream CO₂ used + purchased CO₂)
+- side-stream CO₂ used
+- purchased CO₂
+- CO₂ purchase cost
+- side-stream recycling rate (purchased CO₂ excluded)
+- electrolyzer and methanation bottleneck days
 - annual methane produced
 - annual hydrogen needed
 - annual electricity consumed
@@ -235,7 +244,8 @@ At minimum:
 
 #### Qualitative readouts (reporting interpretation, not new engine output)
 - **Economic verdict:** a small, color-coded band (favourable / mixed / unfavourable / not computable) derived **only** from existing annual summary fields — **not** an investment recommendation.
-- **Assumptions used in this calculation:** grouped summary (scenario, CO₂, electricity, economics, CAPEX, process) reflecting what was actually merged into the run, including Simple defaults. Excludes internal future-capability-only fields not surfaced in UI (e.g. plant availability / process efficiency as user-facing active assumptions).
+- **Assumptions used in this calculation:** grouped summary (scenario, CO₂, plant capacity / CO₂ purchase, electricity, economics, CAPEX, process) reflecting what was actually merged into the run, including Simple defaults. Excludes internal future-capability-only fields not surfaced in UI (e.g. plant availability / process efficiency as user-facing active assumptions).
+- **WP28 readouts:** UI, Excel, and PDF distinguish **total process CO₂ feed** from **side-stream CO₂ used**. `annualCO2UtilizedKg` is total feed and may exceed `annualCO2AvailableKg` when purchased CO₂ is used; **side-stream recycling rate** is based only on side-stream CO₂.
 
 #### Visualizations
 At minimum:
@@ -265,6 +275,7 @@ Must include:
 - time series results
 - annual summary
 - comparison summary
+- WP28 reporting fields where applicable: total process CO₂ feed, side-stream CO₂ used, purchased CO₂, CO₂ purchase cost, bottleneck days, and active plant / market CO₂ purchase inputs
 
 **Data sheets** keep **numeric** cells; number formats apply display rounding where used — raw engine values are not replaced by pre-rounded strings for analysis columns.
 
@@ -277,6 +288,7 @@ Must include:
 - KPI summary
 - charts (with improved margins/typography vs. early MVP — see invariants)
 - comparison conclusion
+- concise WP28 readout (capacity limits, purchased CO₂, CO₂ purchase cost, bottleneck days) when relevant
 
 ---
 
@@ -289,6 +301,7 @@ Must include:
 - utilization rate
 - availability mode
 - temporal availability data
+- optional market CO₂ purchase mode and purchase price
 
 #### B. Electricity
 - price mode
@@ -297,6 +310,12 @@ Must include:
 #### C. Process assumptions (conceptual groups)
 - **Engine-active (user-facing in Advanced):** stoichiometric factors, SEC (and derived MWh presentation where used)
 - **Retained on wire for future engine work:** plant availability, process efficiency (not user-facing active assumptions in the current product)
+
+#### C2. Plant capacity (WP28)
+- optional electrolyzer max H₂ kg/day
+- optional methanation max CH₄ kg/day
+- missing/null capacity = unbounded
+- daily throughput caps only; not dispatch optimization or equipment sizing economics
 
 #### D. Economics
 - methane price
@@ -323,6 +342,7 @@ Must include:
 ### 8.3 Comparison logic
 - **Path A:** methane pathway
 - **Path B:** hydrogen sold alternative
+- The hydrogen alternative revenue uses the same H₂ amount required by the methane pathway for the selected **total process CO₂ feed**, including purchased-CO₂ throughput when present.
 
 ### 8.4 CAPEX logic
 If `includeCapex = true`, then:
@@ -344,6 +364,8 @@ If `includeCapex = false`, then:
 
 ### 9.1 User-facing default units
 - CO₂: `kt/year` in the visible form; retained internal conversion helpers for `kg/year` do not change the current product UI
+- Plant capacity: `kg H₂/day` and `kg CH₄/day`
+- Market CO₂ purchase price: `EUR/tCO₂`
 - H₂: `kg`
 - CH₄: `t/year`
 - methane price: `EUR/t_CH4`
@@ -358,6 +380,7 @@ If `includeCapex = false`, then:
 - CH₄ timestep value: `kg/day`
 - electricity timestep value: `MWh/day`
 - money timestep value: `EUR/day`
+- CO₂ source split values: `kg/day` (`freeCo2UsedKg`, `purchasedCo2Kg`, `usableCO2Kg`)
 
 ### 9.3 Unit principles
 - every input and output field must display units explicitly
@@ -384,6 +407,7 @@ The calculation engine accepts one validated scenario input object containing:
 - CO₂ input data
 - electricity price input data
 - economic inputs
+- optional plant capacity and market CO₂ purchase inputs
 - optional CAPEX inputs
 - assumptions metadata
 
@@ -393,6 +417,7 @@ The calculation engine returns one canonical calculation result containing:
 - resolved daily time series
 - assumptions metadata including source flags
 - annual summary
+- monthly summary and daily rows including WP28 CO₂ source split / bottleneck fields
 - warnings array
 - export-ready formatted sections or export-ready mapping inputs
 
@@ -403,6 +428,7 @@ The calculation engine returns one canonical calculation result containing:
 - the same input always produces the same output
 - output contains everything needed by UI and exports
 - calculation consumes canonical resolved temporal series rather than raw UI-specific source formats (bulk paste or CSV-imported text is normalized into the same series builder / validation path before **`ScenarioInput`** is accepted)
+- no-WP28 / legacy scenarios without plant capacity or market purchase retain pre-WP28 behaviour
 
 ---
 
@@ -417,6 +443,8 @@ The calculation engine returns one canonical calculation result containing:
 - temporal series length must be valid for the selected mode
 - optional CAPEX inputs must be complete if CAPEX is enabled
 - CAPEX lifetime must be greater than zero if CAPEX is enabled
+- plant capacity values, when provided, must be positive; `null` / missing means unbounded
+- enabled market CO₂ purchase requires a non-negative purchase price
 
 ### 11.2 Error cases
 - missing inputs
@@ -449,6 +477,7 @@ The UI must show user-friendly errors, not technical exceptions.
 - advanced engine-active assumptions are available without overwhelming the main workflow; guidance callouts explain major sections
 - primary chrome is a **sticky app navbar**: **flow stepper** (Setup → Advanced settings (optional) → Results → Report), **run**, **reset**, and **language** (locale); **Excel/PDF** downloads are triggered from the **Report** section after a successful run (export buttons **disabled** until then); **no** visible jump-to-outcome control in the navbar; a successful run **scrolls/focuses** the outcome region; this is layout/UX only and does not change calculation or export contracts
 - **Home hero (WP27):** optional static partner marks (**Business Finland**, **LAB**) from **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (place files in **`public/`**); i18n **alt** text; no visible “Partners” label; not inside a separate card
+- **WP28:** Optional plant capacity and market CO₂ purchase are advanced scenario controls. They are daily throughput caps / cost inputs, not dispatch optimization, storage, native hourly engine internals, plant design, or investment decision metrics.
 
 ### 12.2 Performance
 - a single scenario calculation should complete effectively instantly in a normal browser
@@ -585,6 +614,7 @@ The first version should use a neutral visual style that is easy to brand later.
 * target-profitability price calculation
 * hydrogen-sales comparison path
 * monthly and annual aggregation
+* WP28 capacity cap derivation, CO₂ source split, purchase cost, and bottleneck day counts
 
 ### 15.2 Validation tests
 
@@ -702,6 +732,7 @@ The labels below describe the **original implementation sequence** for the MVP. 
 - **WP26** — **Chart / table / PDF** presentation: axis labels, compact units, two-decimal display, PDF robustness; **follow-up:** single X-axis caption per chart; clearer **cost vs. revenue** colours.
 - **WP27** — **Hero** partner marks (**Business Finland**, **LAB**) via static `public/` SVG URLs; **follow-up:** larger logos, no card wrapper, no visible “Partners” line.
 - **App shell / guided flow (accepted 2026)** — **Sticky navbar** with **stepper**, **Run**, **Reset**, and **locale**; **Results** and **Report** via the stepper; **Excel/PDF** actions in the **Report** section. **UX/layout only**; export API and calculation contracts unchanged.
+- **WP28 — Plant capacity / market CO₂ alignment** — optional daily capacity caps (`electrolyzerMaxH2KgPerDay`, `methanationMaxCh4KgPerDay`), optional market CO₂ purchase, CO₂ source split, total process CO₂ feed vs side-stream CO₂ used, side-stream-only recycling rate, CO₂ purchase cost, bottleneck days, and aligned UI / Excel / PDF terminology. **No** dispatch optimization, storage dynamics, native hourly internal engine, plant design economics, or NPV/IRR/payback.
 
 ---
 

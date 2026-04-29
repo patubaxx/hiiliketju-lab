@@ -11,6 +11,43 @@ import { assumptionValueNumberSchema } from "./assumption-schema";
 import { co2AvailabilityInputSchema } from "./co2-availability-schema";
 import { electricityPriceInputSchema } from "./electricity-price-schema";
 
+/**
+ * WP28: optional plant capacity caps. `null` (or absence) means "unbounded" for that
+ * piece of equipment. The whole `plant` block is optional on the wire — pre-WP28
+ * payloads continue to validate.
+ */
+const plantCapacityInputSchema = z
+  .object({
+    electrolyzerMaxH2KgPerDay: z
+      .number("validation.zod.electrolyzerMaxH2MustBeNumber")
+      .finite("validation.zod.electrolyzerMaxH2MustBeFinite")
+      .positive("validation.zod.electrolyzerMaxH2Positive")
+      .nullable(),
+    methanationMaxCh4KgPerDay: z
+      .number("validation.zod.methanationMaxCh4MustBeNumber")
+      .finite("validation.zod.methanationMaxCh4MustBeFinite")
+      .positive("validation.zod.methanationMaxCh4Positive")
+      .nullable(),
+  })
+  .strict();
+
+/**
+ * WP28: optional CO₂ market purchase top-up. When `mode === "enabled"`,
+ * `purchasePriceEurPerTco2` is required and non-negative.
+ */
+const co2MarketPurchaseSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("disabled") }).strict(),
+  z
+    .object({
+      mode: z.literal("enabled"),
+      purchasePriceEurPerTco2: z
+        .number("validation.zod.co2PurchasePriceMustBeNumber")
+        .finite("validation.zod.co2PurchasePriceMustBeFinite")
+        .min(0, "validation.zod.co2PurchasePriceNonNegative"),
+    })
+    .strict(),
+]);
+
 const processAssumptionsPartialSchema = z
   .object({
     stoichiometricHydrogenDemandFactorKgH2PerKgCo2: assumptionValueNumberSchema.optional(),
@@ -37,6 +74,7 @@ export const scenarioInputSchema = z
         .min(0, "validation.zod.utilizationOutOfRange")
         .max(100, "validation.zod.utilizationOutOfRange"),
       availability: co2AvailabilityInputSchema,
+      marketPurchase: co2MarketPurchaseSchema.optional(),
     }),
     electricity: electricityPriceInputSchema,
     economics: z
@@ -100,6 +138,7 @@ export const scenarioInputSchema = z
       assumptionsVersion: z.string().trim().min(1, "validation.zod.assumptionsVersionRequired"),
       notes: z.string().optional(),
     }),
+    plant: plantCapacityInputSchema.optional(),
   })
   .strict();
 
