@@ -1,6 +1,6 @@
 /**
  * Assumption transparency: every literature-based or non-customer value must be traceable via metadata.
- * Shared by process inputs, exports, and UI (see repository `AGENTS.md` for the full policy).
+ * Shared by process inputs, exports, and UI (see `docs/calculation-implementation-spec-v2.md` §2 and `docs/solution-spec-v2.md` for policy).
  */
 
 export type AssumptionSource =

@@ -2,7 +2,7 @@
 
 **Purpose:** Single maintainer-facing checklist aligned with the **current** codebase. Supersedes scattered milestone handoff notes (polish, export hardening, release QA) as the place to verify behaviour and avoid regressions.
 
-**Normative policy** remains in [`AGENTS.md`](../AGENTS.md) and [`.cursor/rules.md`](../.cursor/rules.md). Product intent in [`solution-spec-v2.md`](solution-spec-v2.md); calculation detail in [`calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md).
+**Normative product and calculation policy** is documented in [`solution-spec-v2.md`](solution-spec-v2.md) and [`calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). This file focuses on **current shipped behaviour**, export boundaries, and regression checks.
 
 ---
 

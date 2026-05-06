@@ -1,7 +1,7 @@
 /**
  * Sanity check: run three scenarios through the backend `calculateScenario`,
  * compare the annual summary numbers against an independent Python reference
- * (manual_results.json). Used as a one-shot tool, not a long-lived regression.
+ * (`test/fixtures/manual_results.json`). Used as a one-shot tool, not a long-lived regression.
  */
 import { describe, expect, it } from "vitest";
 import * as fs from "node:fs";
@@ -13,7 +13,7 @@ import { parseScenarioInput } from "@/features/scenario/schemas/scenario-schema"
 const PRECISION = 4; // decimal places for toBeCloseTo (1e-4)
 
 const MANUAL = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "..", "outputs", "manual_results.json"), "utf-8"),
+  fs.readFileSync(path.resolve(__dirname, "fixtures", "manual_results.json"), "utf-8"),
 );
 
 function baseWire(overrides: Record<string, unknown> = {}): Record<string, unknown> {

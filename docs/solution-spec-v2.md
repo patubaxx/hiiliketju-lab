@@ -1,11 +1,11 @@
 # Solution Specification v2
 **Project:** Hiiliketju – browser-based techno-economic calculation application  
-**Implementation model:** Next.js + TypeScript + Cursor-agent guided implementation  
-**Status:** Updated after revised tender requirements  
+**Implementation model:** Next.js + TypeScript  
+**Status:** Updated to reflect agreed product requirements  
 **Language of UI (current):** **Finnish** is the default first paint when no stored locale exists; **English** and **Swedish** are available through the in-app locale control. Copy lives in `src/i18n/messages/` (dot-path keys).
 **Core principle:** daily-first engine, hourly-capable input contract
 
-**Related:** [`docs/index.md`](index.md) · [`repository-invariants.md`](repository-invariants.md) · [`AGENTS.md`](../AGENTS.md) · root [`README.md`](../README.md)
+**Related:** [`docs/index.md`](index.md) · [`repository-invariants.md`](repository-invariants.md) · root [`README.md`](../README.md)
 
 ---
 
@@ -647,172 +647,13 @@ Before that, protect:
 
 ---
 
-## 16. Delivery order (historical reference)
+## 16. Delivery history note
 
-The labels below describe the **original implementation sequence** for the MVP. **Current behaviour** is defined by the repository code and by **[`docs/repository-invariants.md`](repository-invariants.md)** (export boundary, regression checklist). Use **[`docs/index.md`](index.md)** to find all specs.
-
-### WP1 — Solution refinement
-
-* this solution specification
-* input/output field lock
-* process-model basis lock
-* assumptions structure lock
-
-### WP2 — Calculation implementation specification
-
-* formulas
-* units
-* parameters
-* assumptions versions
-* reference tests
-
-### WP3 — Domain foundation
-
-* TypeScript types
-* zod schemas
-* formatters
-* assumption metadata structures
-* temporal input structures
-* temporal resolution helpers
-
-### WP4 — Calculation engine
-
-* temporal series resolution
-* methane path
-* hydrogen-sales alternative
-* optional CAPEX allocation
-* aggregations
-
-### WP5 — Input UI
-
-* form view
-* advanced assumptions
-* temporal profile editor / input controls
-* electricity price mode input
-* validation
-
-### WP6 — Results UI
-
-* KPI cards
-* charts
-* comparisons
-* tables
-* assumption flags and warnings presentation
-
-### WP7 — Exports
-
-* Excel
-* PDF
-
-### WP8 — Polish + QA
-
-* error states
-* documentation
-* final polish
-
-### WP9 — Server-side export hardening
-
-* `/api/export/excel` and `/api/export/pdf` validate `scenario`, run `calculateScenario`, return bytes
-* structural guards; no client-sent authoritative results
-
-### WP10 — Release readiness
-
-* documentation alignment with accepted implementation
-* handoff and explicit MVP limitations (no product expansion)
-
-### Customer-delivery tranche (WP22–WP27, historical reference)
-
-**Note:** the labels below are a **later** implementation sequence (customer feedback), **not** the same as WP1–WP10. **Current behaviour** = repository code + **[`docs/repository-invariants.md`](repository-invariants.md)**.
-
-- **WP22** — Default **Finnish** + **Simple-first** setup (Basic inputs only on the main path; full scenario name and details in Advanced); hydration-safe locale; no separate `SimpleScenarioInput` type.
-- **WP22** — hotfix: locale hydration consistency.
-- **WP23** — **Active assumptions policy:** only engine-used process parameters in user-facing Advanced and in “assumptions used” / export surfaces; `plantAvailabilityPct` / `processEfficiencyPct` retained on wire, not user-facing active.
-- **WP24** — Default **seasonal** CO₂ mode with **winter-weighted** monthly relative weights; **localized** month names; visible **guidance** callouts.
-- **WP25** — **Economic verdict** + **assumptions used in this calculation** in UI, Excel, and PDF (interpretive; no new KPI math).
-- **WP26** — **Chart / table / PDF** presentation: axis labels, compact units, two-decimal display, PDF robustness; **follow-up:** single X-axis caption per chart; clearer **cost vs. revenue** colours.
-- **WP27** — **Hero** partner marks (**Business Finland**, **LAB**) via static `public/` SVG URLs; **follow-up:** larger logos, no card wrapper, no visible “Partners” line.
-- **App shell / guided flow (accepted 2026)** — **Sticky navbar** with **stepper**, **Run**, **Reset**, and **locale**; **Results** and **Report** via the stepper; **Excel/PDF** actions in the **Report** section. **UX/layout only**; export API and calculation contracts unchanged.
-- **WP28 — Plant capacity / market CO₂ alignment** — optional daily capacity caps (`electrolyzerMaxH2KgPerDay`, `methanationMaxCh4KgPerDay`), optional market CO₂ purchase, CO₂ source split, total process CO₂ feed vs side-stream CO₂ used, side-stream-only recycling rate, CO₂ purchase cost, bottleneck days, and aligned UI / Excel / PDF terminology. **No** dispatch optimization, storage dynamics, native hourly internal engine, plant design economics, or NPV/IRR/payback.
+Earlier planning used **WP*** milestone labels (e.g. WP1–WP10 build sequence, later WP22–WP28 customer-delivery items). Those lists are **not** normative. **Current behaviour** is defined only by the **repository code**, **[`docs/repository-invariants.md`](repository-invariants.md)** (regression checklist and export boundary), and the specifications linked from **[`docs/index.md`](index.md)**.
 
 ---
 
-## 17. Automation and agent guidance
-
-Historical note: the following **agent split** described an early parallel workflow. For current work, follow **[`AGENTS.md`](../AGENTS.md)** (repository root), **[`.cursor/rules.md`](../.cursor/rules.md)**, and optional legacy prompts under **`cursor_agents/`** (see **`cursor_agents/README.md`**).
-
-### Agent 1 — Domain & schemas
-
-Responsible for:
-
-* types
-* zod validation
-* unit models
-* temporal input structures
-* assumption metadata structures
-
-### Agent 2 — Calculation engine
-
-Responsible for:
-
-* pure calculation logic
-* temporal series resolution and harmonization
-* stoichiometric methane path
-* hydrogen alternative comparison
-* optional CAPEX allocation
-* aggregation
-
-### Agent 3 — Testing
-
-Responsible for:
-
-* unit tests
-* harmonization tests
-* golden scenario tests
-* edge cases
-
-### Agent 4 — Inputs UI
-
-Responsible for:
-
-* forms
-* validation
-* temporal profile input UI
-* electricity price mode UI
-* advanced assumptions UI
-* UX
-
-### Agent 5 — Results UI
-
-Responsible for:
-
-* KPI cards
-* charts
-* comparison layout
-* tables
-* responsive behavior
-* warnings and flags display
-
-### Agent 6 — Excel export
-
-Responsible for:
-
-* workbook structure
-* sheets
-* assumptions metadata visibility
-* numeric formatting
-
-### Agent 7 — PDF export
-
-Responsible for:
-
-* report template
-* layout
-* brand-ready styling
-* visible assumption flags
-
----
-
-## 18. Definition of Done for MVP
+## 17. Definition of Done for MVP
 
 The MVP is done when:
 
@@ -831,9 +672,9 @@ The MVP is done when:
 
 ---
 
-## 19. Assumptions Used in This Specification
+## 18. Assumptions Used in This Specification
 
-* The tender requirement is the stronger source of truth versus older internal MVP assumptions.
+* Agreed **product requirements** take precedence over older internal MVP assumptions when they conflict.
 * Daily internal resolution is sufficient for MVP if hourly input remains supported at the contract level.
 * Literature-based defaults are acceptable for MVP when clearly marked and separated from customer-confirmed values.
 * Profitability prices are interpreted as markup on cost in MVP.

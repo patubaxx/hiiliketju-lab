@@ -1,4 +1,10 @@
-# Mikä tämä työkalu on?
+# Hiiliketju — käyttöopas (suomi)
+
+Yleistajuinen kuvaus työkalusta päätöksenteon ja keskustelun tueksi.
+
+---
+
+## Mikä tämä työkalu on?
 
 Hiiliketju on laskentatyökalu, joka auttaa arvioimaan, **kannattaako hiilidioksidista ja vedystä valmistaa synteettistä metaania** vai olisiko järkevämpää käyttää vety johonkin muuhun tai myydä se sellaisenaan.
 
@@ -6,7 +12,7 @@ Se näyttää nopeasti, paljonko tuotanto voisi maksaa, paljonko metaania syntyy
 
 ---
 
-# Mitä tämä tekee käytännössä?
+## Mitä tämä tekee käytännössä?
 
 Työkalu vertaa kahta vaihtoehtoa:
 
@@ -22,7 +28,7 @@ Työkalu kertoo, kumpi vaihtoehto näyttää taloudellisesti paremmalta valituil
 
 ---
 
-# Mitä käyttäjän pitää syöttää?
+## Mitä käyttäjän pitää syöttää?
 
 Peruskäytössä vain muutama tieto riittää:
 
@@ -56,7 +62,7 @@ Jos halutaan tarkempi analyysi:
 
 ---
 
-# Miten työkalu laskee tulokset?
+## Miten työkalu laskee tulokset?
 
 Yksinkertaistettuna näin:
 
@@ -95,37 +101,37 @@ Ostettu CO₂ pidetään tuloksissa erillään yrityksen omasta sivuvirran CO₂
 
 ---
 
-# Miten tuloksia tulkitaan?
+## Miten tuloksia tulkitaan?
 
-## Jos tuotantokustannus on matala
+### Jos tuotantokustannus on matala
 
 → Prosessi voi olla kilpailukykyinen.
 
-## Jos kannattava myyntihinta on korkea
+### Jos kannattava myyntihinta on korkea
 
 → Tarvitaan premium-markkina, tuki tai erityisasiakas.
 
-## Jos vedyn myynti näyttää paremmalta
+### Jos vedyn myynti näyttää paremmalta
 
 → Vedyn myynti voi olla järkevämpi kuin metaanin valmistus.
 
-## Jos sähkö on kallista
+### Jos sähkö on kallista
 
 → Kannattavuus heikkenee nopeasti.
 
 ---
 
-# Mitä hyötyä tästä työkalusta on?
+## Mitä hyötyä tästä työkalusta on?
 
-## Nopea päätöksenteon tuki
+### Nopea päätöksenteon tuki
 
 Näkee nopeasti, onko idea realistinen.
 
-## Investointien arviointi
+### Investointien arviointi
 
 Kannattaako selvittää hanketta tarkemmin?
 
-## Skenaariovertailu
+### Skenaariovertailu
 
 Mitä tapahtuu jos:
 
@@ -133,31 +139,31 @@ Mitä tapahtuu jos:
 - CO₂ määrä kasvaa?
 - metaanin hinta nousee?
 
-## Keskustelutyökalu
+### Keskustelutyökalu
 
 Hyvä yrityksille, kunnille, energiayhtiöille ja hankekehitykseen.
 
 ---
 
-# Yhden lauseen hissipuhe
+## Yhden lauseen hissipuhe
 
 Hiiliketju näyttää nopeasti, voiko hiilidioksidista ja vedystä valmistettu synteettinen metaani olla taloudellisesti järkevää juuri sinun lähtötiedoillasi.
 
 ---
 
-# Jos joku kysyy “miksi tämä on tärkeä?”
+## Jos joku kysyy “miksi tämä on tärkeä?”
 
 Koska tulevaisuudessa päästöjä ei riitä vain vähentää — myös hiilidioksidille pitää löytää hyödyllisiä käyttötapoja. Tämä työkalu auttaa arvioimaan, missä tilanteessa se voi kannattaa.
 
 ---
 
-# Päivitys (huhtikuu 2026)
+## Päivitys (huhtikuu 2026)
 
 Käyttöliittymän oletuskieli on **suomi**, jos käyttäjä ei ole valinnut toista kieltä. Sivun yläosan aloitusalueella voi näkyä **Business Finlandin** ja **LAB-ammattikorkeakoulun** tunnukset, kun vastaavat tiedostot on lisätty palvelimen `public/`-kansioon (ks. tekninen dokumentaatio). Tulosnäkymässä on lyhyt **taloudellinen tulkinta** ja **laskennassa käytetyt oletukset** — ne eivät ole sijoitussuosituksia.
 
 ---
 
-# Rehellinen huomio
+## Rehellinen huomio
 
 Tämä ei ole tehdassuunnitelma eikä lopullinen investointipäätösraportti.
 

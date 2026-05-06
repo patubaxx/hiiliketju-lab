@@ -1,8 +1,8 @@
-# Hiiliketju — MVP Release Memo
+# Hiiliketju — customer handoff (MVP)
 
 **Date:** April 2026  
 **Scope:** Accepted product after **WP22–WP28** customer-delivery / alignment tranche (on top of earlier MVP foundations)  
-**Audience:** Internal team and customer handoff
+**Audience:** Customer and maintainer handoff
 
 ---
 
@@ -89,7 +89,7 @@ Non-leap year; no multi-year model in MVP.
 
 ### 3.6 No scenario persistence
 
-Form state is **browser memory** only (refresh clears). **No** save/load in MVP. *(Earlier internal roadmaps may have named “WP22” for persistence — that naming is **obsolete**; **WP22** in the **accepted** codebase is default Finnish + Simple-first.)*
+Form state is **browser memory** only (refresh clears). **No** save/load in MVP.
 
 ### 3.7 No authentication or rate limiting
 
@@ -129,7 +129,7 @@ Market CO₂ purchase is used only when it is enabled **and** a finite plant cap
 
 ---
 
-## 5. Architecture invariants (maintainers)
+## 5. Architecture invariants
 
 - **`calculateScenario` → `CalculationResult`** is the **only** source of business numbers for UI and exports.  
 - **Export routes** accept **`{ "scenario": <wire> }`**, Zod-validate, **`mergeProcessAssumptionsInput`**, recompute, then build — **no** client result object as authority.  
@@ -139,17 +139,10 @@ Market CO₂ purchase is used only when it is enabled **and** a finite plant cap
 
 ---
 
-## 6. Historical internal roadmap (pre-WP22 naming)
+## 6. Note on older planning documents
 
-The following items appeared in an **earlier** internal memo (WP15–WP18 era) as **planned** follow-ups. **They are not commitment dates.** Some ideas shipped under **different** WP numbers (e.g. VAT prominence and assumption nudges were absorbed into later UX; **“WP22 = persistence”** is **not** the accepted meaning of **WP22** in the current codebase — see **§2** above).
-
-- Homepage / hero / electricity disclosure refinements  
-- Optional future: browser **localStorage** scenario persistence (not in current MVP)  
-- Optional future: engine activation of **plant availability / process efficiency** after agreed semantics  
-- Broader: multi-market defaults, side-by-side scenarios, structured warning severities
-
-For the **original WP1–WP10 build sequence**, **WP22–WP27 list**, and **WP28 alignment note**, see **[`docs/solution-spec-v2.md`](solution-spec-v2.md) §16**.
+Some older documents used **WP*** labels in different ways (for example, associating **WP22** with scenario persistence in early notes). **The shipped product** uses **WP22** for default Finnish + Simple-first setup. **Current behaviour** is always defined by the **code** and **[`docs/repository-invariants.md`](repository-invariants.md)**, not by historical planning lists.
 
 ---
 
-*This memo reflects the **April 2026** accepted state after **WP22–WP28**. For formulas and contracts see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope see [`docs/solution-spec-v2.md`](solution-spec-v2.md). Not a source file for automated agents — see [`AGENTS.md`](../AGENTS.md).*
+*This handoff reflects the **April 2026** accepted state after **WP22–WP28**. For formulas and contracts see [`docs/calculation-implementation-spec-v2.md`](calculation-implementation-spec-v2.md). For product scope see [`docs/solution-spec-v2.md`](solution-spec-v2.md).*

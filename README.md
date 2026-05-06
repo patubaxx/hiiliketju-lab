@@ -1,6 +1,6 @@
 # Hiiliketju Site
 
-Browser-based **techno-economic scenario calculator** for biogenic CO₂ utilization: compare **Path A** (CO₂ + H₂ → CH₄) vs **Path B** (CO₂ released + H₂ sold). This repository is the **customer-deliverable** Next.js application (UI, calculation engine, assumptions layer, and Excel/PDF reporting).
+Browser-based **techno-economic scenario calculator** for biogenic CO₂ utilization: compare **Path A** (CO₂ + H₂ → CH₄) vs **Path B** (CO₂ released + H₂ sold). This repository is the Next.js application (UI, calculation engine, assumptions layer, and Excel/PDF reporting).
 
 ## Architecture (four layers)
 
@@ -22,12 +22,10 @@ Browser-based **techno-economic scenario calculator** for biogenic CO₂ utiliza
 | Engine | `src/core/calculation/` | Harmonization, daily engine, monthly/annual roll-ups |
 | Reporting | `src/core/reporting/` | Export models, workbook/PDF builders |
 | Tests | `test/` | Vitest unit/integration tests |
-| Human specs | `docs/` | Solution spec, calculation spec, index, invariants |
+| Documentation | `docs/` | Solution spec, calculation spec, index, invariants, handoff memo |
 | Source data | `sources/` | Raw input data (e.g. `electricity_prices.csv` — quarter-hourly Finnish spot prices from porssisahko.net) |
 | Data pipeline scripts | `scripts/` | Deterministic transform scripts that produce checked-in artifacts in `src/data/` |
 | Generated data artifacts | `src/data/` | App-consumable data modules generated from `sources/` (e.g. `electricity-defaults-2025-fi.ts`) — do not edit manually |
-| Agent rules | `AGENTS.md` (root) | Non-negotiable rules for humans and automation |
-| Cursor policy | `.cursor/rules.md` | Cursor-specific copy of core policy |
 
 ## Calculation flow (high level)
 
@@ -50,7 +48,7 @@ Hourly inputs are supported on the wire; the engine is **daily-first** (CO₂ ho
 - **Home hero (WP27):** partner marks **Business Finland** and **LAB** load from static URLs **`/business-finland-logo.svg`** and **`/lab-logo.svg`** (place files in **`public/`**); they sit in the hero’s right column without a separate card, with alt text from i18n.
 - **Plant capacity and market CO₂ (WP28):** Advanced setup can optionally constrain daily plant throughput with **electrolyzer max H₂ kg/day** and **methanation max CH₄ kg/day**. Missing or `null` capacity means unbounded. Optional market CO₂ purchase can fill a **finite** plant capacity when side-stream CO₂ is insufficient; it is not used when no finite capacity exists. Results distinguish **total process CO₂ feed** (`free side-stream CO₂ + purchased CO₂`) from **side-stream CO₂ used**, and the **side-stream recycling rate** excludes purchased CO₂.
 
-The visible electricity selector still offers only `constant` and `historical_market_data_imported`; retained internal support for `daily_series` and `hourly_series` still exists in schema, domain, engine, and export paths. Imported market defaults use deterministic repository-local **Finland 2025** datasets (VAT in source; see invariants / release memo). The setup UI initializes methane and hydrogen assumed sales prices to **`1200 EUR/t_CH4`** and **`4 EUR/kg_H2`**.
+The visible electricity selector still offers only `constant` and `historical_market_data_imported`; retained internal support for `daily_series` and `hourly_series` still exists in schema, domain, engine, and export paths. Imported market defaults use deterministic repository-local **Finland 2025** datasets (VAT in source; see invariants and [`docs/customer-handoff-mvp.md`](docs/customer-handoff-mvp.md)). The setup UI initializes methane and hydrogen assumed sales prices to **`1200 EUR/t_CH4`** and **`4 EUR/kg_H2`**.
 
 WP28 is still a daily-first scenario model: it does **not** add dispatch optimization, storage dynamics, a native hourly internal engine, equipment sizing economics, or NPV/IRR/payback. CAPEX remains a separate optional user-provided cost input.
 
@@ -64,6 +62,16 @@ Further detail and regression guardrails: **[`docs/repository-invariants.md`](do
 4. Excel/PDF reporting maps WP28 fields from the canonical result: total process CO₂ feed, side-stream CO₂ used, purchased CO₂, CO₂ purchase cost, bottleneck days, and active plant / market CO₂ inputs where applicable.
 
 Details and regression checklist: **[`docs/repository-invariants.md`](docs/repository-invariants.md)**.
+
+## Data pipeline (bundled electricity defaults)
+
+Bundled **Finland 2025** imported-electricity defaults are generated from **`sources/electricity_prices.csv`** into **`src/data/electricity-defaults-2025-fi.ts`** using:
+
+```bash
+node scripts/generate-electricity-defaults-2025-fi.mjs
+```
+
+Do not edit the generated TypeScript module by hand; regenerate from source when the CSV changes. Provenance and VAT caveats are documented in the script header and **[`docs/customer-handoff-mvp.md`](docs/customer-handoff-mvp.md)**.
 
 ## Run the project
 
@@ -88,22 +96,16 @@ npm test    # Vitest
 npm run lint
 ```
 
-## Where specs and policies live
+## Documentation
 
 | Document | Purpose |
 |----------|---------|
-| **[`docs/index.md`](docs/index.md)** | Documentation hub and navigation |
+| **[`docs/index.md`](docs/index.md)** | Documentation hub |
 | **[`docs/solution-spec-v2.md`](docs/solution-spec-v2.md)** | Product scope, UX intent, MVP decisions |
 | **[`docs/calculation-implementation-spec-v2.md`](docs/calculation-implementation-spec-v2.md)** | Formulas, units, result shape, calculation contracts |
-| **[`docs/repository-invariants.md`](docs/repository-invariants.md)** | Export boundary, “do not regress”, known gaps |
-| **[`AGENTS.md`](AGENTS.md)** | Mandatory rules for implementation (including agents) |
-| **[`.cursor/rules.md`](.cursor/rules.md)** | Same policy, Cursor workspace entry |
-
-## Agent and automation files
-
-- **`AGENTS.md`** (repository root) — primary; keep discoverable for tools and humans.
-- **`.cursor/rules.md`** — Cursor reads this path by convention; do not remove without updating team workflow.
-- **`cursor_agents/`** — optional **internal** prompts and notes (legacy Cursor task splits, audits). **Not required** to run or build the app. See **[`cursor_agents/README.md`](cursor_agents/README.md)**.
+| **[`docs/repository-invariants.md`](docs/repository-invariants.md)** | Export boundary, regression checklist, accepted UI behaviour |
+| **[`docs/customer-handoff-mvp.md`](docs/customer-handoff-mvp.md)** | Handoff: capabilities, limitations, caveats |
+| **[`docs/user-guide-fi.md`](docs/user-guide-fi.md)** | Finnish plain-language user guide |
 
 ## License / meta
 
